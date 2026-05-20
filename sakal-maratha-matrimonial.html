@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Sakal Maratha Matrimonial</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Yeseva+One&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Noto+Sans+Devanagari:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -18,25 +18,237 @@
     --maroon: #7C1D2E;
     --maroon-light: #F5E4E8;
     --cream: #FBF7F2;
-    --warm-dark: #1C1410;
-    --warm-mid: #4A3728;
-    --warm-muted: #8C7060;
-    --border: rgba(196,146,42,0.25);
+    --warm-dark: #2A211C;
+    --warm-mid: #5A4638;
+    --warm-muted: #9A8578;
+    --border: rgba(196,146,42,0.2);
     --radius: 16px;
+    --font-ui: 'Plus Jakarta Sans', system-ui, sans-serif;
+    --font-display: 'Cormorant Garamond', Georgia, serif;
+    --font-mr: 'Noto Sans Devanagari', 'Plus Jakarta Sans', sans-serif;
   }
 
   html { scroll-behavior: smooth; }
 
   body {
-    font-family: 'DM Sans', sans-serif;
+    font-family: var(--font-ui);
+    font-weight: 400;
+    font-size: 15px;
+    line-height: 1.7;
+    letter-spacing: 0.015em;
     background: var(--cream);
     color: var(--warm-dark);
     overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
+  /* ── LOGIN (entry) ── */
+  .login-hero {
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: 1fr 1.05fr;
+  }
+  .login-left {
+    display: flex; flex-direction: column; justify-content: center;
+    padding: 60px 8% 60px 10%;
+    background: var(--cream);
+    position: relative;
+  }
+  .login-left::after {
+    content: "";
+    position: absolute; right: 0; top: 10%; bottom: 10%;
+    width: 1px;
+    background: linear-gradient(180deg, transparent, var(--border), transparent);
+  }
+  .login-brand { display: flex; align-items: center; gap: 12px; margin-bottom: 48px; }
+  .login-brand-icon {
+    width: 44px; height: 44px;
+    background: linear-gradient(135deg, var(--saffron), var(--gold));
+    border-radius: 11px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px;
+  }
+  .login-brand-text {
+    font-family: var(--font-display);
+    font-size: 20px; color: var(--maroon); line-height: 1.1;
+  }
+  .login-brand-text span {
+    display: block;
+    font-family: var(--font-ui);
+    font-size: 11px; font-weight: 400;
+    letter-spacing: 0.08em; color: var(--warm-muted);
+    text-transform: uppercase;
+  }
+  .login-label {
+    font-size: 12px; font-weight: 500;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--saffron); margin-bottom: 10px;
+  }
+  .login-title {
+    font-family: var(--font-display);
+    font-size: clamp(30px, 3vw, 42px);
+    font-weight: 600;
+    line-height: 1.2;
+    letter-spacing: 0.02em;
+    color: var(--warm-dark);
+    margin-bottom: 10px;
+  }
+  .login-subtitle {
+    font-family: var(--font-display);
+    font-size: 17px;
+    font-weight: 500;
+    font-style: italic;
+    color: var(--warm-muted);
+    margin-bottom: 36px;
+    letter-spacing: 0.02em;
+  }
+  .login-form { max-width: 400px; }
+  .login-form .form-group { margin-bottom: 20px; }
+  .login-form .form-label { margin-bottom: 8px; }
+  .login-form .form-input {
+    width: 100%; padding: 14px 18px;
+    border-radius: 12px;
+    border: 1px solid rgba(140,112,96,0.28);
+    background: #fff;
+    font-size: 15px;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .login-form .form-input:focus {
+    border-color: var(--saffron);
+    box-shadow: 0 0 0 3px rgba(212,82,26,0.1);
+  }
+  .login-form .form-input::placeholder { color: rgba(140,112,96,0.55); }
+  .login-options {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 28px; font-size: 13px; color: var(--warm-mid);
+  }
+  .login-remember { display: flex; align-items: center; gap: 8px; cursor: pointer; }
+  .login-remember input { accent-color: var(--maroon); width: 15px; height: 15px; }
+  .login-forgot {
+    color: var(--maroon); text-decoration: none; font-weight: 500;
+    transition: color 0.2s;
+  }
+  .login-forgot:hover { color: var(--saffron); }
+  .btn-login {
+    width: 100%; padding: 15px; border: none; border-radius: 50px;
+    background: linear-gradient(135deg, var(--saffron) 0%, var(--maroon) 100%);
+    color: #fff; font-family: var(--font-ui);
+    font-size: 15px; font-weight: 500; cursor: pointer;
+    box-shadow: 0 6px 24px rgba(124,29,46,0.28);
+    transition: opacity 0.2s, transform 0.15s;
+  }
+  .btn-login:hover { opacity: 0.92; transform: translateY(-2px); }
+  .login-register {
+    margin-top: 28px; font-size: 14px; color: var(--warm-muted); text-align: center;
+  }
+  .login-register a { color: var(--maroon); font-weight: 500; text-decoration: none; }
+  .login-register a:hover { color: var(--saffron); }
+  .login-trust {
+    display: flex; gap: 24px; margin-top: 40px;
+    padding-top: 28px; border-top: 1px solid var(--border);
+  }
+  .trust-item { text-align: left; }
+  .trust-num {
+    font-family: var(--font-display);
+    font-size: 22px; color: var(--maroon);
+    line-height: 1; margin-bottom: 4px;
+  }
+  .trust-label { font-size: 11px; color: var(--warm-muted); letter-spacing: 0.04em; }
+  .login-right {
+    position: relative; min-height: 100vh;
+    overflow: hidden; background: var(--warm-dark);
+  }
+  .login-right img {
+    width: 100%; height: 100%;
+    object-fit: cover; object-position: center 35%;
+    display: block;
+  }
+  .login-right-overlay {
+    position: absolute; inset: 0;
+    background: linear-gradient(105deg, rgba(28,20,16,0.55) 0%, rgba(28,20,16,0.15) 45%, rgba(124,29,46,0.25) 100%);
+  }
+  .login-right-caption {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    padding: 48px 40px;
+    background: linear-gradient(0deg, rgba(28,20,16,0.85) 0%, transparent 100%);
+    color: #fff;
+  }
+  .login-right-caption h2 {
+    font-family: var(--font-display);
+    font-size: clamp(24px, 2.5vw, 32px);
+    font-weight: 600; font-style: italic;
+    margin-bottom: 8px; line-height: 1.25;
+  }
+  .login-right-caption p {
+    font-size: 14px; color: rgba(255,255,255,0.75);
+    max-width: 420px; line-height: 1.6;
+  }
+  .login-right-badge {
+    position: absolute; top: 28px; left: 28px;
+    background: rgba(255,255,255,0.12);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255,255,255,0.2);
+    color: #fff; font-size: 11px; font-weight: 500;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 8px 16px; border-radius: 50px;
+  }
+  .btn-outline {
+    background: transparent; color: var(--maroon);
+    padding: 11px 24px; border-radius: 50px;
+    font-size: 13px; font-weight: 500; text-decoration: none;
+    border: 1.5px solid var(--maroon);
+    font-family: var(--font-ui);
+    transition: background 0.2s, transform 0.15s;
+    white-space: nowrap; cursor: pointer;
+  }
+  .btn-outline:hover { background: var(--maroon-light); transform: translateY(-1px); }
+  .trust-strip {
+    padding: 72px 8% 56px;
+    background: var(--cream);
+    text-align: center;
+  }
+  .trust-strip-title {
+    font-family: var(--font-display);
+    font-size: clamp(26px, 2.8vw, 36px);
+    color: var(--warm-dark); margin-bottom: 12px;
+  }
+  .trust-strip-desc {
+    font-size: 15px; color: var(--warm-muted);
+    max-width: 520px; margin: 0 auto 40px; line-height: 1.7;
+  }
+  .trust-pills { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
+  .trust-pill {
+    font-size: 13px; font-weight: 500; letter-spacing: 0.06em;
+    padding: 10px 20px; border-radius: 50px;
+    border: 1px solid var(--border);
+    background: #fff; color: var(--warm-mid);
+  }
+  .login-scroll-hint {
+    text-align: center; padding: 20px 8% 32px;
+    background: linear-gradient(180deg, var(--cream) 0%, #F5EEE6 100%);
+  }
+  .login-scroll-hint a {
+    font-family: var(--font-display);
+    font-size: 16px; font-style: italic;
+    color: var(--maroon); text-decoration: none;
+    border-bottom: 1px solid rgba(124,29,46,0.3);
+  }
+  .login-scroll-hint a:hover { color: var(--saffron); }
+
+  /* ── LOGIN vs MAIN (two screens, one file) ── */
+  #login-screen { display: block; }
+  #site-main,
+  body:not(.on-main-site) footer.site-footer { display: none; }
+  body.on-main-site #login-screen { display: none; }
+  body.on-main-site #site-main,
+  body.on-main-site footer.site-footer { display: block; }
+
   /* ── NAV ── */
+  nav.site-nav,
   nav {
-    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    position: fixed; top: 0; left: 0; right: 0; z-index: 5000;
     display: flex; align-items: center; justify-content: space-between;
     padding: 0 5%;
     height: 72px;
@@ -55,17 +267,19 @@
     font-size: 20px;
   }
   .nav-logo-text {
-    font-family: 'Yeseva One', serif;
-    font-size: 18px;
+    font-family: var(--font-display);
+    font-size: 19px;
+    font-weight: 600;
     color: var(--maroon);
-    line-height: 1.1;
+    line-height: 1.15;
+    letter-spacing: 0.02em;
   }
   .nav-logo-text span {
     display: block;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 11px;
-    font-weight: 400;
-    letter-spacing: 0.08em;
+    font-family: var(--font-ui);
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
     color: var(--warm-muted);
     text-transform: uppercase;
   }
@@ -73,14 +287,33 @@
     display: flex; align-items: center; gap: 32px;
     list-style: none;
   }
-  .nav-links a {
+  .nav-links a,
+  .nav-settings-btn {
     text-decoration: none;
+    font-family: var(--font-ui);
     font-size: 14px;
-    font-weight: 400;
+    font-weight: 500;
+    letter-spacing: 0.02em;
     color: var(--warm-mid);
     transition: color 0.2s;
   }
-  .nav-links a:hover { color: var(--saffron); }
+  .nav-links a:hover,
+  .nav-settings-btn:hover { color: var(--saffron); }
+  .nav-settings-item { position: relative; list-style: none; z-index: 5002; }
+  .nav-settings-wrap { position: relative; z-index: 5002; }
+  .nav-settings-btn {
+    display: inline-block;
+    font: inherit;
+    color: inherit;
+    background: none;
+    border: none;
+    -webkit-appearance: none;
+    appearance: none;
+    padding: 0;
+    cursor: pointer;
+    line-height: normal;
+    vertical-align: baseline;
+  }
   .nav-cta {
     background: var(--maroon);
     color: #fff !important;
@@ -120,28 +353,34 @@
   }
   .hero-badge::before { content: "✦"; font-size: 10px; }
   .hero-title {
-    font-family: 'Yeseva One', serif;
-    font-size: clamp(40px, 4.5vw, 62px);
-    line-height: 1.1;
+    font-family: var(--font-display);
+    font-size: clamp(38px, 4.2vw, 58px);
+    font-weight: 600;
+    line-height: 1.12;
+    letter-spacing: 0.01em;
     color: var(--warm-dark);
-    margin-bottom: 12px;
+    margin-bottom: 14px;
   }
   .hero-title em {
     font-style: italic;
+    font-weight: 500;
     color: var(--saffron);
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 1.1em;
+    font-family: var(--font-display);
+    font-size: 1.05em;
   }
   .hero-subtitle {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 22px;
+    font-family: var(--font-display);
+    font-size: 21px;
+    font-weight: 500;
     font-style: italic;
     color: var(--warm-muted);
-    margin-bottom: 20px;
+    margin-bottom: 22px;
+    letter-spacing: 0.02em;
   }
   .hero-desc {
     font-size: 15px;
-    line-height: 1.7;
+    font-weight: 400;
+    line-height: 1.75;
     color: var(--warm-mid);
     max-width: 460px;
     margin-bottom: 40px;
@@ -155,8 +394,9 @@
     color: #fff;
     padding: 15px 32px;
     border-radius: 50px;
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 500;
+    letter-spacing: 0.04em;
     text-decoration: none;
     border: none; cursor: pointer;
     transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
@@ -182,7 +422,7 @@
     border-top: 1px solid var(--border);
   }
   .stat-num {
-    font-family: 'Yeseva One', serif;
+    font-family: var(--font-display);
     font-size: 28px;
     color: var(--maroon);
     line-height: 1;
@@ -228,7 +468,7 @@
     margin-bottom: 24px;
   }
   .search-card-title {
-    font-family: 'Yeseva One', serif;
+    font-family: var(--font-display);
     font-size: 20px;
     color: var(--warm-dark);
     margin-bottom: 4px;
@@ -250,7 +490,7 @@
     border-radius: 9px;
     border: none;
     background: transparent;
-    font-family: 'DM Sans', sans-serif;
+    font-family: var(--font-ui);
     font-size: 14px;
     font-weight: 500;
     cursor: pointer;
@@ -278,7 +518,7 @@
     border-radius: 10px;
     border: 1px solid rgba(140,112,96,0.25);
     background: var(--cream);
-    font-family: 'DM Sans', sans-serif;
+    font-family: var(--font-ui);
     font-size: 14px;
     color: var(--warm-dark);
     outline: none;
@@ -294,7 +534,7 @@
     padding: 14px;
     border-radius: 12px;
     border: none;
-    font-family: 'DM Sans', sans-serif;
+    font-family: var(--font-ui);
     font-size: 15px;
     font-weight: 500;
     cursor: pointer;
@@ -332,25 +572,28 @@
   /* ── HOW IT WORKS ── */
   .section { padding: 100px 8%; }
   .section-label {
-    font-size: 12px;
-    font-weight: 500;
-    letter-spacing: 0.12em;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
     text-transform: uppercase;
     color: var(--saffron);
     margin-bottom: 12px;
   }
   .section-title {
-    font-family: 'Yeseva One', serif;
-    font-size: clamp(30px, 3vw, 44px);
-    line-height: 1.15;
+    font-family: var(--font-display);
+    font-size: clamp(28px, 2.8vw, 42px);
+    font-weight: 600;
+    line-height: 1.2;
+    letter-spacing: 0.02em;
     color: var(--warm-dark);
     max-width: 540px;
     margin-bottom: 16px;
   }
   .section-desc {
     font-size: 15px;
+    font-weight: 400;
     color: var(--warm-muted);
-    line-height: 1.7;
+    line-height: 1.75;
     max-width: 480px;
     margin-bottom: 56px;
   }
@@ -382,7 +625,7 @@
     width: 48px; height: 48px;
     border-radius: 14px;
     display: flex; align-items: center; justify-content: center;
-    font-family: 'Yeseva One', serif;
+    font-family: var(--font-display);
     font-size: 20px;
     margin-bottom: 20px;
   }
@@ -391,15 +634,17 @@
   .step-num-3 { background: var(--maroon-light); color: var(--maroon); }
   .step-num-4 { background: #E8F0FE; color: #1A56A0; }
   .step-title {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 20px;
+    font-family: var(--font-display);
+    font-size: 19px;
     font-weight: 600;
+    letter-spacing: 0.02em;
     color: var(--warm-dark);
     margin-bottom: 8px;
   }
   .step-desc {
-    font-size: 13px;
-    line-height: 1.65;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.7;
     color: var(--warm-muted);
   }
 
@@ -458,9 +703,10 @@
   }
   .profile-info { padding: 20px; }
   .profile-name {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 20px;
+    font-family: var(--font-display);
+    font-size: 19px;
     font-weight: 600;
+    letter-spacing: 0.02em;
     color: var(--warm-dark);
     margin-bottom: 4px;
   }
@@ -486,7 +732,7 @@
     border: 1.5px solid var(--saffron);
     background: transparent;
     color: var(--saffron);
-    font-family: 'DM Sans', sans-serif;
+    font-family: var(--font-ui);
     font-size: 14px;
     font-weight: 500;
     cursor: pointer;
@@ -531,7 +777,7 @@
     display: block;
   }
   .why-title {
-    font-family: 'Cormorant Garamond', serif;
+    font-family: var(--font-display);
     font-size: 22px;
     font-weight: 600;
     color: #fff;
@@ -560,7 +806,7 @@
   }
   .testi-quote {
     font-size: 48px;
-    font-family: 'Cormorant Garamond', serif;
+    font-family: var(--font-display);
     color: var(--saffron-light);
     line-height: 1;
     margin-bottom: 12px;
@@ -571,7 +817,7 @@
     line-height: 1.75;
     color: var(--warm-mid);
     margin-bottom: 20px;
-    font-family: 'Cormorant Garamond', serif;
+    font-family: var(--font-display);
     font-size: 17px;
     font-style: italic;
   }
@@ -586,7 +832,7 @@
     display: flex; align-items: center; justify-content: center;
     font-size: 16px;
     font-weight: 600;
-    font-family: 'Yeseva One', serif;
+    font-family: var(--font-display);
   }
   .testi-name {
     font-size: 14px;
@@ -611,7 +857,7 @@
   .cta-section::before {
     content: "शुभ विवाह";
     position: absolute;
-    font-family: 'Yeseva One', serif;
+    font-family: var(--font-display);
     font-size: 160px;
     color: rgba(212,82,26,0.05);
     top: 50%; left: 50%;
@@ -620,7 +866,7 @@
     pointer-events: none;
   }
   .cta-title {
-    font-family: 'Yeseva One', serif;
+    font-family: var(--font-display);
     font-size: clamp(30px, 3.5vw, 48px);
     color: var(--warm-dark);
     margin-bottom: 14px;
@@ -705,55 +951,364 @@
   .hero-actions { animation: fadeUp 0.5s ease 0.4s both; }
   .hero-stats { animation: fadeUp 0.5s ease 0.45s both; }
   .search-card { animation: fadeUp 0.6s ease 0.35s both; }
+
+  /* ── SETTINGS & LANGUAGE ── */
+  .login-top-bar {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding: 20px 5% 0;
+    background: var(--cream);
+  }
+  .login-top-bar { position: relative; z-index: 5001; }
+  .login-top-bar .nav-settings-wrap { position: relative; z-index: 5002; }
+  .settings-panel {
+    position: absolute;
+    top: calc(100% + 14px);
+    right: 0;
+    z-index: 9999;
+    width: 300px;
+    min-width: 300px;
+    background: #fff;
+    border-radius: 16px;
+    border: 1px solid var(--border);
+    box-shadow: 0 16px 48px rgba(76,44,28,0.15);
+    padding: 20px;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transform: translateY(-8px);
+    transition: opacity 0.2s, transform 0.2s, visibility 0.2s;
+  }
+  .settings-panel.open {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: translateY(0);
+  }
+  .settings-panel-title {
+    font-family: var(--font-display);
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--maroon);
+    margin-bottom: 4px;
+    letter-spacing: 0.02em;
+  }
+  .settings-panel-sub {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--warm-muted);
+    margin-bottom: 18px;
+  }
+  .settings-lang-block {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .settings-row-label {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--warm-dark);
+  }
+  .lang-switch {
+    display: flex;
+    width: 100%;
+    border: 1px solid rgba(140,112,96,0.25);
+    border-radius: 10px;
+    overflow: hidden;
+    background: var(--cream);
+  }
+  .lang-switch .lang-choice {
+    flex: 1;
+    min-width: 50%;
+    display: block;
+    border: none;
+    background: transparent;
+    color: var(--warm-mid);
+    padding: 11px 12px;
+    font-family: var(--font-ui);
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.03em;
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: background 0.2s, color 0.2s;
+  }
+  .lang-switch .lang-choice + .lang-choice {
+    border-left: 1px solid rgba(140,112,96,0.25);
+  }
+  .lang-switch .lang-choice.active {
+    background: var(--maroon);
+    color: #fff;
+  }
+  .lang-switch .lang-choice:hover:not(.active) {
+    background: rgba(124,29,46,0.06);
+  }
+  .lang-status {
+    margin: 0;
+    font-size: 12px;
+    color: var(--warm-muted);
+    text-align: right;
+  }
+
+  body.lang-mr {
+    font-family: var(--font-mr);
+    letter-spacing: 0.02em;
+  }
+  body.lang-mr .nav-logo-text,
+  body.lang-mr .hero-title,
+  body.lang-mr .section-title,
+  body.lang-mr .search-card-title,
+  body.lang-mr .cta-title,
+  body.lang-mr .login-title,
+  body.lang-mr .settings-panel-title,
+  body.lang-mr .trust-strip-title {
+    font-family: var(--font-mr);
+    font-weight: 500;
+  }
+  body.lang-mr .hero-title em,
+  body.lang-mr .step-title,
+  body.lang-mr .why-title,
+  body.lang-mr .profile-name,
+  body.lang-mr .testi-text,
+  body.lang-mr .hero-subtitle,
+  body.lang-mr .login-subtitle {
+    font-family: var(--font-mr);
+    font-weight: 400;
+  }
+
+  @media (max-width: 960px) {
+    .login-hero { grid-template-columns: 1fr; }
+    .login-right { min-height: 42vh; order: -1; }
+    .login-left { padding: 48px 6%; }
+    .login-left::after { display: none; }
+  }
 </style>
 </head>
 <body>
 
+<!-- LOGIN SCREEN (only this until signed in) -->
+<div id="login-screen">
+
+<div class="login-top-bar">
+  <div class="nav-settings-wrap">
+    <button type="button" class="nav-settings-btn settings-toggle" aria-label="Settings">
+      <span data-i18n="settings.btnLabel">Settings</span>
+    </button>
+    <div class="settings-panel" id="settingsPanelLogin">
+      <div class="settings-panel-title" data-i18n="settings.title">Settings</div>
+      <div class="settings-panel-sub" data-i18n="settings.subtitle">Preferences</div>
+      <div class="settings-lang-block">
+        <span class="settings-row-label" data-i18n="settings.language">Language</span>
+        <div class="lang-switch" role="group" aria-label="Language">
+          <a href="#" class="lang-choice" data-set-lang="en" role="button">English</a>
+          <a href="#" class="lang-choice" data-set-lang="mr" role="button">मराठी</a>
+        </div>
+        <p class="lang-status">Current: <strong data-lang-status>English</strong></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<section class="login-hero" id="login">
+  <div class="login-left">
+    <div class="login-brand">
+      <div class="login-brand-icon">🪷</div>
+      <div class="login-brand-text">
+        Sakal Maratha
+        <span data-i18n="nav.subtitle">Matrimonial</span>
+      </div>
+    </div>
+    <p class="login-label" data-i18n="login.label">Member Login</p>
+    <h1 class="login-title" data-i18n="login.title">Welcome Back</h1>
+    <p class="login-subtitle" data-i18n="login.subtitle">Sign in to continue your journey</p>
+    <form class="login-form" id="loginForm">
+      <div class="form-group">
+        <label class="form-label" for="loginEmail" data-i18n="login.emailLabel">Email or Mobile</label>
+        <input class="form-input" type="text" id="loginEmail" data-i18n-placeholder="login.emailPlaceholder" placeholder="you@email.com or +91...">
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="loginPassword" data-i18n="login.passwordLabel">Password</label>
+        <input class="form-input" type="password" id="loginPassword" data-i18n-placeholder="login.passwordPlaceholder" placeholder="Enter your password">
+      </div>
+      <div class="login-options">
+        <label class="login-remember">
+          <input type="checkbox" name="remember">
+          <span data-i18n="login.remember">Remember me</span>
+        </label>
+        <a href="#" class="login-forgot" data-i18n="login.forgot">Forgot password?</a>
+      </div>
+      <button type="submit" class="btn-login" data-i18n="login.submit">Sign In</button>
+    </form>
+    <p class="login-register">
+      <span data-i18n="login.noAccount">Don't have an account?</span>
+      <a href="#" class="enter-main" data-i18n="login.register">Register Free</a>
+    </p>
+    <div class="login-trust">
+      <div class="trust-item">
+        <div class="trust-num">50K+</div>
+        <div class="trust-label" data-i18n="hero.statProfiles">Verified Profiles</div>
+      </div>
+      <div class="trust-item">
+        <div class="trust-num">12K+</div>
+        <div class="trust-label" data-i18n="hero.statMatches">Successful Matches</div>
+      </div>
+    </div>
+  </div>
+  <div class="login-right">
+    <img src="assets/bhaiya-wedding.jpeg" alt="Traditional Maratha wedding ceremony">
+    <div class="login-right-overlay"></div>
+    <span class="login-right-badge" data-i18n="login.imageBadge">Trusted Community</span>
+    <div class="login-right-caption">
+      <h2 data-i18n="login.imageTitle">Where traditions meet lifelong unions</h2>
+      <p data-i18n="login.imageDesc">Join thousands of Maratha families who found their perfect match through Sakal Maratha Matrimonial.</p>
+    </div>
+  </div>
+</section>
+
+<section class="profiles-section" id="login-profiles">
+  <div class="profiles-header">
+    <div>
+      <div class="section-label" data-i18n="profiles.label">Featured Profiles</div>
+      <h2 class="section-title" style="margin-bottom:0;" data-i18n="profiles.title">Recently Joined Members</h2>
+    </div>
+    <a href="#" class="btn-outline enter-main" data-i18n="profiles.viewAll">View All Profiles →</a>
+  </div>
+  <div class="profiles-grid">
+    <article class="profile-card">
+      <div class="profile-img-wrap">
+        <div class="profile-img-bg profile-img-bg-1">👤</div>
+        <div class="profile-badge" data-i18n="profiles.online">Online</div>
+      </div>
+      <div class="profile-info">
+        <div class="profile-name">Priya Jadhav</div>
+        <div class="profile-sub" data-i18n="profiles.p1sub">26 years • Pune • Software Engineer</div>
+        <div class="profile-tags">
+          <span class="tag">MSc IT</span><span class="tag">5'4"</span>
+          <span class="tag" data-i18n="profiles.p1kul">Jadhav Kul</span>
+        </div>
+        <button type="button" class="profile-action enter-main" data-i18n="profiles.view">View Profile</button>
+      </div>
+    </article>
+    <article class="profile-card">
+      <div class="profile-img-wrap">
+        <div class="profile-img-bg profile-img-bg-2">👤</div>
+        <div class="profile-badge" data-i18n="profiles.online">Online</div>
+      </div>
+      <div class="profile-info">
+        <div class="profile-name">Sneha Patil</div>
+        <div class="profile-sub" data-i18n="profiles.p2sub">24 years • Nashik • Doctor (MBBS)</div>
+        <div class="profile-tags">
+          <span class="tag">MBBS</span><span class="tag">5'2"</span>
+          <span class="tag" data-i18n="profiles.p2kul">Patil Kul</span>
+        </div>
+        <button type="button" class="profile-action enter-main" data-i18n="profiles.view">View Profile</button>
+      </div>
+    </article>
+    <article class="profile-card">
+      <div class="profile-img-wrap">
+        <div class="profile-img-bg profile-img-bg-3">👤</div>
+        <div class="profile-badge" data-i18n="profiles.online">Online</div>
+      </div>
+      <div class="profile-info">
+        <div class="profile-name">Anita Shinde</div>
+        <div class="profile-sub" data-i18n="profiles.p3sub">27 years • Mumbai • CA</div>
+        <div class="profile-tags">
+          <span class="tag">CA</span><span class="tag">5'3"</span>
+          <span class="tag" data-i18n="profiles.p3kul">Shinde Kul</span>
+        </div>
+        <button type="button" class="profile-action enter-main" data-i18n="profiles.view">View Profile</button>
+      </div>
+    </article>
+  </div>
+</section>
+
+<section class="trust-strip">
+  <h2 class="trust-strip-title" data-i18n="trust.title">Built for the Maratha Community</h2>
+  <p class="trust-strip-desc" data-i18n="trust.desc">Every profile is verified. Your privacy is protected. Families across Maharashtra trust us for meaningful matches.</p>
+  <div class="trust-pills">
+    <span class="trust-pill" data-i18n="marquee.1">100% Maratha Profiles</span>
+    <span class="trust-pill" data-i18n="marquee.2">Verified Members</span>
+    <span class="trust-pill" data-i18n="marquee.3">Privacy Protected</span>
+    <span class="trust-pill" data-i18n="marquee.7">Free Registration</span>
+  </div>
+</section>
+
+<div class="divider">— ✦ —</div>
+
+</div><!-- /#login-screen -->
+
+<!-- MAIN SITE (original content — after login) -->
+<div id="site-main">
+
 <!-- NAV -->
-<nav>
+<nav class="site-nav">
   <div class="nav-logo">
     <div class="nav-logo-icon">🪷</div>
     <div class="nav-logo-text">
       Sakal Maratha
-      <span>Matrimonial</span>
+      <span data-i18n="nav.subtitle">Matrimonial</span>
     </div>
   </div>
   <ul class="nav-links">
-    <li><a href="#">Find Match</a></li>
-    <li><a href="#">Success Stories</a></li>
-    <li><a href="#">About Us</a></li>
-    <li><a href="#">Contact</a></li>
-    <li><a href="#" class="nav-cta">Free Register</a></li>
+    <li class="nav-settings-item">
+      <div class="nav-settings-wrap">
+        <button type="button" class="nav-settings-btn settings-toggle" id="settingsBtn" aria-label="Settings">
+          <span data-i18n="settings.btnLabel">Settings</span>
+        </button>
+        <div class="settings-panel" id="settingsPanel">
+          <div class="settings-panel-title" data-i18n="settings.title">Settings</div>
+          <div class="settings-panel-sub" data-i18n="settings.subtitle">Preferences</div>
+          <div class="settings-lang-block">
+            <span class="settings-row-label" data-i18n="settings.language">Language</span>
+            <div class="lang-switch" role="group" aria-label="Language">
+              <a href="#" class="lang-choice" data-set-lang="en" role="button">English</a>
+              <a href="#" class="lang-choice" data-set-lang="mr" role="button">मराठी</a>
+            </div>
+            <p class="lang-status">Current: <strong data-lang-status>English</strong></p>
+          </div>
+        </div>
+      </div>
+    </li>
+    <li><a href="#" data-i18n="nav.findMatch">Find Match</a></li>
+    <li><a href="#" data-i18n="nav.successStories">Success Stories</a></li>
+    <li><a href="#" data-i18n="nav.aboutUs">About Us</a></li>
+    <li><a href="#" data-i18n="nav.contact">Contact</a></li>
+    <li><a href="#" class="nav-cta" data-i18n="nav.freeRegister">Free Register</a></li>
   </ul>
 </nav>
 
 <!-- HERO -->
 <section class="hero">
   <div class="hero-left">
-    <div class="hero-badge">Exclusively for Maratha Community</div>
-    <h1 class="hero-title">
+    <div class="hero-badge" data-i18n="hero.badge">Exclusively for Maratha Community</div>
+    <h1 class="hero-title" data-i18n-html="hero.title">
       Find Your<br><em>Soulmate</em><br>Within the<br>Maratha Kul
     </h1>
-    <p class="hero-subtitle">जोडीदार शोधा, आयुष्य सजवा</p>
-    <p class="hero-desc">
+    <p class="hero-subtitle" data-i18n="hero.subtitle">जोडीदार शोधा, आयुष्य सजवा</p>
+    <p class="hero-desc" data-i18n="hero.desc">
       Sakal Maratha Matrimonial is a trusted platform dedicated to uniting Maratha families across Maharashtra and beyond. Thousands of verified profiles, helping you find the right match with shared values and culture.
     </p>
     <div class="hero-actions">
-      <a href="#" class="btn-primary">Register Free Today</a>
-      <a href="#" class="btn-secondary">Browse Profiles</a>
+      <a href="#" class="btn-primary" data-i18n="hero.register">Register Free Today</a>
+      <a href="#" class="btn-secondary" data-i18n="hero.browse">Browse Profiles</a>
     </div>
     <div class="hero-stats">
       <div>
         <div class="stat-num">50K+</div>
-        <div class="stat-label">Verified Profiles</div>
+        <div class="stat-label" data-i18n="hero.statProfiles">Verified Profiles</div>
       </div>
       <div>
         <div class="stat-num">12K+</div>
-        <div class="stat-label">Successful Matches</div>
+        <div class="stat-label" data-i18n="hero.statMatches">Successful Matches</div>
       </div>
       <div>
         <div class="stat-num">100%</div>
-        <div class="stat-label">Maratha Community</div>
+        <div class="stat-label" data-i18n="hero.statCommunity">Maratha Community</div>
       </div>
     </div>
   </div>
@@ -762,65 +1317,65 @@
     <div class="hero-pattern"></div>
     <div class="search-card">
       <div class="search-card-header">
-        <div class="search-card-title">Find Your Match</div>
-        <div class="search-card-sub">Search from thousands of Maratha profiles</div>
+        <div class="search-card-title" data-i18n="search.title">Find Your Match</div>
+        <div class="search-card-sub" data-i18n="search.sub">Search from thousands of Maratha profiles</div>
       </div>
 
       <div class="gender-toggle">
-        <button class="gender-btn active" onclick="this.parentElement.querySelectorAll('.gender-btn').forEach(b=>b.classList.remove('active')); this.classList.add('active')">Bride</button>
-        <button class="gender-btn" onclick="this.parentElement.querySelectorAll('.gender-btn').forEach(b=>b.classList.remove('active')); this.classList.add('active')">Groom</button>
+        <button class="gender-btn active" data-i18n="search.bride" onclick="this.parentElement.querySelectorAll('.gender-btn').forEach(b=>b.classList.remove('active')); this.classList.add('active')">Bride</button>
+        <button class="gender-btn" data-i18n="search.groom" onclick="this.parentElement.querySelectorAll('.gender-btn').forEach(b=>b.classList.remove('active')); this.classList.add('active')">Groom</button>
       </div>
 
       <div class="form-row">
         <div class="form-group">
-          <label class="form-label">Age From</label>
-          <select class="form-select">
-            <option>21 Years</option>
-            <option>22 Years</option>
-            <option>23 Years</option>
-            <option>24 Years</option>
-            <option>25 Years</option>
+          <label class="form-label" data-i18n="search.ageFrom">Age From</label>
+          <select class="form-select" id="ageFromSelect">
+            <option value="21" data-i18n-years="21">21 Years</option>
+            <option value="22" data-i18n-years="22">22 Years</option>
+            <option value="23" data-i18n-years="23">23 Years</option>
+            <option value="24" data-i18n-years="24">24 Years</option>
+            <option value="25" data-i18n-years="25">25 Years</option>
           </select>
         </div>
         <div class="form-group">
-          <label class="form-label">Age To</label>
-          <select class="form-select">
-            <option>28 Years</option>
-            <option>30 Years</option>
-            <option>32 Years</option>
-            <option>35 Years</option>
+          <label class="form-label" data-i18n="search.ageTo">Age To</label>
+          <select class="form-select" id="ageToSelect">
+            <option value="28" data-i18n-years="28">28 Years</option>
+            <option value="30" data-i18n-years="30">30 Years</option>
+            <option value="32" data-i18n-years="32">32 Years</option>
+            <option value="35" data-i18n-years="35">35 Years</option>
           </select>
         </div>
       </div>
 
       <div class="form-group">
-        <label class="form-label">District</label>
-        <select class="form-select">
-          <option>All Maharashtra</option>
-          <option>Pune</option>
-          <option>Mumbai</option>
-          <option>Nashik</option>
-          <option>Kolhapur</option>
-          <option>Satara</option>
-          <option>Sangli</option>
-          <option>Aurangabad</option>
-          <option>Nagpur</option>
+        <label class="form-label" data-i18n="search.district">District</label>
+        <select class="form-select" id="districtSelect">
+          <option value="all" data-i18n="district.all">All Maharashtra</option>
+          <option value="pune" data-i18n="district.pune">Pune</option>
+          <option value="mumbai" data-i18n="district.mumbai">Mumbai</option>
+          <option value="nashik" data-i18n="district.nashik">Nashik</option>
+          <option value="kolhapur" data-i18n="district.kolhapur">Kolhapur</option>
+          <option value="satara" data-i18n="district.satara">Satara</option>
+          <option value="sangli" data-i18n="district.sangli">Sangli</option>
+          <option value="aurangabad" data-i18n="district.aurangabad">Aurangabad</option>
+          <option value="nagpur" data-i18n="district.nagpur">Nagpur</option>
         </select>
       </div>
 
       <div class="form-group">
-        <label class="form-label">Education</label>
-        <select class="form-select">
-          <option>Any Education</option>
-          <option>Graduate</option>
-          <option>Post Graduate</option>
-          <option>Engineering</option>
-          <option>Medical</option>
-          <option>MBA</option>
+        <label class="form-label" data-i18n="search.education">Education</label>
+        <select class="form-select" id="educationSelect">
+          <option value="any" data-i18n="edu.any">Any Education</option>
+          <option value="grad" data-i18n="edu.grad">Graduate</option>
+          <option value="pg" data-i18n="edu.pg">Post Graduate</option>
+          <option value="eng" data-i18n="edu.eng">Engineering</option>
+          <option value="med" data-i18n="edu.med">Medical</option>
+          <option value="mba" data-i18n="edu.mba">MBA</option>
         </select>
       </div>
 
-      <button class="search-submit">🔍 Search Profiles</button>
+      <button class="search-submit" data-i18n="search.submit">🔍 Search Profiles</button>
     </div>
   </div>
 </section>
@@ -828,49 +1383,49 @@
 <!-- MARQUEE -->
 <div class="marquee-strip">
   <div class="marquee-inner">
-    <span class="marquee-item">100% Maratha Profiles</span><span class="marquee-dot">✦</span>
-    <span class="marquee-item">Verified Members</span><span class="marquee-dot">✦</span>
-    <span class="marquee-item">Privacy Protected</span><span class="marquee-dot">✦</span>
-    <span class="marquee-item">Trusted by 50,000+ Families</span><span class="marquee-dot">✦</span>
-    <span class="marquee-item">Across Maharashtra & Beyond</span><span class="marquee-dot">✦</span>
-    <span class="marquee-item">12,000+ Successful Matches</span><span class="marquee-dot">✦</span>
-    <span class="marquee-item">Free Registration</span><span class="marquee-dot">✦</span>
-    <span class="marquee-item">100% Maratha Profiles</span><span class="marquee-dot">✦</span>
-    <span class="marquee-item">Verified Members</span><span class="marquee-dot">✦</span>
-    <span class="marquee-item">Privacy Protected</span><span class="marquee-dot">✦</span>
-    <span class="marquee-item">Trusted by 50,000+ Families</span><span class="marquee-dot">✦</span>
-    <span class="marquee-item">Across Maharashtra & Beyond</span><span class="marquee-dot">✦</span>
-    <span class="marquee-item">12,000+ Successful Matches</span><span class="marquee-dot">✦</span>
-    <span class="marquee-item">Free Registration</span><span class="marquee-dot">✦</span>
+    <span class="marquee-item" data-i18n="marquee.1">100% Maratha Profiles</span><span class="marquee-dot">✦</span>
+    <span class="marquee-item" data-i18n="marquee.2">Verified Members</span><span class="marquee-dot">✦</span>
+    <span class="marquee-item" data-i18n="marquee.3">Privacy Protected</span><span class="marquee-dot">✦</span>
+    <span class="marquee-item" data-i18n="marquee.4">Trusted by 50,000+ Families</span><span class="marquee-dot">✦</span>
+    <span class="marquee-item" data-i18n="marquee.5">Across Maharashtra & Beyond</span><span class="marquee-dot">✦</span>
+    <span class="marquee-item" data-i18n="marquee.6">12,000+ Successful Matches</span><span class="marquee-dot">✦</span>
+    <span class="marquee-item" data-i18n="marquee.7">Free Registration</span><span class="marquee-dot">✦</span>
+    <span class="marquee-item" data-i18n="marquee.1">100% Maratha Profiles</span><span class="marquee-dot">✦</span>
+    <span class="marquee-item" data-i18n="marquee.2">Verified Members</span><span class="marquee-dot">✦</span>
+    <span class="marquee-item" data-i18n="marquee.3">Privacy Protected</span><span class="marquee-dot">✦</span>
+    <span class="marquee-item" data-i18n="marquee.4">Trusted by 50,000+ Families</span><span class="marquee-dot">✦</span>
+    <span class="marquee-item" data-i18n="marquee.5">Across Maharashtra & Beyond</span><span class="marquee-dot">✦</span>
+    <span class="marquee-item" data-i18n="marquee.6">12,000+ Successful Matches</span><span class="marquee-dot">✦</span>
+    <span class="marquee-item" data-i18n="marquee.7">Free Registration</span><span class="marquee-dot">✦</span>
   </div>
 </div>
 
 <!-- HOW IT WORKS -->
 <section class="section">
-  <div class="section-label">Simple Process</div>
-  <h2 class="section-title">How Sakal Maratha Works</h2>
-  <p class="section-desc">Finding your life partner has never been this simple. Four easy steps to start your journey.</p>
+  <div class="section-label" data-i18n="steps.label">Simple Process</div>
+  <h2 class="section-title" data-i18n="steps.title">How Sakal Maratha Works</h2>
+  <p class="section-desc" data-i18n="steps.desc">Finding your life partner has never been this simple. Four easy steps to start your journey.</p>
 
   <div class="steps-grid">
     <div class="step-card">
       <div class="step-num step-num-1">01</div>
-      <div class="step-title">Register Free</div>
-      <p class="step-desc">Create your free profile with basic details, photos, and family information. Takes less than 5 minutes.</p>
+      <div class="step-title" data-i18n="steps.s1title">Register Free</div>
+      <p class="step-desc" data-i18n="steps.s1desc">Create your free profile with basic details, photos, and family information. Takes less than 5 minutes.</p>
     </div>
     <div class="step-card">
       <div class="step-num step-num-2">02</div>
-      <div class="step-title">Get Verified</div>
-      <p class="step-desc">We verify your identity and community credentials, ensuring a safe and authentic community.</p>
+      <div class="step-title" data-i18n="steps.s2title">Get Verified</div>
+      <p class="step-desc" data-i18n="steps.s2desc">We verify your identity and community credentials, ensuring a safe and authentic community.</p>
     </div>
     <div class="step-card">
       <div class="step-num step-num-3">03</div>
-      <div class="step-title">Browse Matches</div>
-      <p class="step-desc">Explore thousands of compatible Maratha profiles using smart filters for location, education, and more.</p>
+      <div class="step-title" data-i18n="steps.s3title">Browse Matches</div>
+      <p class="step-desc" data-i18n="steps.s3desc">Explore thousands of compatible Maratha profiles using smart filters for location, education, and more.</p>
     </div>
     <div class="step-card">
       <div class="step-num step-num-4">04</div>
-      <div class="step-title">Connect & Meet</div>
-      <p class="step-desc">Express interest, exchange contact details, and take the relationship forward with your family.</p>
+      <div class="step-title" data-i18n="steps.s4title">Connect & Meet</div>
+      <p class="step-desc" data-i18n="steps.s4desc">Express interest, exchange contact details, and take the relationship forward with your family.</p>
     </div>
   </div>
 </section>
@@ -881,10 +1436,10 @@
 <section class="profiles-section">
   <div class="profiles-header">
     <div>
-      <div class="section-label">Featured Profiles</div>
-      <h2 class="section-title" style="margin-bottom:0;">Recently Joined Members</h2>
+      <div class="section-label" data-i18n="profiles.label">Featured Profiles</div>
+      <h2 class="section-title" style="margin-bottom:0;" data-i18n="profiles.title">Recently Joined Members</h2>
     </div>
-    <a href="#" class="btn-secondary" style="font-size:13px; padding: 11px 24px;">View All Profiles →</a>
+    <a href="#" class="btn-secondary" style="font-size:13px; padding: 11px 24px;" data-i18n="profiles.viewAll">View All Profiles →</a>
   </div>
 
   <div class="profiles-grid">
@@ -892,17 +1447,17 @@
     <div class="profile-card">
       <div class="profile-img-wrap">
         <div class="profile-img-bg profile-img-bg-1">👤</div>
-        <div class="profile-badge">Online</div>
+        <div class="profile-badge" data-i18n="profiles.online">Online</div>
       </div>
       <div class="profile-info">
         <div class="profile-name">Priya Jadhav</div>
-        <div class="profile-sub">26 years • Pune • Software Engineer</div>
+        <div class="profile-sub" data-i18n="profiles.p1sub">26 years • Pune • Software Engineer</div>
         <div class="profile-tags">
           <span class="tag">MSc IT</span>
           <span class="tag">5'4"</span>
-          <span class="tag">Jadhav Kul</span>
+          <span class="tag" data-i18n="profiles.p1kul">Jadhav Kul</span>
         </div>
-        <button class="profile-action">View Profile</button>
+        <button class="profile-action" data-i18n="profiles.view">View Profile</button>
       </div>
     </div>
 
@@ -910,17 +1465,17 @@
     <div class="profile-card">
       <div class="profile-img-wrap">
         <div class="profile-img-bg profile-img-bg-2">👤</div>
-        <div class="profile-badge">Online</div>
+        <div class="profile-badge" data-i18n="profiles.online">Online</div>
       </div>
       <div class="profile-info">
         <div class="profile-name">Sneha Patil</div>
-        <div class="profile-sub">24 years • Nashik • Doctor (MBBS)</div>
+        <div class="profile-sub" data-i18n="profiles.p2sub">24 years • Nashik • Doctor (MBBS)</div>
         <div class="profile-tags">
           <span class="tag">MBBS</span>
           <span class="tag">5'2"</span>
-          <span class="tag">Patil Kul</span>
+          <span class="tag" data-i18n="profiles.p2kul">Patil Kul</span>
         </div>
-        <button class="profile-action">View Profile</button>
+        <button class="profile-action" data-i18n="profiles.view">View Profile</button>
       </div>
     </div>
 
@@ -928,17 +1483,17 @@
     <div class="profile-card">
       <div class="profile-img-wrap">
         <div class="profile-img-bg profile-img-bg-3">👤</div>
-        <div class="profile-badge">Online</div>
+        <div class="profile-badge" data-i18n="profiles.online">Online</div>
       </div>
       <div class="profile-info">
         <div class="profile-name">Anita Shinde</div>
-        <div class="profile-sub">27 years • Mumbai • CA</div>
+        <div class="profile-sub" data-i18n="profiles.p3sub">27 years • Mumbai • CA</div>
         <div class="profile-tags">
           <span class="tag">CA</span>
           <span class="tag">5'3"</span>
-          <span class="tag">Shinde Kul</span>
+          <span class="tag" data-i18n="profiles.p3kul">Shinde Kul</span>
         </div>
-        <button class="profile-action">View Profile</button>
+        <button class="profile-action" data-i18n="profiles.view">View Profile</button>
       </div>
     </div>
   </div>
@@ -946,72 +1501,72 @@
 
 <!-- WHY CHOOSE US -->
 <section class="why-section">
-  <div class="section-label">Why Choose Us</div>
-  <h2 class="section-title" style="color:#fff; max-width: 520px;">Built for the Maratha Community, by the Community</h2>
+  <div class="section-label" data-i18n="why.label">Why Choose Us</div>
+  <h2 class="section-title" style="color:#fff; max-width: 520px;" data-i18n="why.title">Built for the Maratha Community, by the Community</h2>
 
   <div class="why-grid">
     <div class="why-card">
       <span class="why-icon">🔒</span>
-      <div class="why-title">100% Verified Profiles</div>
-      <p class="why-desc">Every profile is manually verified with community credentials, Aadhaar, and family references. No fake profiles, no bots.</p>
+      <div class="why-title" data-i18n="why.c1title">100% Verified Profiles</div>
+      <p class="why-desc" data-i18n="why.c1desc">Every profile is manually verified with community credentials, Aadhaar, and family references. No fake profiles, no bots.</p>
     </div>
     <div class="why-card">
       <span class="why-icon">🪷</span>
-      <div class="why-title">Exclusively Maratha</div>
-      <p class="why-desc">This platform is exclusively for the Maratha community. Find matches who share the same culture, values, and traditions as you.</p>
+      <div class="why-title" data-i18n="why.c2title">Exclusively Maratha</div>
+      <p class="why-desc" data-i18n="why.c2desc">This platform is exclusively for the Maratha community. Find matches who share the same culture, values, and traditions as you.</p>
     </div>
     <div class="why-card">
       <span class="why-icon">🛡️</span>
-      <div class="why-title">Privacy First</div>
-      <p class="why-desc">Your contact details are hidden until you choose to share them. You have complete control over who can see your profile.</p>
+      <div class="why-title" data-i18n="why.c3title">Privacy First</div>
+      <p class="why-desc" data-i18n="why.c3desc">Your contact details are hidden until you choose to share them. You have complete control over who can see your profile.</p>
     </div>
     <div class="why-card">
       <span class="why-icon">💬</span>
-      <div class="why-title">Family Involvement</div>
-      <p class="why-desc">Designed to involve your entire family in the search. Families can manage profiles and communicate directly for the best matches.</p>
+      <div class="why-title" data-i18n="why.c4title">Family Involvement</div>
+      <p class="why-desc" data-i18n="why.c4desc">Designed to involve your entire family in the search. Families can manage profiles and communicate directly for the best matches.</p>
     </div>
   </div>
 </section>
 
 <!-- TESTIMONIALS -->
 <section class="testimonials-section">
-  <div class="section-label">Success Stories</div>
-  <h2 class="section-title">Families United, Lives Changed</h2>
+  <div class="section-label" data-i18n="testi.label">Success Stories</div>
+  <h2 class="section-title" data-i18n="testi.title">Families United, Lives Changed</h2>
 
   <div class="testi-grid">
     <div class="testi-card">
       <div class="stars">★★★★★</div>
       <span class="testi-quote">"</span>
-      <p class="testi-text">We found each other on Sakal Maratha and got married within 8 months. The platform made the whole process smooth and respectful for both families.</p>
+      <p class="testi-text" data-i18n="testi.t1">We found each other on Sakal Maratha and got married within 8 months. The platform made the whole process smooth and respectful for both families.</p>
       <div class="testi-author">
         <div class="testi-avatar" style="background: var(--saffron-light); color: var(--saffron);">RJ</div>
         <div>
           <div class="testi-name">Rohit & Jyoti Jadhav</div>
-          <div class="testi-loc">Pune, Maharashtra • Married 2023</div>
+          <div class="testi-loc" data-i18n="testi.t1loc">Pune, Maharashtra • Married 2023</div>
         </div>
       </div>
     </div>
     <div class="testi-card">
       <div class="stars">★★★★★</div>
       <span class="testi-quote">"</span>
-      <p class="testi-text">Being able to filter by Kul and district was incredibly helpful. We found a match from the same taluka with shared family values. Perfect for us!</p>
+      <p class="testi-text" data-i18n="testi.t2">Being able to filter by Kul and district was incredibly helpful. We found a match from the same taluka with shared family values. Perfect for us!</p>
       <div class="testi-author">
         <div class="testi-avatar" style="background: var(--maroon-light); color: var(--maroon);">SP</div>
         <div>
           <div class="testi-name">Suresh & Priya Patil</div>
-          <div class="testi-loc">Nashik, Maharashtra • Married 2024</div>
+          <div class="testi-loc" data-i18n="testi.t2loc">Nashik, Maharashtra • Married 2024</div>
         </div>
       </div>
     </div>
     <div class="testi-card">
       <div class="stars">★★★★★</div>
       <span class="testi-quote">"</span>
-      <p class="testi-text">My parents were hesitant about online matrimony, but the verification process and family-friendly features won them over. Grateful for this platform!</p>
+      <p class="testi-text" data-i18n="testi.t3">My parents were hesitant about online matrimony, but the verification process and family-friendly features won them over. Grateful for this platform!</p>
       <div class="testi-author">
         <div class="testi-avatar" style="background: var(--gold-light); color: var(--gold);">VM</div>
         <div>
           <div class="testi-name">Vikram & Meera More</div>
-          <div class="testi-loc">Kolhapur, Maharashtra • Married 2024</div>
+          <div class="testi-loc" data-i18n="testi.t3loc">Kolhapur, Maharashtra • Married 2024</div>
         </div>
       </div>
     </div>
@@ -1020,60 +1575,480 @@
 
 <!-- CTA -->
 <section class="cta-section">
-  <h2 class="cta-title">Begin Your Journey to a Beautiful Union</h2>
-  <p class="cta-desc">Join over 50,000 Maratha families who trust Sakal Maratha Matrimonial.<br>Registration is completely free.</p>
+  <h2 class="cta-title" data-i18n="cta.title">Begin Your Journey to a Beautiful Union</h2>
+  <p class="cta-desc" data-i18n-html="cta.desc">Join over 50,000 Maratha families who trust Sakal Maratha Matrimonial.<br>Registration is completely free.</p>
   <div class="cta-actions">
-    <a href="#" class="btn-primary" style="font-size:16px; padding: 16px 40px;">Register Free Today</a>
-    <a href="#" class="btn-secondary" style="font-size:16px; padding: 16px 40px;">Learn More</a>
+    <a href="#" class="btn-primary" style="font-size:16px; padding: 16px 40px;" data-i18n="cta.register">Register Free Today</a>
+    <a href="#" class="btn-secondary" style="font-size:16px; padding: 16px 40px;" data-i18n="cta.learn">Learn More</a>
   </div>
 </section>
 
+</div><!-- /#site-main -->
+
 <!-- FOOTER -->
-<footer>
+<footer class="site-footer">
   <div class="footer-grid">
     <div class="footer-brand">
       <div class="nav-logo">
         <div class="nav-logo-icon">🪷</div>
         <div class="nav-logo-text">
           Sakal Maratha
-          <span>Matrimonial</span>
+          <span data-i18n="nav.subtitle">Matrimonial</span>
         </div>
       </div>
-      <p class="footer-tagline">Dedicated to uniting Maratha families across Maharashtra and the world. Trusted, verified, and community-first.</p>
+      <p class="footer-tagline" data-i18n="footer.tagline">Dedicated to uniting Maratha families across Maharashtra and the world. Trusted, verified, and community-first.</p>
     </div>
     <div>
-      <div class="footer-col-title">Quick Links</div>
+      <div class="footer-col-title" data-i18n="footer.quickLinks">Quick Links</div>
       <ul class="footer-links">
-        <li><a href="#">Register Free</a></li>
-        <li><a href="#">Browse Profiles</a></li>
-        <li><a href="#">Success Stories</a></li>
-        <li><a href="#">Premium Plans</a></li>
+        <li><a href="#" data-i18n="footer.register">Register Free</a></li>
+        <li><a href="#" data-i18n="footer.browse">Browse Profiles</a></li>
+        <li><a href="#" data-i18n="footer.stories">Success Stories</a></li>
+        <li><a href="#" data-i18n="footer.premium">Premium Plans</a></li>
       </ul>
     </div>
     <div>
-      <div class="footer-col-title">Community</div>
+      <div class="footer-col-title" data-i18n="footer.community">Community</div>
       <ul class="footer-links">
-        <li><a href="#">About Maratha</a></li>
-        <li><a href="#">Kul Directory</a></li>
-        <li><a href="#">Marriage Tips</a></li>
-        <li><a href="#">Community Events</a></li>
+        <li><a href="#" data-i18n="footer.aboutMaratha">About Maratha</a></li>
+        <li><a href="#" data-i18n="footer.kulDir">Kul Directory</a></li>
+        <li><a href="#" data-i18n="footer.marriageTips">Marriage Tips</a></li>
+        <li><a href="#" data-i18n="footer.events">Community Events</a></li>
       </ul>
     </div>
     <div>
-      <div class="footer-col-title">Support</div>
+      <div class="footer-col-title" data-i18n="footer.support">Support</div>
       <ul class="footer-links">
-        <li><a href="#">Help Center</a></li>
-        <li><a href="#">Privacy Policy</a></li>
-        <li><a href="#">Terms of Use</a></li>
-        <li><a href="#">Contact Us</a></li>
+        <li><a href="#" data-i18n="footer.help">Help Center</a></li>
+        <li><a href="#" data-i18n="footer.privacy">Privacy Policy</a></li>
+        <li><a href="#" data-i18n="footer.terms">Terms of Use</a></li>
+        <li><a href="#" data-i18n="footer.contact">Contact Us</a></li>
       </ul>
     </div>
   </div>
   <div class="footer-bottom">
-    <span>© 2024 Sakal Maratha Matrimonial. All rights reserved.</span>
-    <span>Made with 🧡 for the Maratha Community</span>
+    <span data-i18n="footer.copyright">© 2024 Sakal Maratha Matrimonial. All rights reserved.</span>
+    <span data-i18n="footer.made">Made with 🧡 for the Maratha Community</span>
   </div>
 </footer>
+
+<script>
+(function () {
+  'use strict';
+  const STORAGE_KEY = 'smm-lang';
+  let currentLang = 'en';
+
+  const t = {
+    en: {
+      'settings.title': 'Settings',
+      'settings.subtitle': 'Preferences',
+      'settings.btnLabel': 'Settings',
+      'settings.language': 'Language',
+      'settings.langEn': 'English',
+      'settings.langMr': 'मराठी',
+      'nav.subtitle': 'Matrimonial',
+      'nav.findMatch': 'Find Match',
+      'nav.successStories': 'Success Stories',
+      'nav.aboutUs': 'About Us',
+      'nav.contact': 'Contact',
+      'nav.freeRegister': 'Free Register',
+      'login.label': 'Member Login',
+      'login.title': 'Welcome Back',
+      'login.subtitle': 'Sign in to continue your journey',
+      'login.emailLabel': 'Email or Mobile',
+      'login.emailPlaceholder': 'you@email.com or +91...',
+      'login.passwordLabel': 'Password',
+      'login.passwordPlaceholder': 'Enter your password',
+      'login.remember': 'Remember me',
+      'login.forgot': 'Forgot password?',
+      'login.submit': 'Sign In',
+      'login.noAccount': "Don't have an account?",
+      'login.register': 'Register Free',
+      'login.imageBadge': 'Trusted Community',
+      'login.imageTitle': 'Where traditions meet lifelong unions',
+      'login.imageDesc': 'Join thousands of Maratha families who found their perfect match through Sakal Maratha Matrimonial.',
+      'login.enterSite': 'Continue to full matrimonial site ↓',
+      'trust.title': 'Built for the Maratha Community',
+      'trust.desc': 'Every profile is verified. Your privacy is protected. Families across Maharashtra trust us for meaningful matches.',
+      'hero.badge': 'Exclusively for Maratha Community',
+      'hero.title': 'Find Your<br><em>Soulmate</em><br>Within the<br>Maratha Kul',
+      'hero.subtitle': 'Find your partner, build your life',
+      'hero.desc': 'Sakal Maratha Matrimonial is a trusted platform dedicated to uniting Maratha families across Maharashtra and beyond. Thousands of verified profiles, helping you find the right match with shared values and culture.',
+      'hero.register': 'Register Free Today',
+      'hero.browse': 'Browse Profiles',
+      'hero.statProfiles': 'Verified Profiles',
+      'hero.statMatches': 'Successful Matches',
+      'hero.statCommunity': 'Maratha Community',
+      'search.title': 'Find Your Match',
+      'search.sub': 'Search from thousands of Maratha profiles',
+      'search.bride': 'Bride',
+      'search.groom': 'Groom',
+      'search.ageFrom': 'Age From',
+      'search.ageTo': 'Age To',
+      'search.district': 'District',
+      'search.education': 'Education',
+      'search.submit': '🔍 Search Profiles',
+      'district.all': 'All Maharashtra',
+      'district.pune': 'Pune',
+      'district.mumbai': 'Mumbai',
+      'district.nashik': 'Nashik',
+      'district.kolhapur': 'Kolhapur',
+      'district.satara': 'Satara',
+      'district.sangli': 'Sangli',
+      'district.aurangabad': 'Aurangabad',
+      'district.nagpur': 'Nagpur',
+      'edu.any': 'Any Education',
+      'edu.grad': 'Graduate',
+      'edu.pg': 'Post Graduate',
+      'edu.eng': 'Engineering',
+      'edu.med': 'Medical',
+      'edu.mba': 'MBA',
+      'marquee.1': '100% Maratha Profiles',
+      'marquee.2': 'Verified Members',
+      'marquee.3': 'Privacy Protected',
+      'marquee.4': 'Trusted by 50,000+ Families',
+      'marquee.5': 'Across Maharashtra & Beyond',
+      'marquee.6': '12,000+ Successful Matches',
+      'marquee.7': 'Free Registration',
+      'steps.label': 'Simple Process',
+      'steps.title': 'How Sakal Maratha Works',
+      'steps.desc': 'Finding your life partner has never been this simple. Four easy steps to start your journey.',
+      'steps.s1title': 'Register Free',
+      'steps.s1desc': 'Create your free profile with basic details, photos, and family information. Takes less than 5 minutes.',
+      'steps.s2title': 'Get Verified',
+      'steps.s2desc': 'We verify your identity and community credentials, ensuring a safe and authentic community.',
+      'steps.s3title': 'Browse Matches',
+      'steps.s3desc': 'Explore thousands of compatible Maratha profiles using smart filters for location, education, and more.',
+      'steps.s4title': 'Connect & Meet',
+      'steps.s4desc': 'Express interest, exchange contact details, and take the relationship forward with your family.',
+      'profiles.label': 'Featured Profiles',
+      'profiles.title': 'Recently Joined Members',
+      'profiles.viewAll': 'View All Profiles →',
+      'profiles.online': 'Online',
+      'profiles.p1sub': '26 years • Pune • Software Engineer',
+      'profiles.p2sub': '24 years • Nashik • Doctor (MBBS)',
+      'profiles.p3sub': '27 years • Mumbai • CA',
+      'profiles.p1kul': 'Jadhav Kul',
+      'profiles.p2kul': 'Patil Kul',
+      'profiles.p3kul': 'Shinde Kul',
+      'profiles.view': 'View Profile',
+      'why.label': 'Why Choose Us',
+      'why.title': 'Built for the Maratha Community, by the Community',
+      'why.c1title': '100% Verified Profiles',
+      'why.c1desc': 'Every profile is manually verified with community credentials, Aadhaar, and family references. No fake profiles, no bots.',
+      'why.c2title': 'Exclusively Maratha',
+      'why.c2desc': 'This platform is exclusively for the Maratha community. Find matches who share the same culture, values, and traditions as you.',
+      'why.c3title': 'Privacy First',
+      'why.c3desc': 'Your contact details are hidden until you choose to share them. You have complete control over who can see your profile.',
+      'why.c4title': 'Family Involvement',
+      'why.c4desc': 'Designed to involve your entire family in the search. Families can manage profiles and communicate directly for the best matches.',
+      'testi.label': 'Success Stories',
+      'testi.title': 'Families United, Lives Changed',
+      'testi.t1': 'We found each other on Sakal Maratha and got married within 8 months. The platform made the whole process smooth and respectful for both families.',
+      'testi.t1loc': 'Pune, Maharashtra • Married 2023',
+      'testi.t2': 'Being able to filter by Kul and district was incredibly helpful. We found a match from the same taluka with shared family values. Perfect for us!',
+      'testi.t2loc': 'Nashik, Maharashtra • Married 2024',
+      'testi.t3': 'My parents were hesitant about online matrimony, but the verification process and family-friendly features won them over. Grateful for this platform!',
+      'testi.t3loc': 'Kolhapur, Maharashtra • Married 2024',
+      'cta.title': 'Begin Your Journey to a Beautiful Union',
+      'cta.desc': 'Join over 50,000 Maratha families who trust Sakal Maratha Matrimonial.<br>Registration is completely free.',
+      'cta.register': 'Register Free Today',
+      'cta.learn': 'Learn More',
+      'footer.tagline': 'Dedicated to uniting Maratha families across Maharashtra and the world. Trusted, verified, and community-first.',
+      'footer.quickLinks': 'Quick Links',
+      'footer.register': 'Register Free',
+      'footer.browse': 'Browse Profiles',
+      'footer.stories': 'Success Stories',
+      'footer.premium': 'Premium Plans',
+      'footer.community': 'Community',
+      'footer.aboutMaratha': 'About Maratha',
+      'footer.kulDir': 'Kul Directory',
+      'footer.marriageTips': 'Marriage Tips',
+      'footer.events': 'Community Events',
+      'footer.support': 'Support',
+      'footer.help': 'Help Center',
+      'footer.privacy': 'Privacy Policy',
+      'footer.terms': 'Terms of Use',
+      'footer.contact': 'Contact Us',
+      'footer.copyright': '© 2024 Sakal Maratha Matrimonial. All rights reserved.',
+      'footer.made': 'Made with 🧡 for the Maratha Community',
+      'page.title': 'Sakal Maratha Matrimonial'
+    },
+    mr: {
+      'settings.title': 'सेटिंग्ज',
+      'settings.subtitle': 'प्राधान्ये',
+      'settings.btnLabel': 'सेटिंग्ज',
+      'settings.language': 'भाषा',
+      'settings.langEn': 'इंग्रजी',
+      'settings.langMr': 'मराठी',
+      'nav.subtitle': 'विवाहसेवा',
+      'nav.findMatch': 'जुळणी शोधा',
+      'nav.successStories': 'यशोगाथा',
+      'nav.aboutUs': 'आमच्याबद्दल',
+      'nav.contact': 'संपर्क',
+      'nav.freeRegister': 'मोफत नोंदणी',
+      'login.label': 'सदस्य प्रवेश',
+      'login.title': 'पुन्हा स्वागत',
+      'login.subtitle': 'आपला प्रवास सुरू ठेवण्यासाठी साइन इन करा',
+      'login.emailLabel': 'ईमेल किंवा मोबाइल',
+      'login.emailPlaceholder': 'you@email.com किंवा +91...',
+      'login.passwordLabel': 'पासवर्ड',
+      'login.passwordPlaceholder': 'पासवर्ड प्रविष्ट करा',
+      'login.remember': 'मला लक्षात ठेवा',
+      'login.forgot': 'पासवर्ड विसरलात?',
+      'login.submit': 'साइन इन',
+      'login.noAccount': 'खाते नाही?',
+      'login.register': 'मोफत नोंदणी',
+      'login.imageBadge': 'विश्वासार्ह समुदाय',
+      'login.imageTitle': 'जिथे परंपरा आयुष्यभराच्या संयोगाशी भेटते',
+      'login.imageDesc': 'सकाळ मराठाद्वारे योग्य जुळणी शोधणाऱ्या हजारो मराठा कुटुंबांमध्ये सामील व्हा.',
+      'login.enterSite': 'संपूर्ण विवाहसेवा पाहा ↓',
+      'trust.title': 'मराठा समुदायासाठी बांधलेले',
+      'trust.desc': 'प्रत्येक प्रोफाइल सत्यापित. गोपनीयता सुरक्षित. महाराष्ट्रभरातील कुटुंबे आमच्यावर विश्वास ठेवतात.',
+      'hero.badge': 'फक्त मराठा समुदायासाठी',
+      'hero.title': 'मराठा कुळात<br><em>जोडीदार</em><br>शोधा',
+      'hero.subtitle': 'जोडीदार शोधा, आयुष्य सजवा',
+      'hero.desc': 'सकाळ मराठा विवाहसेवा ही महाराष्ट्र आणि त्याबाहेरील मराठा कुटुंबे एकत्र आणण्यासाठी समर्पित विश्वासार्ह व्यासपीठ आहे. हजारो सत्यापित प्रोफाइल्स — समान संस्कृती, मूल्ये आणि परंपरा असलेली योग्य जुळणी शोधण्यात आपली मदत करते.',
+      'hero.register': 'आजच मोफत नोंदणी करा',
+      'hero.browse': 'प्रोफाइल पहा',
+      'hero.statProfiles': 'सत्यापित प्रोफाइल',
+      'hero.statMatches': 'यशस्वी जुळण्या',
+      'hero.statCommunity': 'मराठा समुदाय',
+      'search.title': 'जुळणी शोधा',
+      'search.sub': 'हजारो मराठा प्रोफाइलमधून शोधा',
+      'search.bride': 'वधू',
+      'search.groom': 'वर',
+      'search.ageFrom': 'वय पासून',
+      'search.ageTo': 'वय पर्यंत',
+      'search.district': 'जिल्हा',
+      'search.education': 'शिक्षण',
+      'search.submit': '🔍 प्रोफाइल शोधा',
+      'district.all': 'संपूर्ण महाराष्ट्र',
+      'district.pune': 'पुणे',
+      'district.mumbai': 'मुंबई',
+      'district.nashik': 'नाशिक',
+      'district.kolhapur': 'कोल्हापूर',
+      'district.satara': 'सातारा',
+      'district.sangli': 'सांगली',
+      'district.aurangabad': 'औरंगाबाद',
+      'district.nagpur': 'नागपूर',
+      'edu.any': 'कोणतेही शिक्षण',
+      'edu.grad': 'पदवीधर',
+      'edu.pg': 'पदव्युत्तर',
+      'edu.eng': 'अभियांत्रिकी',
+      'edu.med': 'वैद्यकीय',
+      'edu.mba': 'एमबीए',
+      'marquee.1': '१००% मराठा प्रोफाइल',
+      'marquee.2': 'सत्यापित सदस्य',
+      'marquee.3': 'गोपनीयता सुरक्षित',
+      'marquee.4': '५०,०००+ कुटुंबांचा विश्वास',
+      'marquee.5': 'महाराष्ट्र आणि त्याबाहेर',
+      'marquee.6': '१२,०००+ यशस्वी जुळण्या',
+      'marquee.7': 'मोफत नोंदणी',
+      'steps.label': 'सोपी प्रक्रिया',
+      'steps.title': 'सकाळ मराठा कसे कार्य करते',
+      'steps.desc': 'आयुष्यसाथी शोधणे कधीही इतके सोपे नव्हते. प्रवास सुरू करण्यासाठी चार सोपे पायऱ्या.',
+      'steps.s1title': 'मोफत नोंदणी',
+      'steps.s1desc': 'मूलभूत माहिती, छायाचित्रे आणि कुटुंबीय तपशीलांसह मोफत प्रोफाइल तयार करा. पाच मिनिटांपेक्षा कमी वेळ.',
+      'steps.s2title': 'सत्यापन मिळवा',
+      'steps.s2desc': 'आम्ही आपली ओळख आणि समुदायाची पडताळणी करतो — सुरक्षित आणि खरी समुदायाची खात्री.',
+      'steps.s3title': 'जुळण्या पहा',
+      'steps.s3desc': 'स्थान, शिक्षण इत्यादींसाठी स्मार्ट फिल्टर वापरून हजारो योग्य मराठा प्रोफाइल एक्सप्लोर करा.',
+      'steps.s4title': 'संपर्क साधा आणि भेटा',
+      'steps.s4desc': 'रुची व्यक्त करा, संपर्क देवाणघेवाण करा आणि कुटुंबासह नाते पुढे न्या.',
+      'profiles.label': 'वैशिष्ट्यीकृत प्रोफाइल',
+      'profiles.title': 'नुकतेच सामील झालेले सदस्य',
+      'profiles.viewAll': 'सर्व प्रोफाइल पहा →',
+      'profiles.online': 'ऑनलाइन',
+      'profiles.p1sub': '२६ वर्षे • पुणे • सॉफ्टवेअर अभियंता',
+      'profiles.p2sub': '२४ वर्षे • नाशिक • डॉक्टर (एमबीबीएस)',
+      'profiles.p3sub': '२७ वर्षे • मुंबई • चार्टर्ड अकाउंटंट',
+      'profiles.p1kul': 'जाधव कुळ',
+      'profiles.p2kul': 'पाटील कुळ',
+      'profiles.p3kul': 'शिंदे कुळ',
+      'profiles.view': 'प्रोफाइल पहा',
+      'why.label': 'आम्हाला का निवडावे',
+      'why.title': 'मराठा समुदायासाठी, समुदायाकडून बांधलेले',
+      'why.c1title': '१००% सत्यापित प्रोफाइल',
+      'why.c1desc': 'प्रत्येक प्रोफाइल समुदायाच्या पडताळणी, आधार आणि कुटुंबीय संदर्भांसह तपासली जाते. बनावट प्रोफाइल नाहीत.',
+      'why.c2title': 'फक्त मराठा',
+      'why.c2desc': 'हे व्यासपीठ फक्त मराठा समुदायासाठी आहे. आपल्यासारखी संस्कृती, मूल्ये आणि परंपरा असलेली जुळणी शोधा.',
+      'why.c3title': 'गोपनीयता प्रथम',
+      'why.c3desc': 'आपण सामायिक करेपर्यंत संपर्क तपशील लपलेले असतात. कोण आपले प्रोफाइल पाहू शकते यावर पूर्ण नियंत्रण.',
+      'why.c4title': 'कुटुंबाची सहभागिता',
+      'why.c4desc': 'शोधात संपूर्ण कुटुंब सामील होण्यासाठी डिझाइन. कुटुंबे प्रोफाइल व्यवस्थापित करू शकतात आणि थेट संवाद साधू शकतात.',
+      'testi.label': 'यशोगाथा',
+      'testi.title': 'कुटुंबे एकत्र, जीवने बदलली',
+      'testi.t1': 'आम्ही सकाळ मराठावर एकमेकांना सापडलो आणि ८ महिन्यांत लग्न केले. या व्यासपीठाने दोन्ही कुटुंबांसाठी संपूर्ण प्रक्रिया सुरळीत आणि आदरपूर्ण केली.',
+      'testi.t1loc': 'पुणे, महाराष्ट्र • २०२३ मध्ये विवाह',
+      'testi.t2': 'कुळ आणि जिल्ह्यानुसार फिल्टर करणे अतिशय उपयुक्त होते. समान कुटुंबीय मूल्ये असलेली त्याच तालुक्यातील जुळणी सापडली!',
+      'testi.t2loc': 'नाशिक, महाराष्ट्र • २०२४ मध्ये विवाह',
+      'testi.t3': 'ऑनलाइन विवाहसेवेबद्दल पालकांना शंका होती, पण सत्यापन आणि कुटुंब-अनुकूल सुविधांनी त्यांना समजावले. या व्यासपीठाबद्दल कृतज्ञता!',
+      'testi.t3loc': 'कोल्हापूर, महाराष्ट्र • २०२४ मध्ये विवाह',
+      'cta.title': 'सुंदर संयोगाचा प्रवास सुरू करा',
+      'cta.desc': 'सकाळ मराठावर विश्वास ठेवणाऱ्या ५०,०००+ मराठा कुटुंबांमध्ये सामील व्हा.<br>नोंदणी पूर्णपणे मोफत आहे.',
+      'cta.register': 'आजच मोफत नोंदणी करा',
+      'cta.learn': 'अधिक जाणून घ्या',
+      'footer.tagline': 'महाराष्ट्र आणि जगभरातील मराठा कुटुंबे एकत्र आणण्यासाठी समर्पित. विश्वासार्ह, सत्यापित आणि समुदाय-प्रथम.',
+      'footer.quickLinks': 'द्रुत दुवे',
+      'footer.register': 'मोफत नोंदणी',
+      'footer.browse': 'प्रोफाइल पहा',
+      'footer.stories': 'यशोगाथा',
+      'footer.premium': 'प्रीमियम योजना',
+      'footer.community': 'समुदाय',
+      'footer.aboutMaratha': 'मराठा बद्दल',
+      'footer.kulDir': 'कुळ निर्देशिका',
+      'footer.marriageTips': 'लग्न टिप्स',
+      'footer.events': 'समुदाय कार्यक्रम',
+      'footer.support': 'मदत',
+      'footer.help': 'मदत केंद्र',
+      'footer.privacy': 'गोपनीयता धोरण',
+      'footer.terms': 'वापर अटी',
+      'footer.contact': 'आमच्याशी संपर्क',
+      'footer.copyright': '© २०२४ सकाळ मराठा विवाहसेवा. सर्व हक्क राखीव.',
+      'footer.made': 'मराठा समुदायासाठी 🧡 ने बनवले',
+      'page.title': 'सकाळ मराठा विवाहसेवा'
+    }
+  };
+
+  function yearsLabel(n, lang) {
+    return lang === 'mr' ? n + ' वर्षे' : n + ' Years';
+  }
+
+  function applyLanguage(lang) {
+    lang = lang === 'mr' ? 'mr' : 'en';
+    currentLang = lang;
+    const dict = t[lang] || t.en;
+
+    document.documentElement.lang = lang;
+    document.documentElement.setAttribute('data-lang', lang);
+    document.body.classList.toggle('lang-mr', lang === 'mr');
+    document.title = dict['page.title'] || document.title;
+
+    document.querySelectorAll('[data-i18n]').forEach(function (el) {
+      if (el.classList.contains('lang-choice')) return;
+      const key = el.getAttribute('data-i18n');
+      if (!key || dict[key] === undefined) return;
+      el.textContent = dict[key];
+    });
+
+    document.querySelectorAll('[data-i18n-html]').forEach(function (el) {
+      const key = el.getAttribute('data-i18n-html');
+      if (!key || dict[key] === undefined) return;
+      el.innerHTML = dict[key];
+    });
+
+    document.querySelectorAll('[data-i18n-years]').forEach(function (el) {
+      const n = el.getAttribute('data-i18n-years');
+      if (n) el.textContent = yearsLabel(n, lang);
+    });
+
+    document.querySelectorAll('[data-i18n-placeholder]').forEach(function (el) {
+      const key = el.getAttribute('data-i18n-placeholder');
+      if (!key || dict[key] === undefined) return;
+      el.placeholder = dict[key];
+    });
+
+    document.querySelectorAll('.settings-toggle').forEach(function (btn) {
+      if (dict['settings.btnLabel']) {
+        btn.setAttribute('aria-label', dict['settings.btnLabel']);
+        btn.setAttribute('title', dict['settings.btnLabel']);
+      }
+    });
+
+    document.querySelectorAll('[data-set-lang]').forEach(function (btn) {
+      const code = btn.getAttribute('data-set-lang');
+      btn.classList.toggle('active', code === lang);
+      if (btn.getAttribute('role') === 'button') {
+        btn.setAttribute('aria-pressed', code === lang ? 'true' : 'false');
+      }
+    });
+
+    document.querySelectorAll('[data-lang-status]').forEach(function (el) {
+      el.textContent = lang === 'mr' ? 'मराठी' : 'English';
+    });
+
+    try {
+      localStorage.setItem(STORAGE_KEY, lang);
+    } catch (err) { /* ignore on file:// */ }
+  }
+
+  window.setSiteLanguage = applyLanguage;
+  window.__applySiteLanguage = applyLanguage;
+
+  function handleLangPick(lang) {
+    applyLanguage(lang);
+  }
+
+  const settingsPanels = document.querySelectorAll('.settings-panel');
+
+  document.addEventListener('click', function (e) {
+    var langEl = e.target.closest('[data-set-lang]');
+    if (langEl) {
+      e.preventDefault();
+      e.stopPropagation();
+      handleLangPick(langEl.getAttribute('data-set-lang'));
+      return;
+    }
+
+    var toggle = e.target.closest('.settings-toggle');
+    if (toggle) {
+      e.stopPropagation();
+      var panel = toggle.closest('.nav-settings-wrap').querySelector('.settings-panel');
+      var isOpen = panel.classList.contains('open');
+      settingsPanels.forEach(function (p) { p.classList.remove('open'); });
+      if (!isOpen) panel.classList.add('open');
+      return;
+    }
+
+    if (!e.target.closest('.nav-settings-wrap')) {
+      settingsPanels.forEach(function (p) { p.classList.remove('open'); });
+    }
+  }, true);
+
+  document.querySelectorAll('.settings-toggle').forEach(function (btn) {
+    btn.addEventListener('click', function (e) {
+      e.stopPropagation();
+    });
+  });
+
+  const SESSION_KEY = 'smm-session';
+
+  function enterMainSite() {
+    document.body.classList.add('on-main-site');
+    localStorage.setItem(SESSION_KEY, '1');
+    window.scrollTo(0, 0);
+  }
+
+  function showLoginScreen() {
+    document.body.classList.remove('on-main-site');
+    localStorage.removeItem(SESSION_KEY);
+    window.scrollTo(0, 0);
+  }
+
+  document.getElementById('loginForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+    enterMainSite();
+  });
+
+  document.querySelectorAll('.enter-main').forEach(function (el) {
+    el.addEventListener('click', function (e) {
+      e.preventDefault();
+      enterMainSite();
+    });
+  });
+
+  if (localStorage.getItem(SESSION_KEY) === '1') {
+    enterMainSite();
+  }
+
+  let saved = 'en';
+  try {
+    saved = localStorage.getItem(STORAGE_KEY) || 'en';
+  } catch (err) { saved = 'en'; }
+  applyLanguage(saved === 'mr' ? 'mr' : 'en');
+})();
+</script>
 
 </body>
 </html>

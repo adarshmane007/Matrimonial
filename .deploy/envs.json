@@ -1,0 +1,11 @@
+{
+  "common": {
+    "aws_region": "ap-south-1",
+    "default_env": "production"
+  },
+  "production": {
+    "s3_bucket_name": "YOUR_S3_BUCKET_NAME",
+    "cloudfront_distribution_id": "YOUR_CLOUDFRONT_DISTRIBUTION_ID",
+    "api_url": "https://api.your-backend-domain.com"
+  }
+}

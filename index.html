@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sakal Maratha Matrimonial</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Noto+Sans+Devanagari:wght@300;400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<!-- LOGIN SCREEN (only this until signed in) -->
+<div id="login-screen">
+
+<div class="login-top-bar">
+  <div class="nav-settings-wrap">
+    <button type="button" class="nav-settings-btn settings-toggle" aria-label="Settings">
+      <span data-i18n="settings.btnLabel">Settings</span>
+    </button>
+    <div class="settings-panel" id="settingsPanelLogin">
+      <div class="settings-panel-title" data-i18n="settings.title">Settings</div>
+      <div class="settings-panel-sub" data-i18n="settings.subtitle">Preferences</div>
+      <div class="settings-lang-block">
+        <span class="settings-row-label" data-i18n="settings.language">Language</span>
+        <div class="lang-switch" role="group" aria-label="Language">
+          <a href="#" class="lang-choice" data-set-lang="en" role="button">English</a>
+          <a href="#" class="lang-choice" data-set-lang="mr" role="button">मराठी</a>
+        </div>
+        <p class="lang-status">Current: <strong data-lang-status>English</strong></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<section class="login-hero" id="login">
+  <div class="login-left">
+    <div class="login-brand">
+      <div class="login-brand-icon">🪷</div>
+      <div class="login-brand-text">
+        Sakal Maratha
+        <span data-i18n="nav.subtitle">Matrimonial</span>
+      </div>
+    </div>
+    <p class="login-label" data-i18n="login.label">Member Login</p>
+    <h1 class="login-title" data-i18n="login.title">Welcome Back</h1>
+    <p class="login-subtitle" data-i18n="login.subtitle">Sign in to continue your journey</p>
+    <form class="login-form" id="loginForm">
+      <div class="form-group">
+        <label class="form-label" for="loginEmail" data-i18n="login.emailLabel">Email or Mobile</label>
+        <input class="form-input" type="text" id="loginEmail" data-i18n-placeholder="login.emailPlaceholder" placeholder="you@email.com or +91...">
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="loginPassword" data-i18n="login.passwordLabel">Password</label>
+        <input class="form-input" type="password" id="loginPassword" data-i18n-placeholder="login.passwordPlaceholder" placeholder="Enter your password">
+      </div>
+      <div class="login-options">
+        <label class="login-remember">
+          <input type="checkbox" name="remember">
+          <span data-i18n="login.remember">Remember me</span>
+        </label>
+        <a href="#" class="login-forgot" data-i18n="login.forgot">Forgot password?</a>
+      </div>
+      <button type="submit" class="btn-login" data-i18n="login.submit">Sign In</button>
+    </form>
+    <p class="login-register">
+      <span data-i18n="login.noAccount">Don't have an account?</span>
+      <a href="#" data-open-register data-i18n="login.register">Register Free</a>
+    </p>
+    <div class="login-trust">
+      <div class="trust-item">
+        <div class="trust-num">50K+</div>
+        <div class="trust-label" data-i18n="hero.statProfiles">Verified Profiles</div>
+      </div>
+      <div class="trust-item">
+        <div class="trust-num">12K+</div>
+        <div class="trust-label" data-i18n="hero.statMatches">Successful Matches</div>
+      </div>
+    </div>
+  </div>
+  <div class="login-right">
+    <img src="/assets/bhaiya-wedding.jpeg" alt="Traditional Maratha wedding ceremony">
+    <div class="login-right-overlay"></div>
+    <span class="login-right-badge" data-i18n="login.imageBadge">Trusted Community</span>
+    <div class="login-right-caption">
+      <h2 data-i18n="login.imageTitle">Where traditions meet lifelong unions</h2>
+      <p data-i18n="login.imageDesc">Join thousands of Maratha families who found their perfect match through Sakal Maratha Matrimonial.</p>
+    </div>
+  </div>
+</section>
+
+<section class="profiles-section" id="login-profiles">
+  <div class="profiles-header">
+    <div>
+      <div class="section-label" data-i18n="profiles.label">Featured Profiles</div>
+      <h2 class="section-title" style="margin-bottom:0;" data-i18n="profiles.title">Recently Joined Members</h2>
+    </div>
+    <a href="#" class="btn-outline enter-main" data-i18n="profiles.viewAll">View All Profiles →</a>
+  </div>
+  <div class="profiles-grid" id="loginProfilesGrid" data-profiles-grid>
+    <article class="profile-card">
+      <div class="profile-img-wrap">
+        <div class="profile-img-bg profile-img-bg-1">👤</div>
+        <div class="profile-badge" data-i18n="profiles.online">Online</div>
+      </div>
+      <div class="profile-info">
+        <div class="profile-name">Priya Jadhav</div>
+        <div class="profile-sub" data-i18n="profiles.p1sub">26 years • Pune • Software Engineer</div>
+        <div class="profile-tags">
+          <span class="tag">MSc IT</span><span class="tag">5'4"</span>
+          <span class="tag" data-i18n="profiles.p1kul">Jadhav Kul</span>
+        </div>
+        <button type="button" class="profile-action enter-main" data-i18n="profiles.view">View Profile</button>
+      </div>
+    </article>
+    <article class="profile-card">
+      <div class="profile-img-wrap">
+        <div class="profile-img-bg profile-img-bg-2">👤</div>
+        <div class="profile-badge" data-i18n="profiles.online">Online</div>
+      </div>
+      <div class="profile-info">
+        <div class="profile-name">Sneha Patil</div>
+        <div class="profile-sub" data-i18n="profiles.p2sub">24 years • Nashik • Doctor (MBBS)</div>
+        <div class="profile-tags">
+          <span class="tag">MBBS</span><span class="tag">5'2"</span>
+          <span class="tag" data-i18n="profiles.p2kul">Patil Kul</span>
+        </div>
+        <button type="button" class="profile-action enter-main" data-i18n="profiles.view">View Profile</button>
+      </div>
+    </article>
+    <article class="profile-card">
+      <div class="profile-img-wrap">
+        <div class="profile-img-bg profile-img-bg-3">👤</div>
+        <div class="profile-badge" data-i18n="profiles.online">Online</div>
+      </div>
+      <div class="profile-info">
+        <div class="profile-name">Anita Shinde</div>
+        <div class="profile-sub" data-i18n="profiles.p3sub">27 years • Mumbai • CA</div>
+        <div class="profile-tags">
+          <span class="tag">CA</span><span class="tag">5'3"</span>
+          <span class="tag" data-i18n="profiles.p3kul">Shinde Kul</span>
+        </div>
+        <button type="button" class="profile-action enter-main" data-i18n="profiles.view">View Profile</button>
+      </div>
+    </article>
+  </div>
+</section>
+
+<section class="trust-strip">
+  <h2 class="trust-strip-title" data-i18n="trust.title">Built for the Maratha Community</h2>
+  <p class="trust-strip-desc" data-i18n="trust.desc">Every profile is verified. Your privacy is protected. Families across Maharashtra trust us for meaningful matches.</p>
+  <div class="trust-pills">
+    <span class="trust-pill" data-i18n="marquee.1">100% Maratha Profiles</span>
+    <span class="trust-pill" data-i18n="marquee.2">Verified Members</span>
+    <span class="trust-pill" data-i18n="marquee.3">Privacy Protected</span>
+    <span class="trust-pill" data-i18n="marquee.7">Free Registration</span>
+  </div>
+</section>
+
+<div class="divider">— ✦ —</div>
+
+</div><!-- /#login-screen -->
+
+<!-- MAIN SITE (original content — after login) -->
+<div id="site-main">
+
+<!-- NAV -->
+<nav class="site-nav">
+  <div class="nav-logo">
+    <div class="nav-logo-icon">🪷</div>
+    <div class="nav-logo-text">
+      Sakal Maratha
+      <span data-i18n="nav.subtitle">Matrimonial</span>
+    </div>
+  </div>
+  <ul class="nav-links">
+    <li class="nav-settings-item">
+      <div class="nav-settings-wrap">
+        <button type="button" class="nav-settings-btn settings-toggle" id="settingsBtn" aria-label="Settings">
+          <span data-i18n="settings.btnLabel">Settings</span>
+        </button>
+        <div class="settings-panel" id="settingsPanel">
+          <div class="settings-panel-title" data-i18n="settings.title">Settings</div>
+          <div class="settings-panel-sub" data-i18n="settings.subtitle">Preferences</div>
+          <div class="settings-lang-block">
+            <span class="settings-row-label" data-i18n="settings.language">Language</span>
+            <div class="lang-switch" role="group" aria-label="Language">
+              <a href="#" class="lang-choice" data-set-lang="en" role="button">English</a>
+              <a href="#" class="lang-choice" data-set-lang="mr" role="button">मराठी</a>
+            </div>
+            <p class="lang-status">Current: <strong data-lang-status>English</strong></p>
+          </div>
+        </div>
+      </div>
+    </li>
+    <li><a href="#" data-i18n="nav.findMatch">Find Match</a></li>
+    <li><a href="#" data-i18n="nav.successStories">Success Stories</a></li>
+    <li><a href="#" data-i18n="nav.aboutUs">About Us</a></li>
+    <li><a href="#" data-open-contact data-i18n="nav.contact">Contact</a></li>
+    <li id="navUserLabel" class="nav-user-label" hidden></li>
+    <li id="navLogoutItem" hidden>
+      <button type="button" class="nav-logout-btn" id="logoutBtn">Logout</button>
+    </li>
+    <li><a href="#" class="nav-cta" data-open-register data-i18n="nav.freeRegister">Free Register</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-left">
+    <div class="hero-badge" data-i18n="hero.badge">Exclusively for Maratha Community</div>
+    <h1 class="hero-title" data-i18n-html="hero.title">
+      Find Your<br><em>Soulmate</em><br>Within the<br>Maratha Kul
+    </h1>
+    <p class="hero-subtitle" data-i18n="hero.subtitle">जोडीदार शोधा, आयुष्य सजवा</p>
+    <p class="hero-desc" data-i18n="hero.desc">
+      Sakal Maratha Matrimonial is a trusted platform dedicated to uniting Maratha families across Maharashtra and beyond. Thousands of verified profiles, helping you find the right match with shared values and culture.
+    </p>
+    <div class="hero-actions">
+      <a href="#" class="btn-primary" data-open-register data-i18n="hero.register">Register Free Today</a>
+      <a href="#" class="btn-secondary" data-i18n="hero.browse">Browse Profiles</a>
+    </div>
+    <div class="hero-stats">
+      <div>
+        <div class="stat-num">50K+</div>
+        <div class="stat-label" data-i18n="hero.statProfiles">Verified Profiles</div>
+      </div>
+      <div>
+        <div class="stat-num">12K+</div>
+        <div class="stat-label" data-i18n="hero.statMatches">Successful Matches</div>
+      </div>
+      <div>
+        <div class="stat-num">100%</div>
+        <div class="stat-label" data-i18n="hero.statCommunity">Maratha Community</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="hero-right">
+    <div class="hero-pattern"></div>
+    <div class="search-card">
+      <div class="search-card-header">
+        <div class="search-card-title" data-i18n="search.title">Find Your Match</div>
+        <div class="search-card-sub" data-i18n="search.sub">Search from thousands of Maratha profiles</div>
+      </div>
+
+      <div class="gender-toggle">
+        <button class="gender-btn active" data-i18n="search.bride" onclick="this.parentElement.querySelectorAll('.gender-btn').forEach(b=>b.classList.remove('active')); this.classList.add('active')">Bride</button>
+        <button class="gender-btn" data-i18n="search.groom" onclick="this.parentElement.querySelectorAll('.gender-btn').forEach(b=>b.classList.remove('active')); this.classList.add('active')">Groom</button>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label" data-i18n="search.ageFrom">Age From</label>
+          <select class="form-select" id="ageFromSelect">
+            <option value="21" data-i18n-years="21">21 Years</option>
+            <option value="22" data-i18n-years="22">22 Years</option>
+            <option value="23" data-i18n-years="23">23 Years</option>
+            <option value="24" data-i18n-years="24">24 Years</option>
+            <option value="25" data-i18n-years="25">25 Years</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label" data-i18n="search.ageTo">Age To</label>
+          <select class="form-select" id="ageToSelect">
+            <option value="28" data-i18n-years="28">28 Years</option>
+            <option value="30" data-i18n-years="30">30 Years</option>
+            <option value="32" data-i18n-years="32">32 Years</option>
+            <option value="35" data-i18n-years="35">35 Years</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" data-i18n="search.district">District</label>
+        <select class="form-select" id="districtSelect">
+          <option value="all" data-i18n="district.all">All Maharashtra</option>
+          <option value="pune" data-i18n="district.pune">Pune</option>
+          <option value="mumbai" data-i18n="district.mumbai">Mumbai</option>
+          <option value="nashik" data-i18n="district.nashik">Nashik</option>
+          <option value="kolhapur" data-i18n="district.kolhapur">Kolhapur</option>
+          <option value="satara" data-i18n="district.satara">Satara</option>
+          <option value="sangli" data-i18n="district.sangli">Sangli</option>
+          <option value="aurangabad" data-i18n="district.aurangabad">Aurangabad</option>
+          <option value="nagpur" data-i18n="district.nagpur">Nagpur</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" data-i18n="search.education">Education</label>
+        <select class="form-select" id="educationSelect">
+          <option value="any" data-i18n="edu.any">Any Education</option>
+          <option value="grad" data-i18n="edu.grad">Graduate</option>
+          <option value="pg" data-i18n="edu.pg">Post Graduate</option>
+          <option value="eng" data-i18n="edu.eng">Engineering</option>
+          <option value="med" data-i18n="edu.med">Medical</option>
+          <option value="mba" data-i18n="edu.mba">MBA</option>
+        </select>
+      </div>
+
+      <button type="button" class="search-submit" id="searchSubmitBtn" data-i18n="search.submit">🔍 Search Profiles</button>
+    </div>
+  </div>
+</section>
+
+<!-- MARQUEE -->
+<div class="marquee-strip">
+  <div class="marquee-inner">
+    <span class="marquee-item" data-i18n="marquee.1">100% Maratha Profiles</span><span class="marquee-dot">✦</span>
+    <span class="marquee-item" data-i18n="marquee.2">Verified Members</span><span class="marquee-dot">✦</span>
+    <span class="marquee-item" data-i18n="marquee.3">Privacy Protected</span><span class="marquee-dot">✦</span>
+    <span class="marquee-item" data-i18n="marquee.4">Trusted by 50,000+ Families</span><span class="marquee-dot">✦</span>
+    <span class="marquee-item" data-i18n="marquee.5">Across Maharashtra & Beyond</span><span class="marquee-dot">✦</span>
+    <span class="marquee-item" data-i18n="marquee.6">12,000+ Successful Matches</span><span class="marquee-dot">✦</span>
+    <span class="marquee-item" data-i18n="marquee.7">Free Registration</span><span class="marquee-dot">✦</span>
+    <span class="marquee-item" data-i18n="marquee.1">100% Maratha Profiles</span><span class="marquee-dot">✦</span>
+    <span class="marquee-item" data-i18n="marquee.2">Verified Members</span><span class="marquee-dot">✦</span>
+    <span class="marquee-item" data-i18n="marquee.3">Privacy Protected</span><span class="marquee-dot">✦</span>
+    <span class="marquee-item" data-i18n="marquee.4">Trusted by 50,000+ Families</span><span class="marquee-dot">✦</span>
+    <span class="marquee-item" data-i18n="marquee.5">Across Maharashtra & Beyond</span><span class="marquee-dot">✦</span>
+    <span class="marquee-item" data-i18n="marquee.6">12,000+ Successful Matches</span><span class="marquee-dot">✦</span>
+    <span class="marquee-item" data-i18n="marquee.7">Free Registration</span><span class="marquee-dot">✦</span>
+  </div>
+</div>
+
+<!-- HOW IT WORKS -->
+<section class="section">
+  <div class="section-label" data-i18n="steps.label">Simple Process</div>
+  <h2 class="section-title" data-i18n="steps.title">How Sakal Maratha Works</h2>
+  <p class="section-desc" data-i18n="steps.desc">Finding your life partner has never been this simple. Four easy steps to start your journey.</p>
+
+  <div class="steps-grid">
+    <div class="step-card">
+      <div class="step-num step-num-1">01</div>
+      <div class="step-title" data-i18n="steps.s1title">Register Free</div>
+      <p class="step-desc" data-i18n="steps.s1desc">Create your free profile with basic details, photos, and family information. Takes less than 5 minutes.</p>
+    </div>
+    <div class="step-card">
+      <div class="step-num step-num-2">02</div>
+      <div class="step-title" data-i18n="steps.s2title">Get Verified</div>
+      <p class="step-desc" data-i18n="steps.s2desc">We verify your identity and community credentials, ensuring a safe and authentic community.</p>
+    </div>
+    <div class="step-card">
+      <div class="step-num step-num-3">03</div>
+      <div class="step-title" data-i18n="steps.s3title">Browse Matches</div>
+      <p class="step-desc" data-i18n="steps.s3desc">Explore thousands of compatible Maratha profiles using smart filters for location, education, and more.</p>
+    </div>
+    <div class="step-card">
+      <div class="step-num step-num-4">04</div>
+      <div class="step-title" data-i18n="steps.s4title">Connect & Meet</div>
+      <p class="step-desc" data-i18n="steps.s4desc">Express interest, exchange contact details, and take the relationship forward with your family.</p>
+    </div>
+  </div>
+</section>
+
+<div class="divider">— ✦ —</div>
+
+<!-- FEATURED PROFILES -->
+<section class="profiles-section">
+  <div class="profiles-header">
+    <div>
+      <div class="section-label" data-i18n="profiles.label">Featured Profiles</div>
+      <h2 class="section-title" style="margin-bottom:0;" data-i18n="profiles.title">Recently Joined Members</h2>
+    </div>
+    <a href="#" class="btn-secondary" style="font-size:13px; padding: 11px 24px;" data-i18n="profiles.viewAll">View All Profiles →</a>
+  </div>
+
+  <div class="profiles-grid" id="mainProfilesGrid" data-profiles-grid>
+    <!-- Profile 1 -->
+    <div class="profile-card">
+      <div class="profile-img-wrap">
+        <div class="profile-img-bg profile-img-bg-1">👤</div>
+        <div class="profile-badge" data-i18n="profiles.online">Online</div>
+      </div>
+      <div class="profile-info">
+        <div class="profile-name">Priya Jadhav</div>
+        <div class="profile-sub" data-i18n="profiles.p1sub">26 years • Pune • Software Engineer</div>
+        <div class="profile-tags">
+          <span class="tag">MSc IT</span>
+          <span class="tag">5'4"</span>
+          <span class="tag" data-i18n="profiles.p1kul">Jadhav Kul</span>
+        </div>
+        <button class="profile-action" data-i18n="profiles.view">View Profile</button>
+      </div>
+    </div>
+
+    <!-- Profile 2 -->
+    <div class="profile-card">
+      <div class="profile-img-wrap">
+        <div class="profile-img-bg profile-img-bg-2">👤</div>
+        <div class="profile-badge" data-i18n="profiles.online">Online</div>
+      </div>
+      <div class="profile-info">
+        <div class="profile-name">Sneha Patil</div>
+        <div class="profile-sub" data-i18n="profiles.p2sub">24 years • Nashik • Doctor (MBBS)</div>
+        <div class="profile-tags">
+          <span class="tag">MBBS</span>
+          <span class="tag">5'2"</span>
+          <span class="tag" data-i18n="profiles.p2kul">Patil Kul</span>
+        </div>
+        <button class="profile-action" data-i18n="profiles.view">View Profile</button>
+      </div>
+    </div>
+
+    <!-- Profile 3 -->
+    <div class="profile-card">
+      <div class="profile-img-wrap">
+        <div class="profile-img-bg profile-img-bg-3">👤</div>
+        <div class="profile-badge" data-i18n="profiles.online">Online</div>
+      </div>
+      <div class="profile-info">
+        <div class="profile-name">Anita Shinde</div>
+        <div class="profile-sub" data-i18n="profiles.p3sub">27 years • Mumbai • CA</div>
+        <div class="profile-tags">
+          <span class="tag">CA</span>
+          <span class="tag">5'3"</span>
+          <span class="tag" data-i18n="profiles.p3kul">Shinde Kul</span>
+        </div>
+        <button class="profile-action" data-i18n="profiles.view">View Profile</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WHY CHOOSE US -->
+<section class="why-section">
+  <div class="section-label" data-i18n="why.label">Why Choose Us</div>
+  <h2 class="section-title" style="color:#fff; max-width: 520px;" data-i18n="why.title">Built for the Maratha Community, by the Community</h2>
+
+  <div class="why-grid">
+    <div class="why-card">
+      <span class="why-icon">🔒</span>
+      <div class="why-title" data-i18n="why.c1title">100% Verified Profiles</div>
+      <p class="why-desc" data-i18n="why.c1desc">Every profile is manually verified with community credentials, Aadhaar, and family references. No fake profiles, no bots.</p>
+    </div>
+    <div class="why-card">
+      <span class="why-icon">🪷</span>
+      <div class="why-title" data-i18n="why.c2title">Exclusively Maratha</div>
+      <p class="why-desc" data-i18n="why.c2desc">This platform is exclusively for the Maratha community. Find matches who share the same culture, values, and traditions as you.</p>
+    </div>
+    <div class="why-card">
+      <span class="why-icon">🛡️</span>
+      <div class="why-title" data-i18n="why.c3title">Privacy First</div>
+      <p class="why-desc" data-i18n="why.c3desc">Your contact details are hidden until you choose to share them. You have complete control over who can see your profile.</p>
+    </div>
+    <div class="why-card">
+      <span class="why-icon">💬</span>
+      <div class="why-title" data-i18n="why.c4title">Family Involvement</div>
+      <p class="why-desc" data-i18n="why.c4desc">Designed to involve your entire family in the search. Families can manage profiles and communicate directly for the best matches.</p>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section class="testimonials-section">
+  <div class="section-label" data-i18n="testi.label">Success Stories</div>
+  <h2 class="section-title" data-i18n="testi.title">Families United, Lives Changed</h2>
+
+  <div class="testi-grid" id="testimonialsGrid" data-testimonials-grid>
+    <div class="testi-card">
+      <div class="stars">★★★★★</div>
+      <span class="testi-quote">"</span>
+      <p class="testi-text" data-i18n="testi.t1">We found each other on Sakal Maratha and got married within 8 months. The platform made the whole process smooth and respectful for both families.</p>
+      <div class="testi-author">
+        <div class="testi-avatar" style="background: var(--saffron-light); color: var(--saffron);">RJ</div>
+        <div>
+          <div class="testi-name">Rohit & Jyoti Jadhav</div>
+          <div class="testi-loc" data-i18n="testi.t1loc">Pune, Maharashtra • Married 2023</div>
+        </div>
+      </div>
+    </div>
+    <div class="testi-card">
+      <div class="stars">★★★★★</div>
+      <span class="testi-quote">"</span>
+      <p class="testi-text" data-i18n="testi.t2">Being able to filter by Kul and district was incredibly helpful. We found a match from the same taluka with shared family values. Perfect for us!</p>
+      <div class="testi-author">
+        <div class="testi-avatar" style="background: var(--maroon-light); color: var(--maroon);">SP</div>
+        <div>
+          <div class="testi-name">Suresh & Priya Patil</div>
+          <div class="testi-loc" data-i18n="testi.t2loc">Nashik, Maharashtra • Married 2024</div>
+        </div>
+      </div>
+    </div>
+    <div class="testi-card">
+      <div class="stars">★★★★★</div>
+      <span class="testi-quote">"</span>
+      <p class="testi-text" data-i18n="testi.t3">My parents were hesitant about online matrimony, but the verification process and family-friendly features won them over. Grateful for this platform!</p>
+      <div class="testi-author">
+        <div class="testi-avatar" style="background: var(--gold-light); color: var(--gold);">VM</div>
+        <div>
+          <div class="testi-name">Vikram & Meera More</div>
+          <div class="testi-loc" data-i18n="testi.t3loc">Kolhapur, Maharashtra • Married 2024</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <h2 class="cta-title" data-i18n="cta.title">Begin Your Journey to a Beautiful Union</h2>
+  <p class="cta-desc" data-i18n-html="cta.desc">Join over 50,000 Maratha families who trust Sakal Maratha Matrimonial.<br>Registration is completely free.</p>
+  <div class="cta-actions">
+    <a href="#" class="btn-primary" style="font-size:16px; padding: 16px 40px;" data-open-register data-i18n="cta.register">Register Free Today</a>
+    <a href="#" class="btn-secondary" style="font-size:16px; padding: 16px 40px;" data-i18n="cta.learn">Learn More</a>
+  </div>
+</section>
+
+</div><!-- /#site-main -->
+
+<!-- FOOTER -->
+<footer class="site-footer">
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <div class="nav-logo">
+        <div class="nav-logo-icon">🪷</div>
+        <div class="nav-logo-text">
+          Sakal Maratha
+          <span data-i18n="nav.subtitle">Matrimonial</span>
+        </div>
+      </div>
+      <p class="footer-tagline" data-i18n="footer.tagline">Dedicated to uniting Maratha families across Maharashtra and the world. Trusted, verified, and community-first.</p>
+    </div>
+    <div>
+      <div class="footer-col-title" data-i18n="footer.quickLinks">Quick Links</div>
+      <ul class="footer-links">
+        <li><a href="#" data-open-register data-i18n="footer.register">Register Free</a></li>
+        <li><a href="#" data-i18n="footer.browse">Browse Profiles</a></li>
+        <li><a href="#" data-i18n="footer.stories">Success Stories</a></li>
+        <li><a href="#" data-i18n="footer.premium">Premium Plans</a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="footer-col-title" data-i18n="footer.community">Community</div>
+      <ul class="footer-links">
+        <li><a href="#" data-i18n="footer.aboutMaratha">About Maratha</a></li>
+        <li><a href="#" data-i18n="footer.kulDir">Kul Directory</a></li>
+        <li><a href="#" data-i18n="footer.marriageTips">Marriage Tips</a></li>
+        <li><a href="#" data-i18n="footer.events">Community Events</a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="footer-col-title" data-i18n="footer.support">Support</div>
+      <ul class="footer-links">
+        <li><a href="#" data-i18n="footer.help">Help Center</a></li>
+        <li><a href="#" data-i18n="footer.privacy">Privacy Policy</a></li>
+        <li><a href="#" data-i18n="footer.terms">Terms of Use</a></li>
+        <li><a href="#" data-open-contact data-i18n="footer.contact">Contact Us</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span data-i18n="footer.copyright">© 2024 Sakal Maratha Matrimonial. All rights reserved.</span>
+    <span data-i18n="footer.made">Made with 🧡 for the Maratha Community</span>
+  </div>
+</footer>
+
+<div id="appModal" class="app-modal" hidden aria-hidden="true">
+  <div class="app-modal-backdrop" data-modal-close></div>
+  <div class="app-modal-panel" role="dialog" aria-labelledby="appModalTitle">
+    <button type="button" class="app-modal-close" data-modal-close aria-label="Close">&times;</button>
+    <h2 id="appModalTitle" class="app-modal-title"></h2>
+    <p id="appModalMessage" class="app-modal-message" hidden></p>
+    <div id="appModalBody"></div>
+  </div>
+</div>
+
+<script type="module" src="/src/js/app.js"></script>
+</body>
+</html>

@@ -12,75 +12,104 @@
 <!-- LOGIN SCREEN (only this until signed in) -->
 <div id="login-screen">
 
-<div class="login-top-bar">
-  <div class="nav-settings-wrap">
-    <button type="button" class="nav-settings-btn settings-toggle" aria-label="Settings">
-      <span data-i18n="settings.btnLabel">Settings</span>
-    </button>
-    <div class="settings-panel" id="settingsPanelLogin">
-      <div class="settings-panel-title" data-i18n="settings.title">Settings</div>
-      <div class="settings-panel-sub" data-i18n="settings.subtitle">Preferences</div>
-      <div class="settings-lang-block">
-        <span class="settings-row-label" data-i18n="settings.language">Language</span>
-        <div class="lang-switch" role="group" aria-label="Language">
-          <a href="#" class="lang-choice" data-set-lang="en" role="button">English</a>
-          <a href="#" class="lang-choice" data-set-lang="mr" role="button">मराठी</a>
-        </div>
-        <p class="lang-status">Current: <strong data-lang-status>English</strong></p>
-      </div>
-    </div>
-  </div>
-</div>
-
 <section class="login-hero" id="login">
-  <div class="login-bg" aria-hidden="true">
+  <div class="login-split-visual" aria-hidden="true">
     <img src="/assets/bhaiya-wedding.jpeg" alt="">
-    <div class="login-bg-shade"></div>
+    <div class="login-visual-shade"></div>
+    <div class="login-visual-content">
+      <span class="login-visual-badge" data-i18n="login.imageBadge">Trusted Community</span>
+      <h2 class="login-visual-title" data-i18n="login.imageTitle">Where traditions meet lifelong unions</h2>
+      <p class="login-visual-desc" data-i18n="login.imageDesc">Join thousands of Maratha families who found their perfect match through Sakal Maratha Matrimonial.</p>
+      <ul class="login-visual-features">
+        <li><span class="login-feature-icon">✦</span><span data-i18n="marquee.1">100% Maratha Profiles</span></li>
+        <li><span class="login-feature-icon">✦</span><span data-i18n="marquee.2">Verified Members</span></li>
+        <li><span class="login-feature-icon">✦</span><span data-i18n="marquee.3">Privacy Protected</span></li>
+      </ul>
+      <div class="login-visual-stats">
+        <div class="login-visual-stat">
+          <strong>50K+</strong>
+          <span data-i18n="hero.statProfiles">Verified Profiles</span>
+        </div>
+        <div class="login-visual-stat">
+          <strong>12K+</strong>
+          <span data-i18n="hero.statMatches">Successful Matches</span>
+        </div>
+      </div>
+    </div>
   </div>
-  <div class="login-panel">
-    <div class="login-brand">
-      <div class="login-brand-icon">🪷</div>
-      <div class="login-brand-text">
-        Sakal Maratha
-        <span data-i18n="nav.subtitle">Matrimonial</span>
+
+  <div class="login-split-form">
+    <div class="login-panel">
+      <div class="login-panel-accent" aria-hidden="true"></div>
+      <header class="login-panel-header">
+        <div class="login-brand">
+          <div class="login-brand-icon">🪷</div>
+          <div class="login-brand-text">
+            Sakal Maratha
+            <span data-i18n="nav.subtitle">Matrimonial</span>
+          </div>
+        </div>
+        <div class="nav-settings-wrap login-settings-wrap">
+          <button type="button" class="login-settings-btn settings-toggle" aria-label="Settings">
+            <svg class="login-settings-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+            <span data-i18n="settings.btnLabel">Settings</span>
+          </button>
+          <div class="settings-panel" id="settingsPanelLogin">
+            <div class="settings-panel-title" data-i18n="settings.title">Settings</div>
+            <div class="settings-panel-sub" data-i18n="settings.subtitle">Preferences</div>
+            <div class="settings-lang-block">
+              <span class="settings-row-label" data-i18n="settings.language">Language</span>
+              <div class="lang-switch" role="group" aria-label="Language">
+                <a href="#" class="lang-choice" data-set-lang="en" role="button">English</a>
+                <a href="#" class="lang-choice" data-set-lang="mr" role="button">मराठी</a>
+              </div>
+              <p class="lang-status">Current: <strong data-lang-status>English</strong></p>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <div class="login-panel-body">
+        <p class="login-label" data-i18n="login.label">Member Login</p>
+        <h1 class="login-title" data-i18n="login.title">Welcome Back</h1>
+        <p class="login-subtitle" data-i18n="login.subtitle">Sign in to continue your journey</p>
+
+        <form class="login-form" id="loginForm">
+          <div class="form-group login-input-wrap">
+            <label class="form-label" for="loginEmail" data-i18n="login.emailLabel">Email or Mobile</label>
+            <input class="form-input login-input" type="text" id="loginEmail" data-i18n-placeholder="login.emailPlaceholder" placeholder="you@email.com or +91...">
+          </div>
+          <div class="form-group login-input-wrap">
+            <label class="form-label" for="loginPassword" data-i18n="login.passwordLabel">Password</label>
+            <input class="form-input login-input" type="password" id="loginPassword" data-i18n-placeholder="login.passwordPlaceholder" placeholder="Enter your password">
+          </div>
+          <div class="login-options">
+            <label class="login-remember">
+              <input type="checkbox" name="remember">
+              <span data-i18n="login.remember">Remember me</span>
+            </label>
+            <a href="#" class="login-forgot" data-i18n="login.forgot">Forgot password?</a>
+          </div>
+          <button type="submit" class="btn-login" data-i18n="login.submit">Sign In</button>
+        </form>
+
+        <p class="login-register">
+          <span data-i18n="login.noAccount">Don't have an account?</span>
+          <a href="#" data-open-register data-i18n="login.register">Register Free</a>
+        </p>
+
+        <div class="login-trust login-trust-compact">
+          <div class="trust-item">
+            <div class="trust-num">50K+</div>
+            <div class="trust-label" data-i18n="hero.statProfiles">Verified Profiles</div>
+          </div>
+          <div class="trust-item">
+            <div class="trust-num">12K+</div>
+            <div class="trust-label" data-i18n="hero.statMatches">Successful Matches</div>
+          </div>
+        </div>
       </div>
     </div>
-    <p class="login-label" data-i18n="login.label">Member Login</p>
-    <h1 class="login-title" data-i18n="login.title">Welcome Back</h1>
-    <p class="login-subtitle" data-i18n="login.subtitle">Sign in to continue your journey</p>
-    <form class="login-form" id="loginForm">
-      <div class="form-group">
-        <label class="form-label" for="loginEmail" data-i18n="login.emailLabel">Email or Mobile</label>
-        <input class="form-input" type="text" id="loginEmail" data-i18n-placeholder="login.emailPlaceholder" placeholder="you@email.com or +91...">
-      </div>
-      <div class="form-group">
-        <label class="form-label" for="loginPassword" data-i18n="login.passwordLabel">Password</label>
-        <input class="form-input" type="password" id="loginPassword" data-i18n-placeholder="login.passwordPlaceholder" placeholder="Enter your password">
-      </div>
-      <div class="login-options">
-        <label class="login-remember">
-          <input type="checkbox" name="remember">
-          <span data-i18n="login.remember">Remember me</span>
-        </label>
-        <a href="#" class="login-forgot" data-i18n="login.forgot">Forgot password?</a>
-      </div>
-      <button type="submit" class="btn-login" data-i18n="login.submit">Sign In</button>
-    </form>
-    <p class="login-register">
-      <span data-i18n="login.noAccount">Don't have an account?</span>
-      <a href="#" data-open-register data-i18n="login.register">Register Free</a>
-    </p>
-    <div class="login-trust">
-      <div class="trust-item">
-        <div class="trust-num">50K+</div>
-        <div class="trust-label" data-i18n="hero.statProfiles">Verified Profiles</div>
-      </div>
-      <div class="trust-item">
-        <div class="trust-num">12K+</div>
-        <div class="trust-label" data-i18n="hero.statMatches">Successful Matches</div>
-      </div>
-    </div>
-    <p class="login-tagline" data-i18n="login.imageTitle">Where traditions meet lifelong unions</p>
   </div>
 </section>
 

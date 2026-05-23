@@ -16,6 +16,37 @@ export function setOnUnauthorized(handler) {
   onUnauthorized = handler;
 }
 
+async function requestForm(path, formData) {
+  const headers = {};
+  const token = getToken();
+  if (token) headers.Authorization = `Bearer ${token}`;
+
+  const res = await fetch(`${API_BASE}${path}`, { method: 'POST', body: formData, headers });
+  let data = null;
+  const text = await res.text();
+  if (text) {
+    try {
+      data = JSON.parse(text);
+    } catch {
+      data = { message: text };
+    }
+  }
+
+  if (res.status === 401) {
+    clearAuth();
+    onUnauthorized();
+  }
+
+  if (!res.ok) {
+    throw new ApiError(
+      data?.message || `Request failed (${res.status})`,
+      res.status,
+      data
+    );
+  }
+  return data;
+}
+
 async function request(path, options = {}) {
   const headers = { ...(options.headers || {}) };
   if (options.body && !headers['Content-Type']) {
@@ -78,6 +109,23 @@ export const api = {
 
   getMe() {
     return request('/auth/me');
+  },
+
+  getMyProfile() {
+    return request('/profiles/me');
+  },
+
+  updateMyProfile(payload) {
+    return request('/profiles/me', {
+      method: 'PUT',
+      body: JSON.stringify(payload),
+    });
+  },
+
+  parseBiodataPdf(file) {
+    const formData = new FormData();
+    formData.append('biodataPdf', file);
+    return requestForm('/biodata/parse-pdf', formData);
   },
 
   getFeatured(lang) {

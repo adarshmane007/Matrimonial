@@ -1,29 +1,62 @@
-import { isLoggedIn, getUser } from '../storage.js';
+import { isLoggedIn, getUser, clearAuth } from '../storage.js';
 import { showLoginScreen } from './session.js';
-import { clearAuth } from '../storage.js';
-
 export function updateNavAuth() {
   const loggedIn = isLoggedIn();
   const user = getUser();
   const logoutItem = document.getElementById('navLogoutItem');
   const userLabel = document.getElementById('navUserLabel');
-  const registerCtas = document.querySelectorAll('[data-open-register]');
+  const registerItem = document.getElementById('navRegisterItem');
+  const createProfileItem = document.getElementById('navCreateProfileItem');
+
+  document.body.classList.toggle('logged-in', loggedIn);
 
   if (logoutItem) logoutItem.hidden = !loggedIn;
   if (userLabel) {
     userLabel.hidden = !loggedIn;
     userLabel.textContent = user?.fullName ? `Hi, ${user.fullName.split(' ')[0]}` : '';
   }
+  if (registerItem) registerItem.hidden = loggedIn;
+  if (createProfileItem) createProfileItem.hidden = !loggedIn;
 
-  registerCtas.forEach((el) => {
-    if (loggedIn) el.setAttribute('aria-hidden', 'true');
-    else el.removeAttribute('aria-hidden');
+  document.querySelectorAll('[data-guest-only]').forEach((el) => {
+    el.hidden = loggedIn;
+  });
+  document.querySelectorAll('[data-member-only]').forEach((el) => {
+    el.hidden = !loggedIn;
   });
 }
 
+function closeOverlays() {
+  document.body.classList.remove('on-profile-page', 'on-browse-page', 'browse-filters-open', 'nav-open');
+  ['profile-page', 'browse-page'].forEach((id) => {
+    const el = document.getElementById(id);
+    if (el) el.hidden = true;
+  });
+  document.getElementById('navLinks')?.classList.remove('is-open');
+  document.getElementById('navMenuBtn')?.setAttribute('aria-expanded', 'false');
+}
+
 export function initNav() {
+  const menuBtn = document.getElementById('navMenuBtn');
+  const navLinks = document.getElementById('navLinks');
+
+  menuBtn?.addEventListener('click', () => {
+    const open = navLinks?.classList.toggle('is-open');
+    document.body.classList.toggle('nav-open', !!open);
+    menuBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+  });
+
+  navLinks?.querySelectorAll('a').forEach((a) => {
+    a.addEventListener('click', () => {
+      navLinks.classList.remove('is-open');
+      document.body.classList.remove('nav-open');
+      menuBtn?.setAttribute('aria-expanded', 'false');
+    });
+  });
+
   document.getElementById('logoutBtn')?.addEventListener('click', () => {
     clearAuth();
+    closeOverlays();
     showLoginScreen();
     updateNavAuth();
   });

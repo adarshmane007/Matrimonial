@@ -9,6 +9,8 @@ import { initAuth, restoreSession } from './auth.js';
 import { initRegister } from './register.js';
 import { initContact } from './contact.js';
 import { initProfileModal } from './profileModal.js';
+import { initMyProfile } from './myProfile.js';
+import { initBrowseProfiles } from './browseProfiles.js';
 import { loadFeaturedProfiles } from './profiles.js';
 import { initSearch } from './search.js';
 import { loadStats } from './stats.js';
@@ -26,6 +28,8 @@ async function bootstrap() {
   initRegister();
   initContact();
   initProfileModal();
+  initMyProfile();
+  initBrowseProfiles();
   initSearch();
 
   const restored = await restoreSession();

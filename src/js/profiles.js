@@ -15,18 +15,23 @@ export function renderProfileCard(profile, index = 0) {
   const bg = BG_CLASSES[index % BG_CLASSES.length];
   const tags = (profile.tags || [])
     .filter(Boolean)
+    .slice(0, 4)
     .map((t) => `<span class="tag">${escapeHtml(t)}</span>`)
     .join('');
 
   const onlineLabel =
     document.querySelector('[data-i18n="profiles.online"]')?.textContent || 'Online';
 
+  const photoInner = profile.photoUrl
+    ? `<img src="${escapeHtml(profile.photoUrl)}" alt="" class="profile-card-photo" loading="lazy">`
+    : `<div class="profile-img-bg ${bg}">👤</div>`;
+
   return `
     <article class="profile-card" data-profile-id="${profile.id}">
       <div class="profile-img-wrap">
-        <div class="profile-img-bg ${bg}">👤</div>
+        ${photoInner}
         ${profile.isOnline ? `<div class="profile-badge">${escapeHtml(onlineLabel)}</div>` : ''}
-        ${profile.isVerified ? '<div class="profile-badge" style="left:8px;right:auto;background:var(--maroon)">✓</div>' : ''}
+        ${profile.isVerified ? '<div class="profile-badge profile-badge-verified">✓ Verified</div>' : ''}
       </div>
       <div class="profile-info">
         <div class="profile-name">${escapeHtml(profile.displayName)}</div>
@@ -42,7 +47,7 @@ export function renderProfilesGrid(container, profiles) {
   if (!container) return;
   if (!profiles?.length) {
     container.innerHTML =
-      '<p class="profiles-empty" style="grid-column:1/-1;text-align:center;color:var(--warm-muted);padding:24px;">No profiles found.</p>';
+      '<p class="profiles-empty" style="grid-column:1/-1;text-align:center;color:var(--warm-muted);padding:24px;">No profiles found. Try adjusting your filters.</p>';
     return;
   }
   container.innerHTML = profiles.map((p, i) => renderProfileCard(p, i)).join('');

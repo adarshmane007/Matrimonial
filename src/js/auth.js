@@ -1,5 +1,6 @@
 import { api, ApiError, setOnUnauthorized } from './api.js';
 import { getToken, saveAuth, clearAuth } from './storage.js';
+import { openProfilePage } from './myProfile.js';
 import { enterMainSite, showLoginScreen } from './ui/session.js';
 
 function setLoginError(msg) {
@@ -45,9 +46,14 @@ export function initAuth() {
     try {
       const res = await api.login(identifier, password);
       if (res?.data?.token) {
-        saveAuth({ token: res.data.token, user: res.data.user });
+        saveAuth({
+          token: res.data.token,
+          user: res.data.user,
+          profile: res.data.profile || null,
+        });
       }
       enterMainSite();
+      if (res?.data?.profile) openProfilePage();
     } catch (err) {
       const msg =
         err instanceof ApiError
@@ -69,7 +75,11 @@ export async function restoreSession() {
   try {
     const res = await api.getMe();
     if (res?.data?.user) {
-      saveAuth({ token: getToken(), user: res.data.user });
+      saveAuth({
+        token: getToken(),
+        user: res.data.user,
+        profile: res.data.profile || null,
+      });
       enterMainSite();
       return true;
     }

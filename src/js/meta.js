@@ -11,13 +11,23 @@ export async function getSiteMeta() {
     cached = res?.data;
     return cached;
   } catch {
+    const any = (label) => [{ value: 'any', label }];
     return {
-      districts: FALLBACK_DISTRICTS,
+      districts: [{ value: 'all', label: 'All Maharashtra' }, ...FALLBACK_DISTRICTS],
       educationLevels: [{ value: 'any', label: 'Any Education' }, ...FALLBACK_EDUCATION],
       genders: [
         { value: 'bride', label: 'Bride' },
         { value: 'groom', label: 'Groom' },
       ],
+      maritalStatuses: [...any('Any'), { value: 'never_married', label: 'Never Married' }],
+      diets: [...any('Any'), { value: 'veg', label: 'Vegetarian' }],
+      manglikOptions: [...any('Any'), { value: 'no', label: 'Non-Manglik' }],
+      employmentTypes: [...any('Any'), { value: 'private', label: 'Private Sector' }],
+      motherTongues: [...any('Any'), { value: 'marathi', label: 'Marathi' }],
+      familyTypes: [...any('Any'), { value: 'joint', label: 'Joint Family' }],
+      incomeBrackets: [...any('Any Income'), { value: '5_10', label: '₹5 – 10 Lakh' }],
+      heights: [{ value: '', label: 'Any' }],
+      sortOptions: [{ value: 'recent', label: 'Recently joined' }],
     };
   }
 }

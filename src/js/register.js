@@ -3,6 +3,7 @@ import { saveAuth } from './storage.js';
 import { getSiteMeta } from './meta.js';
 import { openModal, closeModal, setModalMessage } from './ui/modal.js';
 import { enterMainSite } from './ui/session.js';
+import { openProfilePage } from './myProfile.js';
 
 function optionsHtml(items, selected = '') {
   return items
@@ -166,9 +167,14 @@ function bindRegisterSubmit(form) {
     btn.disabled = true;
     try {
       const res = await api.register(payload);
-      saveAuth({ token: res.data.token, user: res.data.user });
+      saveAuth({
+        token: res.data.token,
+        user: res.data.user,
+        profile: res.data.profile || null,
+      });
       closeModal();
       enterMainSite();
+      openProfilePage();
     } catch (err) {
       setModalMessage(err instanceof ApiError ? err.message : 'Registration failed.', true);
     } finally {
@@ -228,7 +234,7 @@ export async function openRegisterModal() {
 export function initRegister() {
   document.addEventListener('click', (e) => {
     const el = e.target.closest('[data-open-register]');
-    if (!el) return;
+    if (!el || el.hidden || document.body.classList.contains('logged-in')) return;
     e.preventDefault();
     openRegisterModal();
   });

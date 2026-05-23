@@ -10,21 +10,68 @@ function escapeHtml(str) {
     .replace(/>/g, '&gt;');
 }
 
+function factRow(label, value) {
+  if (!value) return '';
+  return `<li><span class="fact-label">${escapeHtml(label)}</span><span class="fact-value">${escapeHtml(value)}</span></li>`;
+}
+
 function profileHtml(p) {
   const tags = (p.tags || []).map((t) => `<span class="tag">${escapeHtml(t)}</span>`).join('');
+  const photoBlock = p.photoUrl
+    ? `<div class="profile-detail-photo"><img src="${escapeHtml(p.photoUrl)}" alt=""></div>`
+    : '';
+
   return `
-    <div class="profile-detail">
+    <div class="profile-detail profile-detail-rich">
+      ${photoBlock}
       <h3 class="profile-detail-name">${escapeHtml(p.displayName)}</h3>
       <p class="profile-detail-sub">${escapeHtml(p.subtitle || '')}</p>
+      ${p.isVerified ? '<p class="profile-verified-pill">✓ Verified Member</p>' : ''}
       <div class="profile-tags" style="margin:12px 0">${tags}</div>
-      ${p.bio ? `<p class="profile-detail-bio">${escapeHtml(p.bio)}</p>` : ''}
-      <ul class="profile-detail-facts">
-        ${p.districtLabel ? `<li><strong>District:</strong> ${escapeHtml(p.districtLabel)}</li>` : ''}
-        ${p.occupation ? `<li><strong>Occupation:</strong> ${escapeHtml(p.occupation)}</li>` : ''}
-        ${p.education ? `<li><strong>Education:</strong> ${escapeHtml(p.education)}</li>` : ''}
-        ${p.height ? `<li><strong>Height:</strong> ${escapeHtml(p.height)}</li>` : ''}
-        ${p.kul ? `<li><strong>Kul:</strong> ${escapeHtml(p.kul)}</li>` : ''}
-      </ul>
+
+      <div class="profile-detail-section">
+        <h4 class="profile-detail-section-title">Basic Information</h4>
+        <ul class="profile-detail-facts profile-detail-facts-grid">
+          ${factRow('Age', p.age ? `${p.age} years` : null)}
+          ${factRow('Height', p.height)}
+          ${factRow('Marital Status', p.maritalStatusLabel)}
+          ${factRow('Kul', p.kul)}
+          ${factRow('Manglik', p.manglikLabel)}
+          ${factRow('Diet', p.dietLabel)}
+        </ul>
+      </div>
+
+      <div class="profile-detail-section">
+        <h4 class="profile-detail-section-title">Location</h4>
+        <ul class="profile-detail-facts profile-detail-facts-grid">
+          ${factRow('District', p.districtLabel)}
+          ${factRow('City', p.city)}
+          ${factRow('Native Place', p.nativePlace)}
+        </ul>
+      </div>
+
+      <div class="profile-detail-section">
+        <h4 class="profile-detail-section-title">Education &amp; Career</h4>
+        <ul class="profile-detail-facts profile-detail-facts-grid">
+          ${factRow('Education', p.education)}
+          ${factRow('Qualification', p.educationLabel)}
+          ${factRow('Occupation', p.occupation)}
+          ${factRow('Employed In', p.employmentLabel)}
+          ${factRow('Annual Income', p.incomeLabel || p.salary)}
+        </ul>
+      </div>
+
+      <div class="profile-detail-section">
+        <h4 class="profile-detail-section-title">Family &amp; Background</h4>
+        <ul class="profile-detail-facts profile-detail-facts-grid">
+          ${factRow('Mother Tongue', p.motherTongueLabel)}
+          ${factRow('Family Type', p.familyTypeLabel)}
+          ${factRow("Father's Occupation", p.fatherOccupation)}
+        </ul>
+      </div>
+
+      ${p.bio ? `<div class="profile-detail-section"><h4 class="profile-detail-section-title">About</h4><p class="profile-detail-bio">${escapeHtml(p.bio)}</p></div>` : ''}
+
       <div id="profileModalActions"></div>
     </div>
   `;
@@ -39,7 +86,7 @@ export async function openProfileModal(profileId) {
     const p = res?.data;
     if (!p) throw new Error('Not found');
 
-    openModal('Profile', profileHtml(p));
+    openModal(p.displayName, profileHtml(p));
     const actions = document.getElementById('profileModalActions');
 
     if (isLoggedIn()) {
@@ -66,7 +113,7 @@ export async function openProfileModal(profileId) {
     } else {
       actions.innerHTML = `
         <p class="modal-hint" style="margin-top:16px">Sign in to express interest in this profile.</p>
-        <button type="button" class="btn-secondary" id="profileLoginBtn" style="margin-top:8px;width:100%;text-align:center">Sign in / Register</button>
+        <button type="button" class="btn-secondary" id="profileLoginBtn" style="margin-top:8px;width:100%;text-align:center">Sign in</button>
       `;
       document.getElementById('profileLoginBtn')?.addEventListener('click', () => {
         document.getElementById('appModal').hidden = true;

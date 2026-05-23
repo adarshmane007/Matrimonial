@@ -3,6 +3,7 @@ export const STORAGE_KEYS = {
   session: 'smm-session',
   token: 'smm-token',
   user: 'smm-user',
+  profile: 'smm-profile',
 };
 
 export function getToken() {
@@ -40,15 +41,35 @@ export function setUser(user) {
   }
 }
 
-export function saveAuth({ token, user }) {
+export function saveAuth({ token, user, profile }) {
   setToken(token);
   setUser(user || null);
+  if (profile !== undefined) setProfile(profile);
   setSession(true);
+}
+
+export function getProfile() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEYS.profile);
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
+}
+
+export function setProfile(profile) {
+  try {
+    if (profile) localStorage.setItem(STORAGE_KEYS.profile, JSON.stringify(profile));
+    else localStorage.removeItem(STORAGE_KEYS.profile);
+  } catch {
+    /* ignore */
+  }
 }
 
 export function clearAuth() {
   setToken(null);
   setUser(null);
+  setProfile(null);
   setSession(false);
 }
 

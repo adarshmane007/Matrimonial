@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Sakal Maratha Matrimonial</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Noto+Sans+Devanagari:wght@300;400;500&display=swap" rel="stylesheet">
@@ -33,7 +33,11 @@
 </div>
 
 <section class="login-hero" id="login">
-  <div class="login-left">
+  <div class="login-bg" aria-hidden="true">
+    <img src="/assets/bhaiya-wedding.jpeg" alt="">
+    <div class="login-bg-shade"></div>
+  </div>
+  <div class="login-panel">
     <div class="login-brand">
       <div class="login-brand-icon">🪷</div>
       <div class="login-brand-text">
@@ -76,15 +80,7 @@
         <div class="trust-label" data-i18n="hero.statMatches">Successful Matches</div>
       </div>
     </div>
-  </div>
-  <div class="login-right">
-    <img src="/assets/bhaiya-wedding.jpeg" alt="Traditional Maratha wedding ceremony">
-    <div class="login-right-overlay"></div>
-    <span class="login-right-badge" data-i18n="login.imageBadge">Trusted Community</span>
-    <div class="login-right-caption">
-      <h2 data-i18n="login.imageTitle">Where traditions meet lifelong unions</h2>
-      <p data-i18n="login.imageDesc">Join thousands of Maratha families who found their perfect match through Sakal Maratha Matrimonial.</p>
-    </div>
+    <p class="login-tagline" data-i18n="login.imageTitle">Where traditions meet lifelong unions</p>
   </div>
 </section>
 
@@ -94,7 +90,7 @@
       <div class="section-label" data-i18n="profiles.label">Featured Profiles</div>
       <h2 class="section-title" style="margin-bottom:0;" data-i18n="profiles.title">Recently Joined Members</h2>
     </div>
-    <a href="#" class="btn-outline enter-main" data-i18n="profiles.viewAll">View All Profiles →</a>
+    <a href="#" class="btn-outline" data-open-browse data-i18n="profiles.viewAll">View All Profiles →</a>
   </div>
   <div class="profiles-grid" id="loginProfilesGrid" data-profiles-grid>
     <article class="profile-card">
@@ -172,7 +168,8 @@
       <span data-i18n="nav.subtitle">Matrimonial</span>
     </div>
   </div>
-  <ul class="nav-links">
+  <button type="button" class="nav-menu-btn" id="navMenuBtn" aria-label="Open menu" aria-expanded="false">☰</button>
+  <ul class="nav-links" id="navLinks">
     <li class="nav-settings-item">
       <div class="nav-settings-wrap">
         <button type="button" class="nav-settings-btn settings-toggle" id="settingsBtn" aria-label="Settings">
@@ -192,7 +189,7 @@
         </div>
       </div>
     </li>
-    <li><a href="#" data-i18n="nav.findMatch">Find Match</a></li>
+    <li><a href="#" data-open-browse data-i18n="nav.findMatch">Find Match</a></li>
     <li><a href="#" data-i18n="nav.successStories">Success Stories</a></li>
     <li><a href="#" data-i18n="nav.aboutUs">About Us</a></li>
     <li><a href="#" data-open-contact data-i18n="nav.contact">Contact</a></li>
@@ -200,9 +197,17 @@
     <li id="navLogoutItem" hidden>
       <button type="button" class="nav-logout-btn" id="logoutBtn">Logout</button>
     </li>
-    <li><a href="#" class="nav-cta" data-open-register data-i18n="nav.freeRegister">Free Register</a></li>
+    <li id="navRegisterItem">
+      <a href="#" class="nav-cta" data-open-register data-i18n="nav.freeRegister">Free Register</a>
+    </li>
+    <li id="navCreateProfileItem" hidden>
+      <a href="#" class="nav-cta nav-cta-profile" id="createProfileBtn" data-i18n="nav.createProfile">Create Profile</a>
+    </li>
   </ul>
 </nav>
+
+<section id="profile-page" class="profile-page" hidden aria-label="Create profile"></section>
+<section id="browse-page" class="browse-page" hidden aria-label="Browse profiles"></section>
 
 <!-- HERO -->
 <section class="hero">
@@ -216,8 +221,9 @@
       Sakal Maratha Matrimonial is a trusted platform dedicated to uniting Maratha families across Maharashtra and beyond. Thousands of verified profiles, helping you find the right match with shared values and culture.
     </p>
     <div class="hero-actions">
-      <a href="#" class="btn-primary" data-open-register data-i18n="hero.register">Register Free Today</a>
-      <a href="#" class="btn-secondary" data-i18n="hero.browse">Browse Profiles</a>
+      <a href="#" class="btn-primary" data-open-register data-guest-only data-i18n="hero.register">Register Free Today</a>
+      <a href="#" class="btn-primary" data-open-profile data-member-only hidden data-i18n="hero.createProfile">Create Profile</a>
+      <a href="#" class="btn-secondary" data-open-browse data-i18n="hero.browse">Browse Profiles</a>
     </div>
     <div class="hero-stats">
       <div>
@@ -361,7 +367,7 @@
       <div class="section-label" data-i18n="profiles.label">Featured Profiles</div>
       <h2 class="section-title" style="margin-bottom:0;" data-i18n="profiles.title">Recently Joined Members</h2>
     </div>
-    <a href="#" class="btn-secondary" style="font-size:13px; padding: 11px 24px;" data-i18n="profiles.viewAll">View All Profiles →</a>
+    <a href="#" class="btn-secondary" style="font-size:13px; padding: 11px 24px;" data-open-browse data-i18n="profiles.viewAll">View All Profiles →</a>
   </div>
 
   <div class="profiles-grid" id="mainProfilesGrid" data-profiles-grid>
@@ -524,7 +530,7 @@
       <div class="footer-col-title" data-i18n="footer.quickLinks">Quick Links</div>
       <ul class="footer-links">
         <li><a href="#" data-open-register data-i18n="footer.register">Register Free</a></li>
-        <li><a href="#" data-i18n="footer.browse">Browse Profiles</a></li>
+        <li><a href="#" data-open-browse data-i18n="footer.browse">Browse Profiles</a></li>
         <li><a href="#" data-i18n="footer.stories">Success Stories</a></li>
         <li><a href="#" data-i18n="footer.premium">Premium Plans</a></li>
       </ul>

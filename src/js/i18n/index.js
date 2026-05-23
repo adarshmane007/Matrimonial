@@ -16,7 +16,34 @@ function yearsLabel(n, lang) {
   return lang === 'mr' ? `${n} वर्षे` : `${n} Years`;
 }
 
+let applyingLanguage = false;
+
+/** Update i18n inside a subtree only — does not fire smm:lang-change. */
+export function applyLanguageToRoot(root, lang = currentLang) {
+  if (!root) return;
+  const dict = translations[lang === 'mr' ? 'mr' : 'en'] || translations.en;
+  root.querySelectorAll('[data-i18n]').forEach((el) => {
+    if (el.classList.contains('lang-choice')) return;
+    const key = el.getAttribute('data-i18n');
+    if (!key || dict[key] === undefined) return;
+    el.textContent = dict[key];
+  });
+  root.querySelectorAll('[data-i18n-html]').forEach((el) => {
+    const key = el.getAttribute('data-i18n-html');
+    if (!key || dict[key] === undefined) return;
+    el.innerHTML = dict[key];
+  });
+  root.querySelectorAll('[data-i18n-placeholder]').forEach((el) => {
+    const key = el.getAttribute('data-i18n-placeholder');
+    if (!key || dict[key] === undefined) return;
+    el.placeholder = dict[key];
+  });
+}
+
 export function applyLanguage(lang) {
+  if (applyingLanguage) return;
+  applyingLanguage = true;
+  try {
   lang = lang === 'mr' ? 'mr' : 'en';
   currentLang = lang;
   const dict = translations[lang] || translations.en;
@@ -71,6 +98,9 @@ export function applyLanguage(lang) {
 
   saveLang(lang);
   document.dispatchEvent(new CustomEvent('smm:lang-change', { detail: { lang } }));
+  } finally {
+    applyingLanguage = false;
+  }
 }
 
 export function initI18n() {

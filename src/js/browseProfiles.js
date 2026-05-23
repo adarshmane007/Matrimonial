@@ -1,6 +1,6 @@
 import { api, ApiError } from './api.js';
 import { getSiteMeta } from './meta.js';
-import { getLang, t } from './i18n/index.js';
+import { applyLanguageToRoot, getLang, t } from './i18n/index.js';
 import { renderProfilesGrid } from './profiles.js';
 import { bindBrowseLocationFilters } from './locationSelect.js';
 import { enterMainSite } from './ui/session.js';
@@ -311,7 +311,7 @@ async function runSearch(form) {
     grid.innerHTML = `<p class="profiles-empty is-error">${escapeHtml(msg)}</p>`;
   }
 
-  if (window.__applySiteLanguage) window.__applySiteLanguage(getLang());
+  applyLanguageToRoot(grid);
 }
 
 function bindBrowseEvents(meta) {
@@ -354,7 +354,7 @@ function bindBrowseEvents(meta) {
     if (label) {
       label.textContent = open ? t('browse.hideFilters') : t('browse.showFilters');
       label.setAttribute('data-i18n', open ? 'browse.hideFilters' : 'browse.showFilters');
-      if (window.__applySiteLanguage) window.__applySiteLanguage(getLang());
+      label.textContent = t(open ? 'browse.hideFilters' : 'browse.showFilters');
     }
   });
 
@@ -407,7 +407,7 @@ export async function openBrowsePage(initial = {}) {
       if (initial.education && form?.elements.education) form.elements.education.value = initial.education;
 
       await runSearch(form);
-      if (window.__applySiteLanguage) window.__applySiteLanguage(getLang());
+      applyLanguageToRoot(page);
     } catch (err) {
       page.innerHTML = `<p class="profile-status is-error">${escapeHtml(err.message)}</p>`;
     }

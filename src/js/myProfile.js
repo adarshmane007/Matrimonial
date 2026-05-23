@@ -480,10 +480,12 @@ function bindProfilePageEvents(meta) {
 
 export function initMyProfile() {
   document.addEventListener('smm:lang-change', () => {
-    profilePageMounted = false;
-    profileMetaCache = null;
-    if (document.body.classList.contains('on-profile-page')) {
-      applyLanguage(getLang());
+    if (!document.body.classList.contains('on-profile-page')) return;
+    const page = document.getElementById('profile-page');
+    if (page) {
+      import('./i18n/index.js').then(({ applyLanguageToRoot }) => {
+        applyLanguageToRoot(page);
+      });
     }
   });
 

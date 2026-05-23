@@ -1,5 +1,5 @@
 import { api } from './api.js';
-import { getLang } from './i18n/index.js';
+import { applyLanguageToRoot, getLang } from './i18n/index.js';
 import { getProfile } from './storage.js';
 
 const BG_CLASSES = ['profile-img-bg-1', 'profile-img-bg-2', 'profile-img-bg-3'];
@@ -57,7 +57,7 @@ export function renderProfilesGrid(container, profiles, options = {}) {
     return;
   }
   container.innerHTML = profiles.map((p, i) => renderProfileCard(p, i, options)).join('');
-  if (window.__applySiteLanguage) window.__applySiteLanguage(getLang());
+  applyLanguageToRoot(container);
 }
 
 export async function loadFeaturedProfiles() {

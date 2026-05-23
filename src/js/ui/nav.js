@@ -2,23 +2,22 @@ import { isLoggedIn, getUser, getProfile, clearAuth } from '../storage.js';
 import { showLoginScreen } from './session.js';
 import { closeFullPageOverlays } from './fullPage.js';
 import { api } from '../api.js';
-import { getLang } from '../i18n/index.js';
+import { getLang, t } from '../i18n/index.js';
 
 function syncProfileCtaLabels() {
   const hasProfile = !!(getProfile()?.id);
   const navKey = hasProfile ? 'nav.viewProfile' : 'nav.createProfile';
   const heroKey = hasProfile ? 'hero.viewProfile' : 'hero.createProfile';
+  const lang = getLang();
 
   document.querySelectorAll('[data-i18n-profile-cta]').forEach((el) => {
     el.setAttribute('data-i18n', navKey);
+    el.textContent = t(navKey, lang);
   });
   document.querySelectorAll('[data-i18n-hero-profile-cta]').forEach((el) => {
     el.setAttribute('data-i18n', heroKey);
+    el.textContent = t(heroKey, lang);
   });
-
-  if (typeof window.__applySiteLanguage === 'function') {
-    window.__applySiteLanguage(getLang());
-  }
 }
 
 function setBadge(el, count) {

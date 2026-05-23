@@ -504,9 +504,10 @@ export function initChat() {
 
   document.addEventListener('smm:lang-change', () => {
     if (!document.body.classList.contains('on-chat-page')) return;
-    chatMounted = false;
-    const tab = chatState.tab;
-    const conv = chatState.activeConversationId;
-    openChatPage(tab, conv);
+    const page = document.getElementById('chat-page');
+    if (!page) return;
+    import('./i18n/index.js').then(({ applyLanguageToRoot }) => {
+      applyLanguageToRoot(page);
+    });
   });
 }

@@ -173,8 +173,11 @@ function pageShell(meta) {
         <span class="browse-filter-count" id="browseActiveCount" hidden></span>
       </button>
       <div class="browse-layout">
-        <aside class="browse-sidebar" id="browseSidebar">
+        <aside class="browse-sidebar" id="browseSidebar" aria-hidden="true">
           <div class="browse-sidebar-inner card-panel">
+            <div class="browse-sidebar-top">
+              <button type="button" class="browse-sidebar-close" id="browseSidebarClose" data-i18n="browse.backToResults">← Back to results</button>
+            </div>
             ${filtersHtml(meta)}
           </div>
         </aside>
@@ -314,6 +317,20 @@ async function runSearch(form) {
   applyLanguageToRoot(grid);
 }
 
+function closeBrowseFilters() {
+  const sidebar = document.getElementById('browseSidebar');
+  const toggle = document.getElementById('browseFiltersToggle');
+  sidebar?.classList.remove('is-open');
+  sidebar?.setAttribute('aria-hidden', 'true');
+  document.body.classList.remove('browse-filters-open');
+  toggle?.setAttribute('aria-expanded', 'false');
+  const label = toggle?.querySelector('span[data-i18n]');
+  if (label) {
+    label.setAttribute('data-i18n', 'browse.showFilters');
+    label.textContent = t('browse.showFilters');
+  }
+}
+
 function bindBrowseEvents(meta) {
   const form = document.getElementById('browseFiltersForm');
   const sidebar = document.getElementById('browseSidebar');
@@ -332,9 +349,7 @@ function bindBrowseEvents(meta) {
     e.preventDefault();
     currentPage = 1;
     runSearch(form);
-    sidebar?.classList.remove('is-open');
-    document.body.classList.remove('browse-filters-open');
-    toggle?.setAttribute('aria-expanded', 'false');
+    closeBrowseFilters();
   });
 
   document.getElementById('browseResetBtn')?.addEventListener('click', () => {
@@ -348,13 +363,28 @@ function bindBrowseEvents(meta) {
 
   toggle?.addEventListener('click', () => {
     const open = sidebar?.classList.toggle('is-open');
+    sidebar?.setAttribute('aria-hidden', open ? 'false' : 'true');
     document.body.classList.toggle('browse-filters-open', !!open);
     toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
-    const label = toggle.querySelector('span');
+    const label = toggle.querySelector('span[data-i18n]');
     if (label) {
-      label.textContent = open ? t('browse.hideFilters') : t('browse.showFilters');
       label.setAttribute('data-i18n', open ? 'browse.hideFilters' : 'browse.showFilters');
       label.textContent = t(open ? 'browse.hideFilters' : 'browse.showFilters');
+    }
+  });
+
+  document.getElementById('browseSidebarClose')?.addEventListener('click', (e) => {
+    e.preventDefault();
+    closeBrowseFilters();
+  });
+
+  sidebar?.addEventListener('click', (e) => {
+    if (e.target === sidebar) closeBrowseFilters();
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && document.body.classList.contains('browse-filters-open')) {
+      closeBrowseFilters();
     }
   });
 
@@ -365,6 +395,7 @@ function bindBrowseEvents(meta) {
 }
 
 export function closeBrowsePage() {
+  closeBrowseFilters();
   document.body.classList.remove('on-browse-page', 'browse-filters-open');
   const page = document.getElementById('browse-page');
   if (page) page.hidden = true;

@@ -98,6 +98,8 @@ function closeOverlays() {
 
 export function goToHome() {
   closeOverlays();
+  document.getElementById('mobileMoreSheet')?.setAttribute('hidden', '');
+  document.body.classList.remove('mobile-more-open');
   document.querySelectorAll('.mobile-nav-item').forEach((el) => el.classList.remove('is-active'));
   document.querySelector('.mobile-nav-item[data-nav-tab="home"]')?.classList.add('is-active');
   window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -129,6 +131,53 @@ export function initNav() {
   };
   document.getElementById('logoutBtn')?.addEventListener('click', doLogout);
   document.getElementById('mobileLogoutBtn')?.addEventListener('click', doLogout);
+  document.getElementById('mobileMoreLogoutBtn')?.addEventListener('click', doLogout);
+
+  const moreSheet = document.getElementById('mobileMoreSheet');
+  const moreBtn = document.getElementById('mobileMoreBtn');
+  const moreBackdrop = document.getElementById('mobileMoreBackdrop');
+  const moreClose = document.getElementById('mobileMoreClose');
+
+  function openMobileMore() {
+    if (!moreSheet) return;
+    moreSheet.hidden = false;
+    moreSheet.setAttribute('aria-hidden', 'false');
+    moreBtn?.setAttribute('aria-expanded', 'true');
+    moreBtn?.classList.add('is-active');
+    document.body.classList.add('mobile-more-open');
+  }
+
+  function closeMobileMore() {
+    if (!moreSheet) return;
+    moreSheet.hidden = true;
+    moreSheet.setAttribute('aria-hidden', 'true');
+    moreBtn?.setAttribute('aria-expanded', 'false');
+    moreBtn?.classList.remove('is-active');
+    document.body.classList.remove('mobile-more-open');
+  }
+
+  moreBtn?.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (moreSheet?.hidden) openMobileMore();
+    else closeMobileMore();
+  });
+  moreBackdrop?.addEventListener('click', closeMobileMore);
+  moreClose?.addEventListener('click', closeMobileMore);
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && document.body.classList.contains('mobile-more-open')) closeMobileMore();
+  });
+
+  document.addEventListener('click', (e) => {
+    if (e.target.closest('[data-set-lang]') && document.body.classList.contains('mobile-more-open')) {
+      setTimeout(closeMobileMore, 120);
+    }
+    const tab = e.target.closest('[data-nav-tab]');
+    if (tab && tab.id !== 'mobileMoreBtn' && document.body.classList.contains('mobile-more-open')) {
+      closeMobileMore();
+    }
+  });
   document.querySelectorAll('[data-nav-home]').forEach((el) => {
     el.addEventListener('click', (e) => {
       e.preventDefault();
@@ -144,6 +193,9 @@ export function initNav() {
   document.addEventListener('click', (e) => {
     const tab = e.target.closest('[data-nav-tab]');
     if (!tab || !document.body.classList.contains('logged-in')) return;
+    if (tab.id === 'mobileMoreBtn') return;
+    document.getElementById('mobileMoreSheet')?.setAttribute('hidden', '');
+    document.body.classList.remove('mobile-more-open');
     document.querySelectorAll('.mobile-nav-item').forEach((el) => el.classList.remove('is-active'));
     tab.classList.add('is-active');
   });

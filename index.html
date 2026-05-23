@@ -270,7 +270,34 @@
     <span class="mobile-nav-icon">👤</span>
     <span data-i18n="nav.createProfile" data-i18n-profile-cta>Profile</span>
   </a>
+  <button type="button" class="mobile-nav-item mobile-nav-more" id="mobileMoreBtn" data-nav-tab="more" aria-expanded="false" aria-haspopup="dialog">
+    <span class="mobile-nav-icon">☰</span>
+    <span data-i18n="mobile.more">More</span>
+  </button>
 </nav>
+
+<div class="mobile-more-sheet" id="mobileMoreSheet" hidden aria-hidden="true">
+  <div class="mobile-more-backdrop" id="mobileMoreBackdrop"></div>
+  <div class="mobile-more-panel" role="dialog" aria-labelledby="mobileMoreTitle">
+    <div class="mobile-more-header">
+      <h2 id="mobileMoreTitle" data-i18n="mobile.moreMenu">Menu</h2>
+      <button type="button" class="mobile-more-close" id="mobileMoreClose" aria-label="Close">✕</button>
+    </div>
+    <div class="mobile-more-settings">
+      <p class="settings-panel-title" data-i18n="settings.title">Settings</p>
+      <p class="settings-panel-sub" data-i18n="settings.subtitle">Preferences</p>
+      <div class="settings-lang-block">
+        <span class="settings-row-label" data-i18n="settings.language">Language</span>
+        <div class="lang-switch" role="group" aria-label="Language">
+          <a href="#" class="lang-choice" data-set-lang="en" role="button">English</a>
+          <a href="#" class="lang-choice" data-set-lang="mr" role="button">मराठी</a>
+        </div>
+        <p class="lang-status"><span data-i18n="settings.currentLang">Current language:</span> <strong data-lang-status>English</strong></p>
+      </div>
+    </div>
+    <button type="button" class="btn-secondary mobile-more-logout" id="mobileMoreLogoutBtn" data-i18n="nav.logout">Logout</button>
+  </div>
+</div>
 
 <!-- HERO -->
 <section class="hero">

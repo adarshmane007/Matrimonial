@@ -40,11 +40,17 @@ async function bootstrap() {
 
   await Promise.all([loadFeaturedProfiles(), loadTestimonials(getLang())]);
 
+  let langReloadTimer = null;
   document.addEventListener('smm:lang-change', (e) => {
     clearMetaCache();
     const lang = e.detail?.lang || getLang();
-    loadFeaturedProfiles();
-    loadTestimonials(lang);
+    clearTimeout(langReloadTimer);
+    langReloadTimer = setTimeout(() => {
+      if (!document.body.classList.contains('on-browse-page')) {
+        loadFeaturedProfiles();
+      }
+      loadTestimonials(lang);
+    }, 80);
   });
 
   document.addEventListener('smm:enter-main', () => {

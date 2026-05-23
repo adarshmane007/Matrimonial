@@ -1,8 +1,7 @@
 import { api, ApiError } from './api.js';
 import { getProfile, setProfile } from './storage.js';
 import { getSiteMeta } from './meta.js';
-import { getLang } from './i18n/index.js';
-import { applyLanguage } from './i18n/index.js';
+import { applyLanguageToRoot, getLang } from './i18n/index.js';
 import { closeFullPageOverlays } from './ui/fullPage.js';
 import { isNavLocked, withNavLock } from './ui/navigation.js';
 import {
@@ -322,7 +321,7 @@ let profileMetaCache = null;
 function renderProfileForm(page, meta, p) {
   const formValues = profileToFormValues(p);
   page.innerHTML = formHtml(meta, formValues);
-  applyLanguage(getLang());
+  applyLanguageToRoot(page, getLang());
   bindProfilePageEvents(meta);
   bindLocationFields(page, locationFromStoredProfile(formValues));
 }

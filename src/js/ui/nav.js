@@ -1,6 +1,6 @@
 import { isLoggedIn, getUser, getProfile, clearAuth } from '../storage.js';
 import { showLoginScreen } from './session.js';
-import { unlockPageScroll } from './scrollLock.js';
+import { closeFullPageOverlays } from './fullPage.js';
 import { api } from '../api.js';
 import { getLang } from '../i18n/index.js';
 
@@ -90,23 +90,8 @@ export function updateNavAuth() {
 }
 
 function closeOverlays() {
-  document.body.classList.remove(
-    'on-profile-page',
-    'on-browse-page',
-    'on-chat-page',
-    'chat-thread-open',
-    'browse-filters-open',
-    'nav-open'
-  );
-  ['profile-page', 'browse-page', 'chat-page'].forEach((id) => {
-    const el = document.getElementById(id);
-    if (el) el.hidden = true;
-  });
-  document.getElementById('navLinks')?.classList.remove('is-open');
-  document.getElementById('navMenuBtn')?.setAttribute('aria-expanded', 'false');
-  if (!document.body.classList.contains('on-profile-page') && !document.body.classList.contains('on-browse-page')) {
-    unlockPageScroll();
-  }
+  closeFullPageOverlays();
+  document.body.classList.remove('nav-open');
 }
 
 export function goToHome() {

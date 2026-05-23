@@ -4,6 +4,7 @@ import { getLang } from './i18n/index.js';
 import { translations } from './i18n/translations.js';
 import { openProfileModal } from './profileModal.js';
 import { refreshNavBadges } from './ui/nav.js';
+import { closeFullPageOverlays } from './ui/fullPage.js';
 
 function t(key) {
   const lang = getLang();
@@ -255,10 +256,12 @@ export async function openChatPage(tab = 'chats', conversationId = null) {
   chatState.tab = tab;
   chatState.activeConversationId = conversationId;
 
+  closeFullPageOverlays({ except: 'chat' });
   ensureChatMounted(page);
 
   document.body.classList.add('on-chat-page');
   page.hidden = false;
+  window.scrollTo({ top: 0, behavior: 'instant' in window ? 'instant' : 'auto' });
 
   const useCache = chatCache.at && Date.now() - chatCache.at < CACHE_MS;
   if (!useCache) setLoading(page, true);

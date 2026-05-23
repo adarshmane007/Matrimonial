@@ -4,7 +4,7 @@ import { getLang, t } from './i18n/index.js';
 import { renderProfilesGrid } from './profiles.js';
 import { bindBrowseLocationFilters } from './locationSelect.js';
 import { enterMainSite } from './ui/session.js';
-import { lockPageScroll, unlockPageScroll } from './ui/scrollLock.js';
+import { closeFullPageOverlays } from './ui/fullPage.js';
 let metaCache = null;
 let currentPage = 1;
 
@@ -353,7 +353,6 @@ export function closeBrowsePage() {
   document.body.classList.remove('on-browse-page', 'browse-filters-open');
   const page = document.getElementById('browse-page');
   if (page) page.hidden = true;
-  unlockPageScroll();
 }
 
 export async function openBrowsePage(initial = {}) {
@@ -364,9 +363,10 @@ export async function openBrowsePage(initial = {}) {
     enterMainSite();
   }
 
+  closeFullPageOverlays({ except: 'browse' });
   document.body.classList.add('on-browse-page');
-  lockPageScroll();
   page.hidden = false;
+  window.scrollTo({ top: 0, behavior: 'instant' in window ? 'instant' : 'auto' });
   page.innerHTML = `<p class="profile-loading">${escapeHtml(t('browse.loading'))}</p>`;
   currentPage = 1;
 

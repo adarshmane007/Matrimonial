@@ -4,7 +4,7 @@ import { getSiteMeta } from './meta.js';
 import { getLang } from './i18n/index.js';
 import { updateNavAuth } from './ui/nav.js';
 import { applyLanguage } from './i18n/index.js';
-import { lockPageScroll, unlockPageScroll } from './ui/scrollLock.js';
+import { closeFullPageOverlays } from './ui/fullPage.js';
 import {
   locationFieldsHtml,
   bindLocationFields,
@@ -90,6 +90,7 @@ function filterAny(list) {
 }
 
 function formHtml(meta, values) {
+  const v = values;
   const locValues = locationFromStoredProfile(v);
   const eduLevels = (meta.educationLevels || []).filter((e) => e.value !== 'any');
   const marital = filterAny(meta.maritalStatuses);
@@ -100,7 +101,6 @@ function formHtml(meta, values) {
   const families = filterAny(meta.familyTypes);
   const incomes = filterAny(meta.incomeBrackets);
   const heights = filterAny(meta.heights);
-  const v = values;
   const photoPreview = v.photoUrl
     ? `<img src="${escapeHtml(v.photoUrl)}" alt="Profile photo" class="profile-photo-preview" id="profilePhotoPreview">`
     : `<div class="profile-photo-placeholder" id="profilePhotoPreview">📷</div>`;
@@ -314,16 +314,16 @@ export function closeProfilePage() {
   document.body.classList.remove('on-profile-page');
   const page = document.getElementById('profile-page');
   if (page) page.hidden = true;
-  unlockPageScroll();
 }
 
 export async function openProfilePage() {
   const page = document.getElementById('profile-page');
   if (!page) return;
 
+  closeFullPageOverlays({ except: 'profile' });
   document.body.classList.add('on-profile-page');
-  lockPageScroll();
   page.hidden = false;
+  window.scrollTo({ top: 0, behavior: 'instant' in window ? 'instant' : 'auto' });
   page.innerHTML = '<p class="profile-loading">Loading your profile…</p>';
 
   try {
@@ -469,7 +469,6 @@ export function initMyProfile() {
     openProfilePage();
   };
 
-  document.getElementById('createProfileBtn')?.addEventListener('click', openProfileIfAllowed);
   document.querySelectorAll('[data-open-profile]').forEach((el) => {
     el.addEventListener('click', openProfileIfAllowed);
   });

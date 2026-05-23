@@ -3,6 +3,7 @@ import { getProfile, setProfile } from './storage.js';
 import { getSiteMeta } from './meta.js';
 import { getLang } from './i18n/index.js';
 import { updateNavAuth } from './ui/nav.js';
+import { applyLanguage } from './i18n/index.js';
 
 function escapeHtml(s) {
   return String(s ?? '')
@@ -37,6 +38,8 @@ function mapParsedToProfile(parsed) {
     employmentType: parsed.employmentType || '',
     nativePlace: parsed.nativePlace || '',
     fatherOccupation: parsed.fatherOccupation || '',
+    motherTongue: parsed.motherTongue || '',
+    familyType: parsed.familyType || '',
     heightCm: parsed.heightCm || '',
     bio: parsed.bio || '',
   };
@@ -44,6 +47,7 @@ function mapParsedToProfile(parsed) {
 
 function profileToFormValues(p = {}) {
   return {
+    id: p.id || null,
     displayName: p.displayName || p.fullName || '',
     gender: p.gender || 'bride',
     age: p.age ?? 26,
@@ -92,104 +96,107 @@ function formHtml(meta, values) {
     ? `<img src="${escapeHtml(v.photoUrl)}" alt="Profile photo" class="profile-photo-preview" id="profilePhotoPreview">`
     : `<div class="profile-photo-placeholder" id="profilePhotoPreview">📷</div>`;
 
+  const hasProfile = !!(values.id || getProfile()?.id);
+  const titleKey = hasProfile ? 'profile.titleEdit' : 'profile.titleCreate';
+
   return `
     <form id="myProfileForm" class="profile-page-form">
       <div class="profile-page-top">
         <div>
-          <p class="profile-page-label">My matrimonial profile</p>
-          <h1 class="profile-page-title">Create your profile</h1>
-          <p class="profile-page-sub">Details from registration are pre-filled. Add photo, salary, and about you — or upload biodata PDF to auto-fill.</p>
+          <p class="profile-page-label" data-i18n="profile.label">My matrimonial profile</p>
+          <h1 class="profile-page-title" data-i18n="${titleKey}">Create your profile</h1>
+          <p class="profile-page-sub" data-i18n="profile.sub">Details from registration are pre-filled. Add photo, salary, and about you — or upload biodata PDF to auto-fill.</p>
         </div>
-        <button type="button" class="profile-page-back" id="profilePageBack">← Back to home</button>
+        <button type="button" class="profile-page-back" id="profilePageBack" data-i18n="profile.back">← Back to home</button>
       </div>
 
       <div class="profile-biodata-upload card-panel">
-        <h3 class="card-panel-title">Upload biodata PDF</h3>
-        <p class="modal-hint">Upload a searchable PDF — we scan and fill all profile fields automatically.</p>
+        <h3 class="card-panel-title" data-i18n="profile.biodataTitle">Upload biodata PDF</h3>
+        <p class="modal-hint" data-i18n="profile.biodataHint">Upload a searchable PDF — we scan Marathi or English biodata and fill fields automatically.</p>
         <div class="profile-pdf-row">
           <input type="file" id="biodataPdfInput" accept=".pdf,application/pdf" class="profile-file-input">
-          <button type="button" class="btn-secondary" id="scanPdfBtn">Scan PDF &amp; fill fields</button>
+          <button type="button" class="btn-secondary" id="scanPdfBtn" data-i18n="profile.scanPdf">Scan PDF &amp; fill fields</button>
         </div>
         <p id="pdfScanStatus" class="profile-status" hidden></p>
       </div>
 
       <div class="profile-page-grid">
         <aside class="profile-photo-card card-panel">
-          <h3 class="card-panel-title">Profile photo</h3>
+          <h3 class="card-panel-title" data-i18n="profile.photoTitle">Profile photo</h3>
           <div class="profile-photo-wrap">${photoPreview}</div>
           <label class="btn-secondary profile-upload-btn">
-            Add photo
+            <span data-i18n="profile.addPhoto">Add photo</span>
             <input type="file" id="profilePhotoInput" accept="image/jpeg,image/png,image/webp" hidden>
           </label>
-          <p class="modal-hint">JPG or PNG, max 1 MB</p>
+          <p class="modal-hint" data-i18n="profile.photoHint">JPG or PNG, max 1 MB</p>
         </aside>
 
         <div class="profile-fields-card card-panel">
-          <h3 class="card-panel-title">Personal details</h3>
+          <h3 class="card-panel-title" data-i18n="profile.personalTitle">Personal details</h3>
           <div class="form-row">
             <div class="form-group">
-              <label class="form-label">Full name *</label>
+              <label class="form-label" data-i18n="profile.fullName">Full name *</label>
               <input class="form-input" name="displayName" required maxlength="120" value="${escapeHtml(v.displayName)}">
             </div>
             <div class="form-group">
-              <label class="form-label">Gender *</label>
+              <label class="form-label" data-i18n="profile.gender">Gender *</label>
               <select class="form-select" name="gender" required>${optionsHtml(meta.genders, v.gender)}</select>
             </div>
           </div>
           <div class="form-row">
             <div class="form-group">
-              <label class="form-label">Email</label>
+              <label class="form-label" data-i18n="profile.email">Email</label>
               <input class="form-input" type="email" value="${escapeHtml(v.email)}" readonly disabled>
             </div>
             <div class="form-group">
-              <label class="form-label">Mobile</label>
+              <label class="form-label" data-i18n="profile.mobile">Mobile</label>
               <input class="form-input" value="${escapeHtml(v.mobile)}" readonly disabled>
             </div>
           </div>
           <div class="form-row">
             <div class="form-group">
-              <label class="form-label">Age *</label>
+              <label class="form-label" data-i18n="profile.age">Age *</label>
               <input class="form-input" type="number" name="age" min="18" max="80" required value="${v.age}">
             </div>
             <div class="form-group">
-              <label class="form-label">Height</label>
+              <label class="form-label" data-i18n="profile.height">Height</label>
               <select class="form-select" name="heightCm">
-                <option value="">— Select —</option>
+                <option value="" data-i18n="profile.select">— Select —</option>
                 ${optionsHtml(heights, v.heightCm)}
               </select>
             </div>
           </div>
           <div class="form-row">
             <div class="form-group">
-              <label class="form-label">Marital status</label>
+              <label class="form-label" data-i18n="profile.marital">Marital status</label>
               <select class="form-select" name="maritalStatus">${optionsHtml(marital, v.maritalStatus)}</select>
             </div>
             <div class="form-group">
-              <label class="form-label">Mother tongue</label>
+              <label class="form-label" data-i18n="profile.motherTongue">Mother tongue</label>
               <select class="form-select" name="motherTongue">${optionsHtml(tongues, v.motherTongue)}</select>
             </div>
           </div>
           <div class="form-row">
             <div class="form-group">
-              <label class="form-label">District *</label>
+              <label class="form-label" data-i18n="profile.district">District *</label>
               <select class="form-select" name="district" required>${optionsHtml(districts, v.district)}</select>
             </div>
             <div class="form-group">
-              <label class="form-label">City</label>
+              <label class="form-label" data-i18n="profile.city">City</label>
               <input class="form-input" name="city" value="${escapeHtml(v.city)}" maxlength="80">
             </div>
           </div>
           <div class="form-group">
-            <label class="form-label">Native place</label>
+            <label class="form-label" data-i18n="profile.nativePlace">Native place</label>
             <input class="form-input" name="nativePlace" value="${escapeHtml(v.nativePlace)}" maxlength="80">
           </div>
           <div class="form-row">
             <div class="form-group">
-              <label class="form-label">Education</label>
+              <label class="form-label" data-i18n="profile.education">Education</label>
               <input class="form-input" name="education" value="${escapeHtml(v.education)}">
             </div>
             <div class="form-group">
-              <label class="form-label">Education level</label>
+              <label class="form-label" data-i18n="profile.educationLevel">Education level</label>
               <select class="form-select" name="educationLevel">
                 <option value="">—</option>
                 ${optionsHtml(eduLevels, v.educationLevel)}
@@ -198,11 +205,11 @@ function formHtml(meta, values) {
           </div>
           <div class="form-row">
             <div class="form-group">
-              <label class="form-label">Occupation</label>
+              <label class="form-label" data-i18n="profile.occupation">Occupation</label>
               <input class="form-input" name="occupation" value="${escapeHtml(v.occupation)}">
             </div>
             <div class="form-group">
-              <label class="form-label">Employed in</label>
+              <label class="form-label" data-i18n="profile.employedIn">Employed in</label>
               <select class="form-select" name="employmentType">
                 <option value="">—</option>
                 ${optionsHtml(employment, v.employmentType)}
@@ -211,24 +218,24 @@ function formHtml(meta, values) {
           </div>
           <div class="form-row">
             <div class="form-group">
-              <label class="form-label">Annual income bracket</label>
+              <label class="form-label" data-i18n="profile.income">Annual income bracket</label>
               <select class="form-select" name="incomeBracket">
                 <option value="">—</option>
                 ${optionsHtml(incomes, v.incomeBracket)}
               </select>
             </div>
             <div class="form-group">
-              <label class="form-label">Salary (optional text)</label>
-              <input class="form-input" name="salary" value="${escapeHtml(v.salary)}" placeholder="e.g. 8–10 LPA">
+              <label class="form-label" data-i18n="profile.salary">Salary (optional text)</label>
+              <input class="form-input" name="salary" value="${escapeHtml(v.salary)}" data-i18n-placeholder="profile.salaryPh" placeholder="e.g. 8–10 LPA">
             </div>
           </div>
           <div class="form-row">
             <div class="form-group">
-              <label class="form-label">Kul</label>
-              <input class="form-input" name="kul" value="${escapeHtml(v.kul)}" placeholder="e.g. Patil Kul">
+              <label class="form-label" data-i18n="profile.kul">Kul</label>
+              <input class="form-input" name="kul" value="${escapeHtml(v.kul)}" data-i18n-placeholder="profile.kulPh" placeholder="e.g. Patil Kul">
             </div>
             <div class="form-group">
-              <label class="form-label">Diet</label>
+              <label class="form-label" data-i18n="profile.diet">Diet</label>
               <select class="form-select" name="diet">
                 <option value="">—</option>
                 ${optionsHtml(diets, v.diet)}
@@ -237,14 +244,14 @@ function formHtml(meta, values) {
           </div>
           <div class="form-row">
             <div class="form-group">
-              <label class="form-label">Manglik</label>
+              <label class="form-label" data-i18n="profile.manglik">Manglik</label>
               <select class="form-select" name="manglik">
                 <option value="">—</option>
                 ${optionsHtml(manglik, v.manglik)}
               </select>
             </div>
             <div class="form-group">
-              <label class="form-label">Family type</label>
+              <label class="form-label" data-i18n="profile.familyType">Family type</label>
               <select class="form-select" name="familyType">
                 <option value="">—</option>
                 ${optionsHtml(families, v.familyType)}
@@ -252,16 +259,16 @@ function formHtml(meta, values) {
             </div>
           </div>
           <div class="form-group">
-            <label class="form-label">Father's occupation</label>
+            <label class="form-label" data-i18n="profile.fatherOcc">Father's occupation</label>
             <input class="form-input" name="fatherOccupation" value="${escapeHtml(v.fatherOccupation)}" maxlength="120">
           </div>
           <div class="form-group">
-            <label class="form-label">About you</label>
-            <textarea class="form-input profile-about" name="bio" rows="5" maxlength="8000" placeholder="Tell families about yourself, values, and expectations…">${escapeHtml(v.bio)}</textarea>
+            <label class="form-label" data-i18n="profile.about">About you</label>
+            <textarea class="form-input profile-about" name="bio" rows="5" maxlength="8000" data-i18n-placeholder="profile.aboutPh" placeholder="Tell families about yourself, values, and expectations…">${escapeHtml(v.bio)}</textarea>
           </div>
           <input type="hidden" name="photoUrl" id="profilePhotoUrl" value="${escapeHtml(v.photoUrl)}">
           <p id="profileSaveMessage" class="profile-status" hidden></p>
-          <button type="submit" class="btn-login profile-save-btn">Save profile</button>
+          <button type="submit" class="btn-login profile-save-btn" data-i18n="profile.save">Save profile</button>
         </div>
       </div>
     </form>
@@ -299,6 +306,8 @@ function fillFormFromParsed(form, parsed) {
   set('employmentType', mapped.employmentType);
   set('nativePlace', mapped.nativePlace);
   set('fatherOccupation', mapped.fatherOccupation);
+  set('motherTongue', mapped.motherTongue);
+  set('familyType', mapped.familyType);
   if (mapped.heightCm) set('heightCm', String(mapped.heightCm));
 }
 
@@ -325,6 +334,7 @@ export async function openProfilePage() {
     const p = profileRes?.data || getProfile() || {};
     if (p) setProfile(p);
     page.innerHTML = formHtml(metaRes, profileToFormValues(p));
+    applyLanguage(getLang());
     bindProfilePageEvents(metaRes);
   } catch (err) {
     page.innerHTML = `<p class="profile-status is-error">${escapeHtml(err.message || 'Could not load profile')}</p>`;
@@ -445,6 +455,12 @@ function bindProfilePageEvents(meta) {
 }
 
 export function initMyProfile() {
+  document.addEventListener('smm:lang-change', () => {
+    if (document.body.classList.contains('on-profile-page')) {
+      applyLanguage(getLang());
+    }
+  });
+
   document.getElementById('createProfileBtn')?.addEventListener('click', (e) => {
     e.preventDefault();
     openProfilePage();

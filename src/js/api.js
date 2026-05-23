@@ -151,6 +151,10 @@ export const api = {
     });
   },
 
+  getChatUnreadSummary() {
+    return request('/chat/unread-summary');
+  },
+
   getIncomingChatRequests() {
     return request('/chat/requests/incoming');
   },

@@ -1,5 +1,55 @@
-import { isLoggedIn, getUser, clearAuth } from '../storage.js';
+import { isLoggedIn, getUser, getProfile, clearAuth } from '../storage.js';
 import { showLoginScreen } from './session.js';
+import { api } from '../api.js';
+import { getLang } from '../i18n/index.js';
+
+function syncProfileCtaLabels() {
+  const hasProfile = !!(getProfile()?.id);
+  const navKey = hasProfile ? 'nav.viewProfile' : 'nav.createProfile';
+  const heroKey = hasProfile ? 'hero.viewProfile' : 'hero.createProfile';
+
+  document.querySelectorAll('[data-i18n-profile-cta]').forEach((el) => {
+    el.setAttribute('data-i18n', navKey);
+  });
+  document.querySelectorAll('[data-i18n-hero-profile-cta]').forEach((el) => {
+    el.setAttribute('data-i18n', heroKey);
+  });
+
+  if (typeof window.__applySiteLanguage === 'function') {
+    window.__applySiteLanguage(getLang());
+  }
+}
+
+function setBadge(el, count) {
+  if (!el) return;
+  const n = Number(count) || 0;
+  if (n <= 0) {
+    el.hidden = true;
+    el.textContent = '';
+    el.removeAttribute('aria-label');
+    return;
+  }
+  el.hidden = false;
+  el.textContent = n > 99 ? '99+' : String(n);
+  el.setAttribute('aria-label', `${n} unread`);
+}
+
+export async function refreshNavBadges() {
+  if (!isLoggedIn()) {
+    setBadge(document.getElementById('navMsgBadge'), 0);
+    setBadge(document.getElementById('navMsgBadgeMobile'), 0);
+    return;
+  }
+  try {
+    const res = await api.getChatUnreadSummary();
+    const total = res?.data?.total ?? 0;
+    setBadge(document.getElementById('navMsgBadge'), total);
+    setBadge(document.getElementById('navMsgBadgeMobile'), total);
+  } catch {
+    /* ignore when offline */
+  }
+}
+
 export function updateNavAuth() {
   const loggedIn = isLoggedIn();
   const user = getUser();
@@ -28,6 +78,14 @@ export function updateNavAuth() {
   document.querySelectorAll('[data-member-only]').forEach((el) => {
     el.hidden = !loggedIn;
   });
+
+  if (loggedIn) {
+    syncProfileCtaLabels();
+    refreshNavBadges();
+  } else {
+    setBadge(document.getElementById('navMsgBadge'), 0);
+    setBadge(document.getElementById('navMsgBadgeMobile'), 0);
+  }
 }
 
 function closeOverlays() {
@@ -77,4 +135,8 @@ export function initNav() {
   });
 
   updateNavAuth();
+
+  if (isLoggedIn()) {
+    setInterval(() => refreshNavBadges(), 45000);
+  }
 }

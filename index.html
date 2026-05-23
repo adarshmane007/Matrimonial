@@ -224,7 +224,7 @@
     <li><a href="#" data-open-contact data-i18n="nav.contact">Contact</a></li>
     <li id="navUserLabel" class="nav-user-label" hidden></li>
     <li id="navChatItem" hidden>
-      <a href="#" data-open-chat data-i18n="nav.messages">Messages</a>
+      <a href="#" class="nav-messages-link" data-open-chat data-i18n="nav.messages">Messages<span class="nav-msg-badge" id="navMsgBadge" hidden aria-label="Unread messages"></span></a>
     </li>
     <li id="navLogoutItem" hidden>
       <button type="button" class="nav-logout-btn" id="logoutBtn">Logout</button>
@@ -233,7 +233,7 @@
       <a href="#" class="nav-cta" data-open-register data-i18n="nav.freeRegister">Free Register</a>
     </li>
     <li id="navCreateProfileItem" hidden>
-      <a href="#" class="nav-cta nav-cta-profile" id="createProfileBtn" data-i18n="nav.createProfile">Create Profile</a>
+      <a href="#" class="nav-cta nav-cta-profile" id="createProfileBtn" data-i18n="nav.createProfile" data-i18n-profile-cta>Create Profile</a>
     </li>
   </ul>
 </nav>
@@ -251,13 +251,13 @@
     <span class="mobile-nav-icon">🔍</span>
     <span>Search</span>
   </a>
-  <a href="#" class="mobile-nav-item" data-open-chat>
-    <span class="mobile-nav-icon">💬</span>
-    <span>Chat</span>
+  <a href="#" class="mobile-nav-item nav-messages-link" data-open-chat>
+    <span class="mobile-nav-icon mobile-nav-icon-chat">💬<span class="nav-msg-badge nav-msg-badge--mobile" id="navMsgBadgeMobile" hidden></span></span>
+    <span data-i18n="nav.messages">Chat</span>
   </a>
   <a href="#" class="mobile-nav-item" id="createProfileMobile" data-open-profile>
     <span class="mobile-nav-icon">👤</span>
-    <span>Profile</span>
+    <span data-i18n="nav.createProfile" data-i18n-profile-cta>Profile</span>
   </a>
 </nav>
 
@@ -274,7 +274,7 @@
     </p>
     <div class="hero-actions">
       <a href="#" class="btn-primary" data-open-register data-guest-only data-i18n="hero.register">Register Free Today</a>
-      <a href="#" class="btn-primary" data-open-profile data-member-only hidden data-i18n="hero.createProfile">Create Profile</a>
+      <a href="#" class="btn-primary" data-open-profile data-member-only hidden data-i18n="hero.createProfile" data-i18n-hero-profile-cta>Create Profile</a>
       <a href="#" class="btn-secondary" data-open-browse data-i18n="hero.browse">Browse Profiles</a>
     </div>
     <div class="hero-stats">

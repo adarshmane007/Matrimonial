@@ -34,19 +34,20 @@
     -moz-osx-font-smoothing: grayscale;
   }
 
-  /* ── LOGIN (split layout — matrimonial style) ── */
+  /* ── LOGIN (split layout — soft merge) ── */
   .login-hero {
+    position: relative;
     min-height: 100vh;
     min-height: 100dvh;
-    display: grid;
-    grid-template-columns: 1.15fr 0.85fr;
+    background: var(--cream);
     overflow: hidden;
   }
 
-  /* Left: full-bleed wedding visual */
+  /* Full-bleed visual with fade into cream */
   .login-split-visual {
-    position: relative;
-    min-height: 280px;
+    position: absolute;
+    inset: 0;
+    z-index: 0;
     overflow: hidden;
   }
   .login-split-visual img {
@@ -55,13 +56,35 @@
     object-fit: cover;
     object-position: center 35%;
     display: block;
+    transform: scale(1.03);
   }
   .login-visual-shade {
     position: absolute;
     inset: 0;
     background:
-      linear-gradient(160deg, rgba(42,33,28,0.25) 0%, rgba(42,33,28,0.55) 40%, rgba(124,29,46,0.75) 100%),
-      linear-gradient(90deg, rgba(42,33,28,0.4) 0%, transparent 50%);
+      linear-gradient(180deg, rgba(42,33,28,0.15) 0%, transparent 35%, rgba(124,29,46,0.45) 100%),
+      linear-gradient(95deg,
+        rgba(42,33,28,0.5) 0%,
+        rgba(42,33,28,0.2) 28%,
+        transparent 48%,
+        rgba(251,247,242,0.35) 62%,
+        rgba(251,247,242,0.78) 76%,
+        var(--cream) 92%);
+  }
+  /* Soft feather on the merge edge */
+  .login-split-visual::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: min(42vw, 520px);
+    background: linear-gradient(90deg,
+      transparent 0%,
+      rgba(251,247,242,0.25) 35%,
+      rgba(251,247,242,0.7) 65%,
+      var(--cream) 100%);
+    pointer-events: none;
   }
   .login-visual-content {
     position: absolute;
@@ -69,7 +92,7 @@
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
-    padding: clamp(32px, 6vw, 64px) clamp(28px, 5vw, 56px);
+    padding: clamp(32px, 6vw, 64px) clamp(32%, 38vw, 48%) clamp(32px, 6vw, 64px) clamp(28px, 5vw, 56px);
     color: #fff;
     z-index: 1;
   }
@@ -143,51 +166,52 @@
     color: rgba(255,255,255,0.7);
   }
 
-  /* Right: form column */
+  /* Form floats on the right, overlapping the blend zone */
   .login-split-form {
+    position: relative;
+    z-index: 2;
+    min-height: 100vh;
+    min-height: 100dvh;
     display: flex;
     align-items: center;
-    justify-content: center;
-    padding: clamp(24px, 4vw, 48px) clamp(20px, 4vw, 56px);
-    background:
-      linear-gradient(180deg, var(--cream) 0%, #F8F0E8 50%, var(--cream) 100%);
-    position: relative;
+    justify-content: flex-end;
+    padding: clamp(24px, 4vh, 48px) clamp(20px, 4vw, 72px);
+    padding-left: clamp(36%, 42vw, 52%);
+    background: transparent;
     overflow-y: auto;
-  }
-  .login-split-form::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    bottom: 0;
-    width: 1px;
-    background: linear-gradient(180deg, transparent, var(--border), transparent);
   }
   .login-split-form::after {
     content: "";
     position: absolute;
     inset: 0;
-    background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23C4922A' fill-opacity='0.04'%3E%3Cpath d='M30 30m-2 0a2 2 0 1 1 4 0a2 2 0 1 1-4 0'/%3E%3C/g%3E%3C/svg%3E");
+    left: 30%;
+    background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23C4922A' fill-opacity='0.035'%3E%3Cpath d='M30 30m-2 0a2 2 0 1 1 4 0a2 2 0 1 1-4 0'/%3E%3C/g%3E%3C/svg%3E");
     pointer-events: none;
+    mask-image: linear-gradient(90deg, transparent 0%, black 40%);
+    -webkit-mask-image: linear-gradient(90deg, transparent 0%, black 40%);
   }
 
   .login-panel {
     position: relative;
-    z-index: 1;
+    z-index: 3;
     width: 100%;
     max-width: 420px;
-    background: #fff;
+    margin-left: -32px;
+    background: rgba(255,255,255,0.93);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
     border-radius: 28px;
-    border: 1px solid rgba(196,146,42,0.22);
+    border: 1px solid rgba(255,255,255,0.65);
     box-shadow:
-      0 4px 6px rgba(76,44,28,0.04),
-      0 24px 56px rgba(76,44,28,0.1),
-      0 0 0 1px rgba(255,255,255,0.8) inset;
+      -12px 0 40px rgba(251,247,242,0.5),
+      0 8px 32px rgba(76,44,28,0.12),
+      0 24px 64px rgba(76,44,28,0.08),
+      0 0 0 1px rgba(196,146,42,0.15) inset;
     overflow: hidden;
-    animation: loginPanelIn 0.55s ease 0.1s both;
+    animation: loginPanelIn 0.6s ease 0.12s both;
   }
   @keyframes loginPanelIn {
-    from { opacity: 0; transform: translateX(20px); }
+    from { opacity: 0; transform: translateX(28px); }
     to { opacity: 1; transform: translateX(0); }
   }
   .login-panel-accent {
@@ -1251,28 +1275,47 @@
   }
 
   @media (max-width: 960px) {
-    .login-hero {
-      grid-template-columns: 1fr;
-      grid-template-rows: auto 1fr;
-    }
     .login-split-visual {
-      min-height: 38vh;
-      max-height: 42vh;
+      position: relative;
+      min-height: 40vh;
+      max-height: 44vh;
+    }
+    .login-split-visual::after {
+      width: 100%;
+      height: 40%;
+      top: auto;
+      bottom: 0;
+      right: 0;
+      background: linear-gradient(0deg, var(--cream) 0%, rgba(251,247,242,0.9) 40%, transparent 100%);
+    }
+    .login-visual-shade {
+      background:
+        linear-gradient(180deg, rgba(42,33,28,0.2) 0%, rgba(124,29,46,0.55) 100%),
+        linear-gradient(0deg, transparent 40%, var(--cream) 100%);
     }
     .login-visual-content {
       padding: 24px 6%;
-      justify-content: center;
+      justify-content: flex-end;
+    }
+    .login-hero .login-split-visual {
+      position: relative;
     }
     .login-visual-features,
     .login-visual-stats { display: none; }
     .login-visual-title { font-size: 24px; margin-bottom: 8px; }
     .login-visual-desc { font-size: 13px; margin-bottom: 0; }
     .login-split-form {
-      padding: 24px 5% 40px;
-      align-items: flex-start;
+      min-height: auto;
+      padding: 0 5% 40px;
+      justify-content: center;
+      padding-left: 5%;
+      margin-top: -48px;
     }
-    .login-split-form::before { display: none; }
-    .login-panel { max-width: 100%; border-radius: 24px; }
+    .login-panel {
+      max-width: 100%;
+      margin-left: 0;
+      border-radius: 24px;
+    }
     .login-panel-header { padding: 20px 20px 0; }
     .login-panel-body { padding: 16px 20px 28px; }
   }

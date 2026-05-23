@@ -23,9 +23,9 @@ function optionsHtml(items, selected = '') {
 }
 
 function ageOptions(min, max, selected) {
-  const opts = [];
+  const opts = [`<option value="" ${selected === '' || selected === 'any' ? 'selected' : ''}>Any</option>`];
   for (let a = min; a <= max; a++) {
-    opts.push(`<option value="${a}" ${a === selected ? 'selected' : ''}>${a}</option>`);
+    opts.push(`<option value="${a}" ${Number(selected) === a ? 'selected' : ''}>${a}</option>`);
   }
   return opts.join('');
 }
@@ -36,17 +36,18 @@ function filtersHtml(meta) {
       <div class="browse-filter-section">
         <h3 class="browse-filter-heading" data-i18n="browse.basic">Basic</h3>
         <div class="gender-toggle browse-gender-toggle">
-          <button type="button" class="gender-btn active" data-gender="bride" data-i18n="search.bride">Bride</button>
+          <button type="button" class="gender-btn active" data-gender="" data-i18n="browse.genderAny">Any</button>
+          <button type="button" class="gender-btn" data-gender="bride" data-i18n="search.bride">Bride</button>
           <button type="button" class="gender-btn" data-gender="groom" data-i18n="search.groom">Groom</button>
         </div>
         <div class="form-row">
           <div class="form-group">
             <label class="form-label" data-i18n="search.ageFrom">Age From</label>
-            <select class="form-select" name="ageFrom" id="browseAgeFrom">${ageOptions(21, 45, 21)}</select>
+            <select class="form-select" name="ageFrom" id="browseAgeFrom">${ageOptions(18, 50, '')}</select>
           </div>
           <div class="form-group">
             <label class="form-label" data-i18n="search.ageTo">Age To</label>
-            <select class="form-select" name="ageTo" id="browseAgeTo">${ageOptions(22, 50, 35)}</select>
+            <select class="form-select" name="ageTo" id="browseAgeTo">${ageOptions(18, 50, '')}</select>
           </div>
         </div>
         <div class="form-group">
@@ -176,15 +177,15 @@ function pageShell(meta) {
 
 function getSelectedGender(form) {
   const active = form?.querySelector('.browse-gender-toggle .gender-btn.active');
-  return active?.dataset.gender || 'bride';
+  const g = active?.dataset.gender;
+  return g === 'bride' || g === 'groom' ? g : '';
 }
 
 function collectFilters(form) {
   const fd = new FormData(form);
   const params = {
-    gender: getSelectedGender(form),
-    ageFrom: fd.get('ageFrom'),
-    ageTo: fd.get('ageTo'),
+    ageFrom: fd.get('ageFrom') || undefined,
+    ageTo: fd.get('ageTo') || undefined,
     district: fd.get('district') || 'all',
     education: fd.get('education') || 'any',
     maritalStatus: fd.get('maritalStatus') || 'any',
@@ -199,6 +200,8 @@ function collectFilters(form) {
     page: currentPage,
     limit: 12,
   };
+  const gender = getSelectedGender(form);
+  if (gender) params.gender = gender;
   const kul = fd.get('kul')?.trim();
   const occupation = fd.get('occupation')?.trim();
   const heightFrom = fd.get('heightFrom');
@@ -214,6 +217,8 @@ function collectFilters(form) {
 
 function countActiveFilters(params) {
   let n = 0;
+  if (params.gender) n++;
+  if (params.ageFrom || params.ageTo) n++;
   if (params.district !== 'all') n++;
   if (params.education !== 'any') n++;
   if (params.maritalStatus !== 'any') n++;
@@ -304,8 +309,8 @@ function bindBrowseEvents(meta) {
 
   document.getElementById('browseResetBtn')?.addEventListener('click', () => {
     form?.reset();
-    form?.querySelectorAll('.browse-gender-toggle .gender-btn').forEach((b, i) => {
-      b.classList.toggle('active', i === 0);
+    form?.querySelectorAll('.browse-gender-toggle .gender-btn').forEach((b) => {
+      b.classList.toggle('active', b.dataset.gender === '');
     });
     currentPage = 1;
     runSearch(form);

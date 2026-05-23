@@ -1,7 +1,8 @@
 import { api, ApiError } from './api.js';
 import { isLoggedIn } from './storage.js';
 import { getLang } from './i18n/index.js';
-import { openModal, setModalMessage } from './ui/modal.js';
+import { openModal, closeModal, setModalMessage } from './ui/modal.js';
+import { openChatPage } from './chat.js';
 
 function escapeHtml(str) {
   return String(str ?? '')
@@ -27,6 +28,7 @@ function profileHtml(p) {
       <h3 class="profile-detail-name">${escapeHtml(p.displayName)}</h3>
       <p class="profile-detail-sub">${escapeHtml(p.subtitle || '')}</p>
       ${p.isVerified ? '<p class="profile-verified-pill">✓ Verified Member</p>' : ''}
+      <p class="profile-privacy-note">Contact details are private. Use chat request to connect safely.</p>
       <div class="profile-tags" style="margin:12px 0">${tags}</div>
 
       <div class="profile-detail-section">
@@ -77,8 +79,75 @@ function profileHtml(p) {
   `;
 }
 
+function bindChatActions(profileId, p) {
+  const actions = document.getElementById('profileModalActions');
+  if (!actions || p.isOwnProfile) {
+    if (actions && p.isOwnProfile) {
+      actions.innerHTML = '<p class="modal-hint">This is your profile.</p>';
+    }
+    return;
+  }
+
+  const status = p.chatStatus || 'none';
+
+  if (status === 'accepted' && p.conversationId) {
+    actions.innerHTML = `
+      <button type="button" class="btn-login" id="openChatBtn" style="margin-top:16px">Open chat</button>
+    `;
+    document.getElementById('openChatBtn')?.addEventListener('click', () => {
+      closeModal();
+      openChatPage('chats');
+    });
+    return;
+  }
+
+  if (status === 'pending_sent') {
+    actions.innerHTML = `<p class="modal-hint" style="margin-top:16px">Chat request sent — waiting for response.</p>`;
+    return;
+  }
+
+  if (status === 'pending_received') {
+    actions.innerHTML = `
+      <p class="modal-hint" style="margin-top:12px">This member sent you a chat request.</p>
+      <button type="button" class="btn-login" id="goRequestsBtn" style="margin-top:12px">View requests</button>
+    `;
+    document.getElementById('goRequestsBtn')?.addEventListener('click', () => {
+      closeModal();
+      openChatPage('requests');
+    });
+    return;
+  }
+
+  actions.innerHTML = `
+    <div class="form-group" style="margin-top:16px">
+      <label class="form-label">Intro message (optional)</label>
+      <input class="form-input" id="chatRequestMessage" maxlength="500" placeholder="Brief note for the family">
+    </div>
+    <button type="button" class="btn-login" id="sendChatRequestBtn">Send chat request</button>
+  `;
+
+  document.getElementById('sendChatRequestBtn')?.addEventListener('click', async () => {
+    const msg = document.getElementById('chatRequestMessage')?.value?.trim();
+    const btn = document.getElementById('sendChatRequestBtn');
+    btn.disabled = true;
+    try {
+      await api.sendChatRequest(profileId, msg || undefined);
+      setModalMessage('Chat request sent successfully.');
+      btn.replaceWith(Object.assign(document.createElement('p'), {
+        className: 'modal-hint',
+        textContent: 'Request pending — you will be notified when accepted.',
+      }));
+    } catch (err) {
+      setModalMessage(err instanceof ApiError ? err.message : 'Could not send request.', true);
+      btn.disabled = false;
+    }
+  });
+}
+
 export async function openProfileModal(profileId) {
-  openModal('Profile', '<p style="text-align:center;color:var(--warm-muted)">Loading…</p>');
+  if (!profileId) return;
+
+  openModal('Profile', '<p style="text-align:center;color:var(--warm-muted);padding:24px">Loading…</p>');
   setModalMessage('');
 
   try {
@@ -87,39 +156,19 @@ export async function openProfileModal(profileId) {
     if (!p) throw new Error('Not found');
 
     openModal(p.displayName, profileHtml(p));
-    const actions = document.getElementById('profileModalActions');
 
-    if (isLoggedIn()) {
+    if (!isLoggedIn()) {
+      const actions = document.getElementById('profileModalActions');
       actions.innerHTML = `
-        <div class="form-group" style="margin-top:16px">
-          <label class="form-label">Message (optional)</label>
-          <input class="form-input" id="interestMessage" maxlength="500" placeholder="Short note for the family">
-        </div>
-        <button type="button" class="btn-login" id="expressInterestBtn">Express interest</button>
-      `;
-      document.getElementById('expressInterestBtn')?.addEventListener('click', async () => {
-        const msg = document.getElementById('interestMessage')?.value?.trim();
-        const btn = document.getElementById('expressInterestBtn');
-        btn.disabled = true;
-        try {
-          await api.expressInterest(profileId, msg || undefined);
-          setModalMessage('Interest sent successfully.');
-        } catch (err) {
-          setModalMessage(err instanceof ApiError ? err.message : 'Could not send interest.', true);
-        } finally {
-          btn.disabled = false;
-        }
-      });
-    } else {
-      actions.innerHTML = `
-        <p class="modal-hint" style="margin-top:16px">Sign in to express interest in this profile.</p>
-        <button type="button" class="btn-secondary" id="profileLoginBtn" style="margin-top:8px;width:100%;text-align:center">Sign in</button>
+        <p class="modal-hint" style="margin-top:16px">Sign in to send a chat request.</p>
+        <button type="button" class="btn-secondary" id="profileLoginBtn" style="margin-top:8px;width:100%">Sign in</button>
       `;
       document.getElementById('profileLoginBtn')?.addEventListener('click', () => {
-        document.getElementById('appModal').hidden = true;
-        document.body.style.overflow = '';
+        closeModal();
         window.scrollTo(0, 0);
       });
+    } else {
+      bindChatActions(profileId, p);
     }
   } catch (err) {
     openModal('Profile', '');
@@ -128,14 +177,24 @@ export async function openProfileModal(profileId) {
 }
 
 export function initProfileModal() {
-  document.addEventListener('click', (e) => {
-    const btn = e.target.closest('.profile-action');
-    if (!btn) return;
-    const card = btn.closest('[data-profile-id]');
-    const id = card?.getAttribute('data-profile-id');
-    if (id) {
+  document.addEventListener(
+    'click',
+    (e) => {
+      const btn = e.target.closest('.profile-action');
+      if (!btn || btn.disabled) return;
+
+      const profileId =
+        btn.dataset.profileId || btn.closest('[data-profile-id]')?.getAttribute('data-profile-id');
+      if (!profileId) return;
+
       e.preventDefault();
-      openProfileModal(id);
-    }
-  });
+      e.stopPropagation();
+
+      btn.disabled = true;
+      openProfileModal(profileId).finally(() => {
+        btn.disabled = false;
+      });
+    },
+    true
+  );
 }

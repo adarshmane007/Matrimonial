@@ -1,5 +1,6 @@
 import { api } from './api.js';
 import { getLang } from './i18n/index.js';
+import { getProfile } from './storage.js';
 
 const BG_CLASSES = ['profile-img-bg-1', 'profile-img-bg-2', 'profile-img-bg-3'];
 
@@ -37,7 +38,7 @@ export function renderProfileCard(profile, index = 0) {
         <div class="profile-name">${escapeHtml(profile.displayName)}</div>
         <div class="profile-sub">${escapeHtml(profile.subtitle || '')}</div>
         <div class="profile-tags">${tags}</div>
-        <button type="button" class="profile-action" data-i18n="profiles.view">View Profile</button>
+        <button type="button" class="profile-action" data-profile-id="${profile.id}" data-i18n="profiles.view">View Profile</button>
       </div>
     </article>
   `;
@@ -60,7 +61,9 @@ export async function loadFeaturedProfiles() {
 
   try {
     const res = await api.getFeatured(getLang());
-    const profiles = res?.data || [];
+    let profiles = res?.data || [];
+    const myId = getProfile()?.id;
+    if (myId) profiles = profiles.filter((p) => p.id !== myId);
     grids.forEach((grid) => renderProfilesGrid(grid, profiles));
   } catch (err) {
     console.warn('Featured profiles:', err);

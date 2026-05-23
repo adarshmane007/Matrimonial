@@ -11,6 +11,7 @@ import { initContact } from './contact.js';
 import { initProfileModal } from './profileModal.js';
 import { initMyProfile } from './myProfile.js';
 import { initBrowseProfiles } from './browseProfiles.js';
+import { initChat } from './chat.js';
 import { loadFeaturedProfiles } from './profiles.js';
 import { initSearch } from './search.js';
 import { loadStats } from './stats.js';
@@ -30,6 +31,7 @@ async function bootstrap() {
   initProfileModal();
   initMyProfile();
   initBrowseProfiles();
+  initChat();
   initSearch();
 
   const restored = await restoreSession();

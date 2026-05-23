@@ -7,6 +7,8 @@ export function updateNavAuth() {
   const userLabel = document.getElementById('navUserLabel');
   const registerItem = document.getElementById('navRegisterItem');
   const createProfileItem = document.getElementById('navCreateProfileItem');
+  const chatItem = document.getElementById('navChatItem');
+  const mobileNav = document.getElementById('mobileBottomNav');
 
   document.body.classList.toggle('logged-in', loggedIn);
 
@@ -17,6 +19,8 @@ export function updateNavAuth() {
   }
   if (registerItem) registerItem.hidden = loggedIn;
   if (createProfileItem) createProfileItem.hidden = !loggedIn;
+  if (chatItem) chatItem.hidden = !loggedIn;
+  if (mobileNav) mobileNav.hidden = !loggedIn;
 
   document.querySelectorAll('[data-guest-only]').forEach((el) => {
     el.hidden = loggedIn;
@@ -27,8 +31,14 @@ export function updateNavAuth() {
 }
 
 function closeOverlays() {
-  document.body.classList.remove('on-profile-page', 'on-browse-page', 'browse-filters-open', 'nav-open');
-  ['profile-page', 'browse-page'].forEach((id) => {
+  document.body.classList.remove(
+    'on-profile-page',
+    'on-browse-page',
+    'on-chat-page',
+    'browse-filters-open',
+    'nav-open'
+  );
+  ['profile-page', 'browse-page', 'chat-page'].forEach((id) => {
     const el = document.getElementById(id);
     if (el) el.hidden = true;
   });
@@ -60,5 +70,11 @@ export function initNav() {
     showLoginScreen();
     updateNavAuth();
   });
+  document.querySelector('[data-mobile-home]')?.addEventListener('click', (e) => {
+    e.preventDefault();
+    closeOverlays();
+    window.scrollTo(0, 0);
+  });
+
   updateNavAuth();
 }

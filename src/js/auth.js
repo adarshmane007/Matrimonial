@@ -1,6 +1,5 @@
 import { api, ApiError, setOnUnauthorized } from './api.js';
 import { getToken, saveAuth, clearAuth } from './storage.js';
-import { openProfilePage } from './myProfile.js';
 import { enterMainSite, showLoginScreen } from './ui/session.js';
 
 function setLoginError(msg) {
@@ -53,7 +52,6 @@ export function initAuth() {
         });
       }
       enterMainSite();
-      if (res?.data?.profile) openProfilePage();
     } catch (err) {
       const msg =
         err instanceof ApiError

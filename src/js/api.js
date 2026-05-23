@@ -137,8 +137,48 @@ export const api = {
   },
 
   search(params) {
-    const q = new URLSearchParams(params);
+    const q = new URLSearchParams();
+    Object.entries(params).forEach(([key, val]) => {
+      if (val !== undefined && val !== null && val !== '') q.set(key, String(val));
+    });
     return request(`/profiles/search?${q.toString()}`);
+  },
+
+  sendChatRequest(profileId, message) {
+    return request('/chat/requests', {
+      method: 'POST',
+      body: JSON.stringify({ toProfileId: Number(profileId), message }),
+    });
+  },
+
+  getIncomingChatRequests() {
+    return request('/chat/requests/incoming');
+  },
+
+  getOutgoingChatRequests() {
+    return request('/chat/requests/outgoing');
+  },
+
+  respondChatRequest(requestId, action) {
+    return request(`/chat/requests/${requestId}/respond`, {
+      method: 'PATCH',
+      body: JSON.stringify({ action }),
+    });
+  },
+
+  getConversations() {
+    return request('/chat/conversations');
+  },
+
+  getChatMessages(conversationId) {
+    return request(`/chat/conversations/${conversationId}/messages`);
+  },
+
+  sendChatMessage(conversationId, body) {
+    return request(`/chat/conversations/${conversationId}/messages`, {
+      method: 'POST',
+      body: JSON.stringify({ body }),
+    });
   },
 
   getStats() {

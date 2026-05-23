@@ -223,6 +223,9 @@
     <li><a href="#" data-i18n="nav.aboutUs">About Us</a></li>
     <li><a href="#" data-open-contact data-i18n="nav.contact">Contact</a></li>
     <li id="navUserLabel" class="nav-user-label" hidden></li>
+    <li id="navChatItem" hidden>
+      <a href="#" data-open-chat data-i18n="nav.messages">Messages</a>
+    </li>
     <li id="navLogoutItem" hidden>
       <button type="button" class="nav-logout-btn" id="logoutBtn">Logout</button>
     </li>
@@ -237,6 +240,26 @@
 
 <section id="profile-page" class="profile-page" hidden aria-label="Create profile"></section>
 <section id="browse-page" class="browse-page" hidden aria-label="Browse profiles"></section>
+<section id="chat-page" class="chat-page" hidden aria-label="Messages"></section>
+
+<nav class="mobile-bottom-nav" id="mobileBottomNav" hidden aria-label="Quick navigation">
+  <a href="#" class="mobile-nav-item" data-mobile-home>
+    <span class="mobile-nav-icon">🏠</span>
+    <span>Home</span>
+  </a>
+  <a href="#" class="mobile-nav-item" data-open-browse>
+    <span class="mobile-nav-icon">🔍</span>
+    <span>Search</span>
+  </a>
+  <a href="#" class="mobile-nav-item" data-open-chat>
+    <span class="mobile-nav-icon">💬</span>
+    <span>Chat</span>
+  </a>
+  <a href="#" class="mobile-nav-item" id="createProfileMobile" data-open-profile>
+    <span class="mobile-nav-icon">👤</span>
+    <span>Profile</span>
+  </a>
+</nav>
 
 <!-- HERO -->
 <section class="hero">

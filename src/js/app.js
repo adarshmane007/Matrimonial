@@ -14,7 +14,7 @@ import { initBrowseProfiles } from './browseProfiles.js';
 import { initChat } from './chat.js';
 import { loadFeaturedProfiles } from './profiles.js';
 import { initSearch } from './search.js';
-import { loadStats } from './stats.js';
+import { initQuoteRotators } from './quotes.js';
 import { loadTestimonials } from './testimonials.js';
 import { hasSession } from './storage.js';
 import { API_BASE } from './config.js';
@@ -33,15 +33,12 @@ async function bootstrap() {
   initBrowseProfiles();
   initChat();
   initSearch();
+  initQuoteRotators();
 
   const restored = await restoreSession();
   if (!restored && hasSession()) enterMainSite();
 
-  await Promise.all([
-    loadStats(),
-    loadFeaturedProfiles(),
-    loadTestimonials(getLang()),
-  ]);
+  await Promise.all([loadFeaturedProfiles(), loadTestimonials(getLang())]);
 
   document.addEventListener('smm:lang-change', (e) => {
     clearMetaCache();
@@ -52,7 +49,6 @@ async function bootstrap() {
 
   document.addEventListener('smm:enter-main', () => {
     loadFeaturedProfiles();
-    loadStats();
   });
 
   console.info('Sakal Maratha — API:', API_BASE);

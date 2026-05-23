@@ -1,5 +1,6 @@
 import { isLoggedIn, getUser, getProfile, clearAuth } from '../storage.js';
 import { showLoginScreen } from './session.js';
+import { unlockPageScroll } from './scrollLock.js';
 import { api } from '../api.js';
 import { getLang } from '../i18n/index.js';
 
@@ -93,6 +94,7 @@ function closeOverlays() {
     'on-profile-page',
     'on-browse-page',
     'on-chat-page',
+    'chat-thread-open',
     'browse-filters-open',
     'nav-open'
   );
@@ -102,6 +104,14 @@ function closeOverlays() {
   });
   document.getElementById('navLinks')?.classList.remove('is-open');
   document.getElementById('navMenuBtn')?.setAttribute('aria-expanded', 'false');
+  if (!document.body.classList.contains('on-profile-page') && !document.body.classList.contains('on-browse-page')) {
+    unlockPageScroll();
+  }
+}
+
+export function goToHome() {
+  closeOverlays();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 export function initNav() {
@@ -128,10 +138,16 @@ export function initNav() {
     showLoginScreen();
     updateNavAuth();
   });
+  document.querySelectorAll('[data-nav-home]').forEach((el) => {
+    el.addEventListener('click', (e) => {
+      e.preventDefault();
+      goToHome();
+    });
+  });
+
   document.querySelector('[data-mobile-home]')?.addEventListener('click', (e) => {
     e.preventDefault();
-    closeOverlays();
-    window.scrollTo(0, 0);
+    goToHome();
   });
 
   updateNavAuth();

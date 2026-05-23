@@ -7,6 +7,11 @@ export function getLang() {
   return currentLang;
 }
 
+export function t(key, lang = currentLang) {
+  const dict = translations[lang === 'mr' ? 'mr' : 'en'] || translations.en;
+  return dict[key] ?? translations.en[key] ?? key;
+}
+
 function yearsLabel(n, lang) {
   return lang === 'mr' ? `${n} वर्षे` : `${n} Years`;
 }

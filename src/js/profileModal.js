@@ -1,6 +1,6 @@
 import { api, ApiError } from './api.js';
 import { isLoggedIn } from './storage.js';
-import { getLang } from './i18n/index.js';
+import { getLang, t } from './i18n/index.js';
 import { openModal, closeModal, setModalMessage } from './ui/modal.js';
 import { openChatPage } from './chat.js';
 
@@ -17,62 +17,63 @@ function factRow(label, value) {
 }
 
 function profileHtml(p) {
-  const tags = (p.tags || []).map((t) => `<span class="tag">${escapeHtml(t)}</span>`).join('');
+  const tags = (p.tags || []).map((tag) => `<span class="tag">${escapeHtml(tag)}</span>`).join('');
   const photoBlock = p.photoUrl
     ? `<div class="profile-detail-photo"><img src="${escapeHtml(p.photoUrl)}" alt=""></div>`
     : '';
+  const ageText = p.age ? `${p.age} ${t('modal.years')}` : null;
 
   return `
     <div class="profile-detail profile-detail-rich">
       ${photoBlock}
       <h3 class="profile-detail-name">${escapeHtml(p.displayName)}</h3>
       <p class="profile-detail-sub">${escapeHtml(p.subtitle || '')}</p>
-      ${p.isVerified ? '<p class="profile-verified-pill">✓ Verified Member</p>' : ''}
-      <p class="profile-privacy-note">Contact details are private. Use chat request to connect safely.</p>
+      ${p.isVerified ? `<p class="profile-verified-pill">${escapeHtml(t('modal.verified'))}</p>` : ''}
+      <p class="profile-privacy-note">${escapeHtml(t('modal.privacy'))}</p>
       <div class="profile-tags" style="margin:12px 0">${tags}</div>
 
       <div class="profile-detail-section">
-        <h4 class="profile-detail-section-title">Basic Information</h4>
+        <h4 class="profile-detail-section-title">${escapeHtml(t('modal.basicInfo'))}</h4>
         <ul class="profile-detail-facts profile-detail-facts-grid">
-          ${factRow('Age', p.age ? `${p.age} years` : null)}
-          ${factRow('Height', p.height)}
-          ${factRow('Marital Status', p.maritalStatusLabel)}
-          ${factRow('Kul', p.kul)}
-          ${factRow('Manglik', p.manglikLabel)}
-          ${factRow('Diet', p.dietLabel)}
+          ${factRow(t('modal.age'), ageText)}
+          ${factRow(t('modal.height'), p.height)}
+          ${factRow(t('modal.maritalStatus'), p.maritalStatusLabel)}
+          ${factRow(t('profile.kul'), p.kul)}
+          ${factRow(t('profile.manglik'), p.manglikLabel)}
+          ${factRow(t('profile.diet'), p.dietLabel)}
         </ul>
       </div>
 
       <div class="profile-detail-section">
-        <h4 class="profile-detail-section-title">Location</h4>
+        <h4 class="profile-detail-section-title">${escapeHtml(t('modal.location'))}</h4>
         <ul class="profile-detail-facts profile-detail-facts-grid">
-          ${factRow('District', p.districtLabel)}
-          ${factRow('City', p.city)}
-          ${factRow('Native Place', p.nativePlace)}
+          ${factRow(t('profile.state'), p.stateLabel)}
+          ${factRow(t('profile.city'), p.city || p.districtLabel)}
+          ${factRow(t('modal.nativePlace'), p.nativePlace)}
         </ul>
       </div>
 
       <div class="profile-detail-section">
-        <h4 class="profile-detail-section-title">Education &amp; Career</h4>
+        <h4 class="profile-detail-section-title">${escapeHtml(t('modal.educationCareer'))}</h4>
         <ul class="profile-detail-facts profile-detail-facts-grid">
-          ${factRow('Education', p.education)}
-          ${factRow('Qualification', p.educationLabel)}
-          ${factRow('Occupation', p.occupation)}
-          ${factRow('Employed In', p.employmentLabel)}
-          ${factRow('Annual Income', p.incomeLabel || p.salary)}
+          ${factRow(t('profile.education'), p.education)}
+          ${factRow(t('modal.qualification'), p.educationLabel)}
+          ${factRow(t('profile.occupation'), p.occupation)}
+          ${factRow(t('modal.employedIn'), p.employmentLabel)}
+          ${factRow(t('modal.annualIncome'), p.incomeLabel || p.salary)}
         </ul>
       </div>
 
       <div class="profile-detail-section">
-        <h4 class="profile-detail-section-title">Family &amp; Background</h4>
+        <h4 class="profile-detail-section-title">${escapeHtml(t('modal.familyBackground'))}</h4>
         <ul class="profile-detail-facts profile-detail-facts-grid">
-          ${factRow('Mother Tongue', p.motherTongueLabel)}
-          ${factRow('Family Type', p.familyTypeLabel)}
-          ${factRow("Father's Occupation", p.fatherOccupation)}
+          ${factRow(t('modal.motherTongue'), p.motherTongueLabel)}
+          ${factRow(t('profile.familyType'), p.familyTypeLabel)}
+          ${factRow(t('modal.fatherOcc'), p.fatherOccupation)}
         </ul>
       </div>
 
-      ${p.bio ? `<div class="profile-detail-section"><h4 class="profile-detail-section-title">About</h4><p class="profile-detail-bio">${escapeHtml(p.bio)}</p></div>` : ''}
+      ${p.bio ? `<div class="profile-detail-section"><h4 class="profile-detail-section-title">${escapeHtml(t('modal.about'))}</h4><p class="profile-detail-bio">${escapeHtml(p.bio)}</p></div>` : ''}
 
       <div id="profileModalActions"></div>
     </div>
@@ -83,7 +84,7 @@ function bindChatActions(profileId, p) {
   const actions = document.getElementById('profileModalActions');
   if (!actions || p.isOwnProfile) {
     if (actions && p.isOwnProfile) {
-      actions.innerHTML = '<p class="modal-hint">This is your profile.</p>';
+      actions.innerHTML = `<p class="modal-hint">${escapeHtml(t('modal.ownProfile'))}</p>`;
     }
     return;
   }
@@ -92,7 +93,7 @@ function bindChatActions(profileId, p) {
 
   if (status === 'accepted' && p.conversationId) {
     actions.innerHTML = `
-      <button type="button" class="btn-login" id="openChatBtn" style="margin-top:16px">Open chat</button>
+      <button type="button" class="btn-login" id="openChatBtn" style="margin-top:16px">${escapeHtml(t('modal.openChat'))}</button>
     `;
     document.getElementById('openChatBtn')?.addEventListener('click', () => {
       closeModal();
@@ -102,14 +103,14 @@ function bindChatActions(profileId, p) {
   }
 
   if (status === 'pending_sent') {
-    actions.innerHTML = `<p class="modal-hint" style="margin-top:16px">Chat request sent — waiting for response.</p>`;
+    actions.innerHTML = `<p class="modal-hint" style="margin-top:16px">${escapeHtml(t('modal.requestSent'))}</p>`;
     return;
   }
 
   if (status === 'pending_received') {
     actions.innerHTML = `
-      <p class="modal-hint" style="margin-top:12px">This member sent you a chat request.</p>
-      <button type="button" class="btn-login" id="goRequestsBtn" style="margin-top:12px">View requests</button>
+      <p class="modal-hint" style="margin-top:12px">${escapeHtml(t('modal.requestReceived'))}</p>
+      <button type="button" class="btn-login" id="goRequestsBtn" style="margin-top:12px">${escapeHtml(t('modal.viewRequests'))}</button>
     `;
     document.getElementById('goRequestsBtn')?.addEventListener('click', () => {
       closeModal();
@@ -120,10 +121,10 @@ function bindChatActions(profileId, p) {
 
   actions.innerHTML = `
     <div class="form-group" style="margin-top:16px">
-      <label class="form-label">Intro message (optional)</label>
-      <input class="form-input" id="chatRequestMessage" maxlength="500" placeholder="Brief note for the family">
+      <label class="form-label">${escapeHtml(t('modal.introLabel'))}</label>
+      <input class="form-input" id="chatRequestMessage" maxlength="500" placeholder="${escapeHtml(t('modal.introPlaceholder'))}">
     </div>
-    <button type="button" class="btn-login" id="sendChatRequestBtn">Send chat request</button>
+    <button type="button" class="btn-login" id="sendChatRequestBtn">${escapeHtml(t('modal.sendRequest'))}</button>
   `;
 
   document.getElementById('sendChatRequestBtn')?.addEventListener('click', async () => {
@@ -132,13 +133,15 @@ function bindChatActions(profileId, p) {
     btn.disabled = true;
     try {
       await api.sendChatRequest(profileId, msg || undefined);
-      setModalMessage('Chat request sent successfully.');
-      btn.replaceWith(Object.assign(document.createElement('p'), {
-        className: 'modal-hint',
-        textContent: 'Request pending — you will be notified when accepted.',
-      }));
+      setModalMessage(t('modal.requestSuccess'));
+      btn.replaceWith(
+        Object.assign(document.createElement('p'), {
+          className: 'modal-hint',
+          textContent: t('modal.requestPending'),
+        })
+      );
     } catch (err) {
-      setModalMessage(err instanceof ApiError ? err.message : 'Could not send request.', true);
+      setModalMessage(err instanceof ApiError ? err.message : t('modal.sendFailed'), true);
       btn.disabled = false;
     }
   });
@@ -147,7 +150,7 @@ function bindChatActions(profileId, p) {
 export async function openProfileModal(profileId) {
   if (!profileId) return;
 
-  openModal('Profile', '<p style="text-align:center;color:var(--warm-muted);padding:24px">Loading…</p>');
+  openModal(t('modal.profileTitle'), `<p style="text-align:center;color:var(--warm-muted);padding:24px">${escapeHtml(t('modal.loading'))}</p>`);
   setModalMessage('');
 
   try {
@@ -160,8 +163,8 @@ export async function openProfileModal(profileId) {
     if (!isLoggedIn()) {
       const actions = document.getElementById('profileModalActions');
       actions.innerHTML = `
-        <p class="modal-hint" style="margin-top:16px">Sign in to send a chat request.</p>
-        <button type="button" class="btn-secondary" id="profileLoginBtn" style="margin-top:8px;width:100%">Sign in</button>
+        <p class="modal-hint" style="margin-top:16px">${escapeHtml(t('modal.signInHint'))}</p>
+        <button type="button" class="btn-secondary" id="profileLoginBtn" style="margin-top:8px;width:100%">${escapeHtml(t('modal.signIn'))}</button>
       `;
       document.getElementById('profileLoginBtn')?.addEventListener('click', () => {
         closeModal();
@@ -171,8 +174,8 @@ export async function openProfileModal(profileId) {
       bindChatActions(profileId, p);
     }
   } catch (err) {
-    openModal('Profile', '');
-    setModalMessage(err instanceof ApiError ? err.message : 'Could not load profile.', true);
+    openModal(t('modal.profileTitle'), '');
+    setModalMessage(err instanceof ApiError ? err.message : t('modal.loadFailed'), true);
   }
 }
 
@@ -181,7 +184,8 @@ export function initProfileModal() {
     'click',
     (e) => {
       const btn = e.target.closest('.profile-action');
-      if (!btn || btn.disabled) return;
+      if (!btn || btn.disabled || btn.classList.contains('enter-main')) return;
+      if (!document.body.classList.contains('on-main-site')) return;
 
       const profileId =
         btn.dataset.profileId || btn.closest('[data-profile-id]')?.getAttribute('data-profile-id');
@@ -190,9 +194,11 @@ export function initProfileModal() {
       e.preventDefault();
       e.stopPropagation();
 
-      btn.disabled = true;
+      if (btn.dataset.loading === '1') return;
+      btn.dataset.loading = '1';
+
       openProfileModal(profileId).finally(() => {
-        btn.disabled = false;
+        delete btn.dataset.loading;
       });
     },
     true

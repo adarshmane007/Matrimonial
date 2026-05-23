@@ -1,8 +1,10 @@
 import { api, ApiError } from './api.js';
 import { getSiteMeta } from './meta.js';
-import { getLang } from './i18n/index.js';
+import { getLang, t } from './i18n/index.js';
 import { renderProfilesGrid } from './profiles.js';
+import { bindBrowseLocationFilters } from './locationSelect.js';
 import { enterMainSite } from './ui/session.js';
+import { lockPageScroll, unlockPageScroll } from './ui/scrollLock.js';
 let metaCache = null;
 let currentPage = 1;
 
@@ -23,7 +25,7 @@ function optionsHtml(items, selected = '') {
 }
 
 function ageOptions(min, max, selected) {
-  const opts = [`<option value="" ${selected === '' || selected === 'any' ? 'selected' : ''}>Any</option>`];
+  const opts = [`<option value="" ${selected === '' || selected === 'any' ? 'selected' : ''}>${escapeHtml(t('browse.genderAny'))}</option>`];
   for (let a = min; a <= max; a++) {
     opts.push(`<option value="${a}" ${Number(selected) === a ? 'selected' : ''}>${a}</option>`);
   }
@@ -59,8 +61,17 @@ function filtersHtml(meta) {
       <div class="browse-filter-section">
         <h3 class="browse-filter-heading" data-i18n="browse.location">Location &amp; Community</h3>
         <div class="form-group">
-          <label class="form-label" data-i18n="search.district">District</label>
-          <select class="form-select" name="district">${optionsHtml(meta.districts, 'all')}</select>
+          <label class="form-label" data-i18n="profile.state">State</label>
+          <select class="form-select" name="state" id="browseFilterState">
+            <option value="all">${escapeHtml(t('browse.genderAny'))}</option>
+            ${optionsHtml(meta.states || [], 'all')}
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label" data-i18n="profile.city">City</label>
+          <select class="form-select" name="district" id="browseFilterCity">
+            <option value="all">${escapeHtml(t('browse.allCities'))}</option>
+          </select>
         </div>
         <div class="form-group">
           <label class="form-label" data-i18n="browse.kul">Kul / Subcaste</label>
@@ -186,6 +197,7 @@ function collectFilters(form) {
   const params = {
     ageFrom: fd.get('ageFrom') || undefined,
     ageTo: fd.get('ageTo') || undefined,
+    state: fd.get('state') || 'all',
     district: fd.get('district') || 'all',
     education: fd.get('education') || 'any',
     maritalStatus: fd.get('maritalStatus') || 'any',
@@ -219,6 +231,7 @@ function countActiveFilters(params) {
   let n = 0;
   if (params.gender) n++;
   if (params.ageFrom || params.ageTo) n++;
+  if (params.state && params.state !== 'all') n++;
   if (params.district !== 'all') n++;
   if (params.education !== 'any') n++;
   if (params.maritalStatus !== 'any') n++;
@@ -235,7 +248,7 @@ async function runSearch(form) {
   if (!grid) return;
 
   grid.innerHTML =
-    '<p class="profiles-empty" style="grid-column:1/-1;text-align:center;padding:32px;color:var(--warm-muted)">Searching…</p>';
+    `<p class="profiles-empty" style="grid-column:1/-1;text-align:center;padding:32px;color:var(--warm-muted)">${escapeHtml(t('browse.searching'))}</p>`;
 
   try {
     const params = collectFilters(form);
@@ -280,7 +293,7 @@ async function runSearch(form) {
       paginationEl.hidden = true;
     }
   } catch (err) {
-    grid.innerHTML = `<p class="profiles-empty is-error">${escapeHtml(err instanceof ApiError ? err.message : 'Search failed')}</p>`;
+    grid.innerHTML = `<p class="profiles-empty is-error">${escapeHtml(err instanceof ApiError ? err.message : t('browse.searchFailed'))}</p>`;
   }
 
   if (window.__applySiteLanguage) window.__applySiteLanguage(getLang());
@@ -290,6 +303,8 @@ function bindBrowseEvents(meta) {
   const form = document.getElementById('browseFiltersForm');
   const sidebar = document.getElementById('browseSidebar');
   const toggle = document.getElementById('browseFiltersToggle');
+
+  bindBrowseLocationFilters(form, meta);
 
   form?.querySelectorAll('.browse-gender-toggle .gender-btn').forEach((btn) => {
     btn.addEventListener('click', () => {
@@ -322,7 +337,7 @@ function bindBrowseEvents(meta) {
     toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
     const label = toggle.querySelector('span');
     if (label) {
-      label.textContent = open ? 'Hide Filters' : 'Show Filters';
+      label.textContent = open ? t('browse.hideFilters') : t('browse.showFilters');
       label.setAttribute('data-i18n', open ? 'browse.hideFilters' : 'browse.showFilters');
       if (window.__applySiteLanguage) window.__applySiteLanguage(getLang());
     }
@@ -338,6 +353,7 @@ export function closeBrowsePage() {
   document.body.classList.remove('on-browse-page', 'browse-filters-open');
   const page = document.getElementById('browse-page');
   if (page) page.hidden = true;
+  unlockPageScroll();
 }
 
 export async function openBrowsePage(initial = {}) {
@@ -349,9 +365,9 @@ export async function openBrowsePage(initial = {}) {
   }
 
   document.body.classList.add('on-browse-page');
+  lockPageScroll();
   page.hidden = false;
-  page.innerHTML = '<p class="profile-loading">Loading…</p>';
-  window.scrollTo(0, 0);
+  page.innerHTML = `<p class="profile-loading">${escapeHtml(t('browse.loading'))}</p>`;
   currentPage = 1;
 
   try {
@@ -378,14 +394,26 @@ export async function openBrowsePage(initial = {}) {
 }
 
 export function initBrowseProfiles() {
-  document.addEventListener('click', (e) => {
+  let browseOpening = false;
+
+  document.addEventListener('click', async (e) => {
     const link = e.target.closest('[data-open-browse]');
-    if (!link) return;
+    if (!link || browseOpening) return;
     e.preventDefault();
 
-    const initial = {};
-    if (link.dataset.browseGender) initial.gender = link.dataset.browseGender;
-    openBrowsePage(initial);
-  });
+    if (!document.body.classList.contains('on-main-site')) {
+      enterMainSite();
+      window.scrollTo({ top: 0, behavior: 'instant' in window ? 'instant' : 'auto' });
+      return;
+    }
 
+    browseOpening = true;
+    try {
+      const initial = {};
+      if (link.dataset.browseGender) initial.gender = link.dataset.browseGender;
+      await openBrowsePage(initial);
+    } finally {
+      browseOpening = false;
+    }
+  });
 }

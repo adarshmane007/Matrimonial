@@ -4,6 +4,13 @@ import { getSiteMeta } from './meta.js';
 import { getLang } from './i18n/index.js';
 import { updateNavAuth } from './ui/nav.js';
 import { applyLanguage } from './i18n/index.js';
+import { lockPageScroll, unlockPageScroll } from './ui/scrollLock.js';
+import {
+  locationFieldsHtml,
+  bindLocationFields,
+  locationPayloadFromForm,
+  locationFromStoredProfile,
+} from './locationSelect.js';
 
 function escapeHtml(s) {
   return String(s ?? '')
@@ -24,6 +31,7 @@ function mapParsedToProfile(parsed) {
     displayName: parsed.fullName || parsed.displayName || '',
     gender: parsed.gender || 'bride',
     age: parsed.age ?? 25,
+    state: parsed.state || 'mh',
     district: parsed.district || 'pune',
     city: parsed.city || '',
     education: parsed.education || '',
@@ -51,6 +59,7 @@ function profileToFormValues(p = {}) {
     displayName: p.displayName || p.fullName || '',
     gender: p.gender || 'bride',
     age: p.age ?? 26,
+    state: p.state || 'mh',
     district: p.district || 'pune',
     city: p.city || '',
     nativePlace: p.nativePlace || '',
@@ -81,7 +90,7 @@ function filterAny(list) {
 }
 
 function formHtml(meta, values) {
-  const districts = (meta.districts || []).filter((d) => d.value !== 'all');
+  const locValues = locationFromStoredProfile(v);
   const eduLevels = (meta.educationLevels || []).filter((e) => e.value !== 'any');
   const marital = filterAny(meta.maritalStatuses);
   const diets = filterAny(meta.diets);
@@ -176,16 +185,7 @@ function formHtml(meta, values) {
               <select class="form-select" name="motherTongue">${optionsHtml(tongues, v.motherTongue)}</select>
             </div>
           </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label class="form-label" data-i18n="profile.district">District *</label>
-              <select class="form-select" name="district" required>${optionsHtml(districts, v.district)}</select>
-            </div>
-            <div class="form-group">
-              <label class="form-label" data-i18n="profile.city">City</label>
-              <input class="form-input" name="city" value="${escapeHtml(v.city)}" maxlength="80">
-            </div>
-          </div>
+          ${locationFieldsHtml(meta, locValues)}
           <div class="form-group">
             <label class="form-label" data-i18n="profile.nativePlace">Native place</label>
             <input class="form-input" name="nativePlace" value="${escapeHtml(v.nativePlace)}" maxlength="80">
@@ -291,8 +291,7 @@ function fillFormFromParsed(form, parsed) {
   set('displayName', mapped.displayName);
   set('gender', mapped.gender);
   set('age', mapped.age);
-  set('district', mapped.district);
-  set('city', mapped.city);
+  return mapped;
   set('education', mapped.education);
   set('educationLevel', mapped.educationLevel);
   set('occupation', mapped.occupation);
@@ -315,6 +314,7 @@ export function closeProfilePage() {
   document.body.classList.remove('on-profile-page');
   const page = document.getElementById('profile-page');
   if (page) page.hidden = true;
+  unlockPageScroll();
 }
 
 export async function openProfilePage() {
@@ -322,9 +322,9 @@ export async function openProfilePage() {
   if (!page) return;
 
   document.body.classList.add('on-profile-page');
+  lockPageScroll();
   page.hidden = false;
   page.innerHTML = '<p class="profile-loading">Loading your profile…</p>';
-  window.scrollTo(0, 0);
 
   try {
     const [metaRes, profileRes] = await Promise.all([
@@ -333,9 +333,11 @@ export async function openProfilePage() {
     ]);
     const p = profileRes?.data || getProfile() || {};
     if (p) setProfile(p);
-    page.innerHTML = formHtml(metaRes, profileToFormValues(p));
+    const formValues = profileToFormValues(p);
+    page.innerHTML = formHtml(metaRes, formValues);
     applyLanguage(getLang());
     bindProfilePageEvents(metaRes);
+    bindLocationFields(page, locationFromStoredProfile(formValues));
   } catch (err) {
     page.innerHTML = `<p class="profile-status is-error">${escapeHtml(err.message || 'Could not load profile')}</p>`;
   }
@@ -392,7 +394,8 @@ function bindProfilePageEvents(meta) {
       const res = await api.parseBiodataPdf(file);
       const form = document.getElementById('myProfileForm');
       if (form && res?.data?.parsed) {
-        fillFormFromParsed(form, res.data.parsed);
+        const mapped = fillFormFromParsed(form, res.data.parsed);
+        await bindLocationFields(document.getElementById('profile-page'), locationFromStoredProfile(mapped));
         const warn = res.data.warnings?.length
           ? ` Filled with notes: ${res.data.warnings.join('; ')}`
           : '';
@@ -415,8 +418,7 @@ function bindProfilePageEvents(meta) {
       displayName: fd.get('displayName')?.trim(),
       gender: fd.get('gender'),
       age: Number(fd.get('age')),
-      district: fd.get('district'),
-      city: fd.get('city')?.trim() || undefined,
+      ...locationPayloadFromForm(form),
       education: fd.get('education')?.trim() || undefined,
       educationLevel: fd.get('educationLevel') || undefined,
       occupation: fd.get('occupation')?.trim() || undefined,
@@ -461,14 +463,14 @@ export function initMyProfile() {
     }
   });
 
-  document.getElementById('createProfileBtn')?.addEventListener('click', (e) => {
+  const openProfileIfAllowed = (e) => {
     e.preventDefault();
+    if (!document.body.classList.contains('on-main-site')) return;
     openProfilePage();
-  });
+  };
+
+  document.getElementById('createProfileBtn')?.addEventListener('click', openProfileIfAllowed);
   document.querySelectorAll('[data-open-profile]').forEach((el) => {
-    el.addEventListener('click', (e) => {
-      e.preventDefault();
-      openProfilePage();
-    });
+    el.addEventListener('click', openProfileIfAllowed);
   });
 }

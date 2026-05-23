@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5, viewport-fit=cover">
 <title>Sakal Maratha Matrimonial</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Noto+Sans+Devanagari:wght@300;400;500&display=swap" rel="stylesheet">
@@ -25,15 +25,13 @@
         <li><span class="login-feature-icon">✦</span><span data-i18n="marquee.2">Verified Members</span></li>
         <li><span class="login-feature-icon">✦</span><span data-i18n="marquee.3">Privacy Protected</span></li>
       </ul>
-      <div class="login-visual-stats">
-        <div class="login-visual-stat">
-          <strong>50K+</strong>
-          <span data-i18n="hero.statProfiles">Verified Profiles</span>
-        </div>
-        <div class="login-visual-stat">
-          <strong>12K+</strong>
-          <span data-i18n="hero.statMatches">Successful Matches</span>
-        </div>
+      <div class="login-visual-quotes" aria-label="Inspirational quotes">
+        <blockquote class="quote-item is-active">
+          <p class="quote-text" data-i18n="quote.login1">"Marriage is not just two people — it unites two families and two traditions."</p>
+        </blockquote>
+        <blockquote class="quote-item">
+          <p class="quote-text" data-i18n="quote.login2">"A true match rests on shared values, respect, and trust."</p>
+        </blockquote>
       </div>
     </div>
   </div>
@@ -63,7 +61,7 @@
                 <a href="#" class="lang-choice" data-set-lang="en" role="button">English</a>
                 <a href="#" class="lang-choice" data-set-lang="mr" role="button">मराठी</a>
               </div>
-              <p class="lang-status">Current: <strong data-lang-status>English</strong></p>
+              <p class="lang-status"><span data-i18n="settings.currentLang">Current language:</span> <strong data-lang-status>English</strong></p>
             </div>
           </div>
         </div>
@@ -98,15 +96,10 @@
           <a href="#" data-open-register data-i18n="login.register">Register Free</a>
         </p>
 
-        <div class="login-trust login-trust-compact">
-          <div class="trust-item">
-            <div class="trust-num">50K+</div>
-            <div class="trust-label" data-i18n="hero.statProfiles">Verified Profiles</div>
-          </div>
-          <div class="trust-item">
-            <div class="trust-num">12K+</div>
-            <div class="trust-label" data-i18n="hero.statMatches">Successful Matches</div>
-          </div>
+        <div class="login-trust-quotes login-trust-compact" aria-label="Quotes">
+          <blockquote class="quote-item is-active">
+            <p class="quote-text" data-i18n="quote.trust1">"Uphold tradition, embrace the future — that is our promise."</p>
+          </blockquote>
         </div>
       </div>
     </div>
@@ -119,7 +112,7 @@
       <div class="section-label" data-i18n="profiles.label">Featured Profiles</div>
       <h2 class="section-title" style="margin-bottom:0;" data-i18n="profiles.title">Recently Joined Members</h2>
     </div>
-    <a href="#" class="btn-outline" data-open-browse data-i18n="profiles.viewAll">View All Profiles →</a>
+    <a href="#" class="btn-outline enter-main" data-i18n="profiles.viewAll">View All Profiles →</a>
   </div>
   <div class="profiles-grid" id="loginProfilesGrid" data-profiles-grid>
     <article class="profile-card">
@@ -190,13 +183,13 @@
 
 <!-- NAV -->
 <nav class="site-nav">
-  <div class="nav-logo">
+  <a href="#" class="nav-logo" data-nav-home aria-label="Go to home">
     <div class="nav-logo-icon">🪷</div>
     <div class="nav-logo-text">
       Sakal Maratha
       <span data-i18n="nav.subtitle">Matrimonial</span>
     </div>
-  </div>
+  </a>
   <button type="button" class="nav-menu-btn" id="navMenuBtn" aria-label="Open menu" aria-expanded="false">☰</button>
   <ul class="nav-links" id="navLinks">
     <li class="nav-settings-item">
@@ -213,7 +206,7 @@
               <a href="#" class="lang-choice" data-set-lang="en" role="button">English</a>
               <a href="#" class="lang-choice" data-set-lang="mr" role="button">मराठी</a>
             </div>
-            <p class="lang-status">Current: <strong data-lang-status>English</strong></p>
+            <p class="lang-status"><span data-i18n="settings.currentLang">Current language:</span> <strong data-lang-status>English</strong></p>
           </div>
         </div>
       </div>
@@ -227,7 +220,7 @@
       <a href="#" class="nav-messages-link" data-open-chat data-i18n="nav.messages">Messages<span class="nav-msg-badge" id="navMsgBadge" hidden aria-label="Unread messages"></span></a>
     </li>
     <li id="navLogoutItem" hidden>
-      <button type="button" class="nav-logout-btn" id="logoutBtn">Logout</button>
+      <button type="button" class="nav-logout-btn" id="logoutBtn" data-i18n="nav.logout">Logout</button>
     </li>
     <li id="navRegisterItem">
       <a href="#" class="nav-cta" data-open-register data-i18n="nav.freeRegister">Free Register</a>
@@ -245,11 +238,11 @@
 <nav class="mobile-bottom-nav" id="mobileBottomNav" hidden aria-label="Quick navigation">
   <a href="#" class="mobile-nav-item" data-mobile-home>
     <span class="mobile-nav-icon">🏠</span>
-    <span>Home</span>
+    <span data-i18n="mobile.home">Home</span>
   </a>
   <a href="#" class="mobile-nav-item" data-open-browse>
     <span class="mobile-nav-icon">🔍</span>
-    <span>Search</span>
+    <span data-i18n="mobile.search">Search</span>
   </a>
   <a href="#" class="mobile-nav-item nav-messages-link" data-open-chat>
     <span class="mobile-nav-icon mobile-nav-icon-chat">💬<span class="nav-msg-badge nav-msg-badge--mobile" id="navMsgBadgeMobile" hidden></span></span>
@@ -268,28 +261,25 @@
     <h1 class="hero-title" data-i18n-html="hero.title">
       Find Your<br><em>Soulmate</em><br>Within the<br>Maratha Kul
     </h1>
-    <p class="hero-subtitle" data-i18n="hero.subtitle">जोडीदार शोधा, आयुष्य सजवा</p>
+    <p class="hero-subtitle" data-i18n="hero.subtitle">Find your partner, build your life</p>
     <p class="hero-desc" data-i18n="hero.desc">
-      Sakal Maratha Matrimonial is a trusted platform dedicated to uniting Maratha families across Maharashtra and beyond. Thousands of verified profiles, helping you find the right match with shared values and culture.
+      Sakal Maratha Matrimonial is a trusted platform dedicated to uniting Maratha families across Maharashtra and beyond — helping you find the right match with shared values and culture.
     </p>
     <div class="hero-actions">
       <a href="#" class="btn-primary" data-open-register data-guest-only data-i18n="hero.register">Register Free Today</a>
       <a href="#" class="btn-primary" data-open-profile data-member-only hidden data-i18n="hero.createProfile" data-i18n-hero-profile-cta>Create Profile</a>
       <a href="#" class="btn-secondary" data-open-browse data-i18n="hero.browse">Browse Profiles</a>
     </div>
-    <div class="hero-stats">
-      <div>
-        <div class="stat-num">50K+</div>
-        <div class="stat-label" data-i18n="hero.statProfiles">Verified Profiles</div>
-      </div>
-      <div>
-        <div class="stat-num">12K+</div>
-        <div class="stat-label" data-i18n="hero.statMatches">Successful Matches</div>
-      </div>
-      <div>
-        <div class="stat-num">100%</div>
-        <div class="stat-label" data-i18n="hero.statCommunity">Maratha Community</div>
-      </div>
+    <div class="hero-quotes" aria-label="Inspirational quotes">
+      <blockquote class="quote-item is-active">
+        <p class="quote-text" data-i18n="quote.hero1">"Marriage joins two hearts — blessed by two families."</p>
+      </blockquote>
+      <blockquote class="quote-item">
+        <p class="quote-text" data-i18n="quote.hero2">"The right match shares culture, values, and dreams."</p>
+      </blockquote>
+      <blockquote class="quote-item">
+        <p class="quote-text" data-i18n="quote.hero3">"Honor tradition as you move forward — the path of trust."</p>
+      </blockquote>
     </div>
   </div>
 
@@ -366,16 +356,16 @@
     <span class="marquee-item" data-i18n="marquee.1">100% Maratha Profiles</span><span class="marquee-dot">✦</span>
     <span class="marquee-item" data-i18n="marquee.2">Verified Members</span><span class="marquee-dot">✦</span>
     <span class="marquee-item" data-i18n="marquee.3">Privacy Protected</span><span class="marquee-dot">✦</span>
-    <span class="marquee-item" data-i18n="marquee.4">Trusted by 50,000+ Families</span><span class="marquee-dot">✦</span>
+    <span class="marquee-item" data-i18n="marquee.4">Families Find Trust Here</span><span class="marquee-dot">✦</span>
     <span class="marquee-item" data-i18n="marquee.5">Across Maharashtra & Beyond</span><span class="marquee-dot">✦</span>
-    <span class="marquee-item" data-i18n="marquee.6">12,000+ Successful Matches</span><span class="marquee-dot">✦</span>
+    <span class="marquee-item" data-i18n="marquee.6">Meaningful Matches Begin Here</span><span class="marquee-dot">✦</span>
     <span class="marquee-item" data-i18n="marquee.7">Free Registration</span><span class="marquee-dot">✦</span>
     <span class="marquee-item" data-i18n="marquee.1">100% Maratha Profiles</span><span class="marquee-dot">✦</span>
     <span class="marquee-item" data-i18n="marquee.2">Verified Members</span><span class="marquee-dot">✦</span>
     <span class="marquee-item" data-i18n="marquee.3">Privacy Protected</span><span class="marquee-dot">✦</span>
-    <span class="marquee-item" data-i18n="marquee.4">Trusted by 50,000+ Families</span><span class="marquee-dot">✦</span>
+    <span class="marquee-item" data-i18n="marquee.4">Families Find Trust Here</span><span class="marquee-dot">✦</span>
     <span class="marquee-item" data-i18n="marquee.5">Across Maharashtra & Beyond</span><span class="marquee-dot">✦</span>
-    <span class="marquee-item" data-i18n="marquee.6">12,000+ Successful Matches</span><span class="marquee-dot">✦</span>
+    <span class="marquee-item" data-i18n="marquee.6">Meaningful Matches Begin Here</span><span class="marquee-dot">✦</span>
     <span class="marquee-item" data-i18n="marquee.7">Free Registration</span><span class="marquee-dot">✦</span>
   </div>
 </div>
@@ -556,7 +546,7 @@
 <!-- CTA -->
 <section class="cta-section">
   <h2 class="cta-title" data-i18n="cta.title">Begin Your Journey to a Beautiful Union</h2>
-  <p class="cta-desc" data-i18n-html="cta.desc">Join over 50,000 Maratha families who trust Sakal Maratha Matrimonial.<br>Registration is completely free.</p>
+  <p class="cta-desc" data-i18n-html="cta.desc">Begin your journey with a platform built for the Maratha community.<br>Registration is completely free.</p>
   <div class="cta-actions">
     <a href="#" class="btn-primary" style="font-size:16px; padding: 16px 40px;" data-open-register data-i18n="cta.register">Register Free Today</a>
     <a href="#" class="btn-secondary" style="font-size:16px; padding: 16px 40px;" data-i18n="cta.learn">Learn More</a>

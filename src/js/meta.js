@@ -13,6 +13,12 @@ export async function getSiteMeta() {
   } catch {
     const any = (label) => [{ value: 'any', label }];
     return {
+      states: [
+        { value: 'mh', label: 'Maharashtra' },
+        { value: 'ka', label: 'Karnataka' },
+        { value: 'dl', label: 'Delhi' },
+      ],
+      cityOtherValue: '__other__',
       districts: [{ value: 'all', label: 'All Maharashtra' }, ...FALLBACK_DISTRICTS],
       educationLevels: [{ value: 'any', label: 'Any Education' }, ...FALLBACK_EDUCATION],
       genders: [

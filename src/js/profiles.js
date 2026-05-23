@@ -12,7 +12,7 @@ function escapeHtml(str) {
     .replace(/"/g, '&quot;');
 }
 
-export function renderProfileCard(profile, index = 0) {
+export function renderProfileCard(profile, index = 0, { guestMode = false } = {}) {
   const bg = BG_CLASSES[index % BG_CLASSES.length];
   const tags = (profile.tags || [])
     .filter(Boolean)
@@ -24,11 +24,16 @@ export function renderProfileCard(profile, index = 0) {
     document.querySelector('[data-i18n="profiles.online"]')?.textContent || 'Online';
 
   const photoInner = profile.photoUrl
-    ? `<img src="${escapeHtml(profile.photoUrl)}" alt="" class="profile-card-photo" loading="lazy">`
+    ? `<img src="${escapeHtml(profile.photoUrl)}" alt="" class="profile-card-photo" loading="lazy" decoding="async">`
     : `<div class="profile-img-bg ${bg}">👤</div>`;
 
+  const cardClass = guestMode ? 'profile-card profile-card--guest' : 'profile-card';
+  const actionBtn = guestMode
+    ? `<button type="button" class="profile-action enter-main" data-i18n="profiles.signInToView">Sign in to view</button>`
+    : `<button type="button" class="profile-action" data-profile-id="${profile.id}" data-i18n="profiles.view">View Profile</button>`;
+
   return `
-    <article class="profile-card" data-profile-id="${profile.id}">
+    <article class="${cardClass}" ${guestMode ? '' : `data-profile-id="${profile.id}"`}>
       <div class="profile-img-wrap">
         ${photoInner}
         ${profile.isOnline ? `<div class="profile-badge">${escapeHtml(onlineLabel)}</div>` : ''}
@@ -38,20 +43,20 @@ export function renderProfileCard(profile, index = 0) {
         <div class="profile-name">${escapeHtml(profile.displayName)}</div>
         <div class="profile-sub">${escapeHtml(profile.subtitle || '')}</div>
         <div class="profile-tags">${tags}</div>
-        <button type="button" class="profile-action" data-profile-id="${profile.id}" data-i18n="profiles.view">View Profile</button>
+        ${actionBtn}
       </div>
     </article>
   `;
 }
 
-export function renderProfilesGrid(container, profiles) {
+export function renderProfilesGrid(container, profiles, options = {}) {
   if (!container) return;
   if (!profiles?.length) {
     container.innerHTML =
       '<p class="profiles-empty" style="grid-column:1/-1;text-align:center;color:var(--warm-muted);padding:24px;">No profiles found. Try adjusting your filters.</p>';
     return;
   }
-  container.innerHTML = profiles.map((p, i) => renderProfileCard(p, i)).join('');
+  container.innerHTML = profiles.map((p, i) => renderProfileCard(p, i, options)).join('');
   if (window.__applySiteLanguage) window.__applySiteLanguage(getLang());
 }
 
@@ -64,7 +69,10 @@ export async function loadFeaturedProfiles() {
     let profiles = res?.data || [];
     const myId = getProfile()?.id;
     if (myId) profiles = profiles.filter((p) => p.id !== myId);
-    grids.forEach((grid) => renderProfilesGrid(grid, profiles));
+    grids.forEach((grid) => {
+      const guestMode = !!grid.closest('#login-screen');
+      renderProfilesGrid(grid, profiles, { guestMode });
+    });
   } catch (err) {
     console.warn('Featured profiles:', err);
   }

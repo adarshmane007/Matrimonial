@@ -86,6 +86,10 @@ export const api = {
     return request(`/meta?lang=${lang}`);
   },
 
+  getCities(state, lang) {
+    return request(`/meta/cities?state=${encodeURIComponent(state)}&lang=${lang}`);
+  },
+
   login(identifier, password) {
     return request('/auth/login', {
       method: 'POST',

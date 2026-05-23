@@ -2,9 +2,9 @@ import { api, ApiError } from './api.js';
 import { getProfile, setProfile } from './storage.js';
 import { getSiteMeta } from './meta.js';
 import { getLang } from './i18n/index.js';
-import { updateNavAuth } from './ui/nav.js';
 import { applyLanguage } from './i18n/index.js';
 import { closeFullPageOverlays } from './ui/fullPage.js';
+import { isNavLocked, withNavLock } from './ui/navigation.js';
 import {
   locationFieldsHtml,
   bindLocationFields,
@@ -316,31 +316,52 @@ export function closeProfilePage() {
   if (page) page.hidden = true;
 }
 
+let profilePageMounted = false;
+let profileMetaCache = null;
+
+function renderProfileForm(page, meta, p) {
+  const formValues = profileToFormValues(p);
+  page.innerHTML = formHtml(meta, formValues);
+  applyLanguage(getLang());
+  bindProfilePageEvents(meta);
+  bindLocationFields(page, locationFromStoredProfile(formValues));
+}
+
 export async function openProfilePage() {
   const page = document.getElementById('profile-page');
-  if (!page) return;
+  if (!page || isNavLocked('profile')) return;
 
-  closeFullPageOverlays({ except: 'profile' });
-  document.body.classList.add('on-profile-page');
-  page.hidden = false;
-  window.scrollTo({ top: 0, behavior: 'instant' in window ? 'instant' : 'auto' });
-  page.innerHTML = '<p class="profile-loading">Loading your profile…</p>';
+  return withNavLock('profile', async () => {
+    closeFullPageOverlays({ except: 'profile' });
+    document.body.classList.add('on-profile-page');
+    page.hidden = false;
+    window.scrollTo(0, 0);
 
-  try {
-    const [metaRes, profileRes] = await Promise.all([
-      getSiteMeta(),
-      api.getMyProfile().catch(() => ({ data: getProfile() })),
-    ]);
-    const p = profileRes?.data || getProfile() || {};
-    if (p) setProfile(p);
-    const formValues = profileToFormValues(p);
-    page.innerHTML = formHtml(metaRes, formValues);
-    applyLanguage(getLang());
-    bindProfilePageEvents(metaRes);
-    bindLocationFields(page, locationFromStoredProfile(formValues));
-  } catch (err) {
-    page.innerHTML = `<p class="profile-status is-error">${escapeHtml(err.message || 'Could not load profile')}</p>`;
-  }
+    const cached = getProfile();
+    const metaPromise = profileMetaCache ? Promise.resolve(profileMetaCache) : getSiteMeta();
+
+    if (cached?.displayName && profilePageMounted && profileMetaCache) {
+      renderProfileForm(page, profileMetaCache, cached);
+    } else {
+      page.innerHTML = '<p class="profile-loading">Loading your profile…</p>';
+    }
+
+    try {
+      const [metaRes, profileRes] = await Promise.all([
+        metaPromise,
+        api.getMyProfile().catch(() => ({ data: getProfile() })),
+      ]);
+      profileMetaCache = metaRes;
+      profilePageMounted = true;
+      const p = profileRes?.data || getProfile() || {};
+      if (p) setProfile(p);
+      renderProfileForm(page, metaRes, p);
+    } catch (err) {
+      if (!cached?.displayName) {
+        page.innerHTML = `<p class="profile-status is-error">${escapeHtml(err.message || 'Could not load profile')}</p>`;
+      }
+    }
+  });
 }
 
 function bindProfilePageEvents(meta) {
@@ -446,6 +467,7 @@ function bindProfilePageEvents(meta) {
       if (res?.data) {
         setProfile(res.data);
         setStatus(msgEl, 'Profile saved successfully.');
+        const { updateNavAuth } = await import('./ui/nav.js');
         updateNavAuth();
       }
     } catch (err) {
@@ -458,6 +480,8 @@ function bindProfilePageEvents(meta) {
 
 export function initMyProfile() {
   document.addEventListener('smm:lang-change', () => {
+    profilePageMounted = false;
+    profileMetaCache = null;
     if (document.body.classList.contains('on-profile-page')) {
       applyLanguage(getLang());
     }
@@ -465,7 +489,9 @@ export function initMyProfile() {
 
   const openProfileIfAllowed = (e) => {
     e.preventDefault();
+    e.stopPropagation();
     if (!document.body.classList.contains('on-main-site')) return;
+    if (document.body.classList.contains('on-profile-page')) return;
     openProfilePage();
   };
 

@@ -73,6 +73,9 @@ export function updateNavAuth() {
   if (chatItem) chatItem.hidden = !loggedIn;
   if (mobileNav) mobileNav.hidden = !loggedIn;
 
+  const mobileActions = document.getElementById('navMobileActions');
+  if (mobileActions) mobileActions.hidden = !loggedIn;
+
   document.querySelectorAll('[data-guest-only]').forEach((el) => {
     el.hidden = loggedIn;
   });
@@ -96,6 +99,8 @@ function closeOverlays() {
 
 export function goToHome() {
   closeOverlays();
+  document.querySelectorAll('.mobile-nav-item').forEach((el) => el.classList.remove('is-active'));
+  document.querySelector('.mobile-nav-item[data-nav-tab="home"]')?.classList.add('is-active');
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
@@ -117,12 +122,14 @@ export function initNav() {
     });
   });
 
-  document.getElementById('logoutBtn')?.addEventListener('click', () => {
+  const doLogout = () => {
     clearAuth();
     closeOverlays();
     showLoginScreen();
     updateNavAuth();
-  });
+  };
+  document.getElementById('logoutBtn')?.addEventListener('click', doLogout);
+  document.getElementById('mobileLogoutBtn')?.addEventListener('click', doLogout);
   document.querySelectorAll('[data-nav-home]').forEach((el) => {
     el.addEventListener('click', (e) => {
       e.preventDefault();
@@ -133,6 +140,17 @@ export function initNav() {
   document.querySelector('[data-mobile-home]')?.addEventListener('click', (e) => {
     e.preventDefault();
     goToHome();
+  });
+
+  document.addEventListener('click', (e) => {
+    const tab = e.target.closest('[data-nav-tab]');
+    if (!tab || !document.body.classList.contains('logged-in')) return;
+    document.querySelectorAll('.mobile-nav-item').forEach((el) => el.classList.remove('is-active'));
+    tab.classList.add('is-active');
+  });
+
+  document.addEventListener('smm:enter-main', () => {
+    document.querySelector('.mobile-nav-item[data-nav-tab="home"]')?.classList.add('is-active');
   });
 
   updateNavAuth();

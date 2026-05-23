@@ -5,6 +5,7 @@ import { translations } from './i18n/translations.js';
 import { openProfileModal } from './profileModal.js';
 import { refreshNavBadges } from './ui/nav.js';
 import { closeFullPageOverlays } from './ui/fullPage.js';
+import { isNavLocked, withNavLock } from './ui/navigation.js';
 
 function t(key) {
   const lang = getLang();
@@ -249,9 +250,10 @@ async function fetchChatData(force = false) {
 
 export async function openChatPage(tab = 'chats', conversationId = null) {
   const page = document.getElementById('chat-page');
-  if (!page || chatBusy) return;
+  if (!page || chatBusy || isNavLocked('chat')) return;
   if (!isLoggedIn() || !document.body.classList.contains('on-main-site')) return;
 
+  return withNavLock('chat', async () => {
   chatBusy = true;
   chatState.tab = tab;
   chatState.activeConversationId = conversationId;
@@ -261,7 +263,7 @@ export async function openChatPage(tab = 'chats', conversationId = null) {
 
   document.body.classList.add('on-chat-page');
   page.hidden = false;
-  window.scrollTo({ top: 0, behavior: 'instant' in window ? 'instant' : 'auto' });
+  window.scrollTo(0, 0);
 
   const useCache = chatCache.at && Date.now() - chatCache.at < CACHE_MS;
   if (!useCache) setLoading(page, true);
@@ -292,6 +294,7 @@ export async function openChatPage(tab = 'chats', conversationId = null) {
   } finally {
     chatBusy = false;
   }
+  });
 }
 
 function bindRequestActions(page) {
@@ -495,7 +498,7 @@ export function initChat() {
     openChatPage().finally(() => {
       setTimeout(() => {
         clickLock = false;
-      }, 400);
+      }, 320);
     });
   });
 

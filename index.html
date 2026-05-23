@@ -190,6 +190,24 @@
       <span data-i18n="nav.subtitle">Matrimonial</span>
     </div>
   </a>
+  <div class="nav-mobile-actions" id="navMobileActions" hidden>
+    <div class="nav-settings-wrap nav-settings-wrap--mobile">
+      <button type="button" class="nav-mobile-icon-btn settings-toggle" id="mobileSettingsBtn" aria-label="Settings" title="Settings">⚙</button>
+      <div class="settings-panel settings-panel--mobile" id="settingsPanelMobile">
+        <div class="settings-panel-title" data-i18n="settings.title">Settings</div>
+        <div class="settings-panel-sub" data-i18n="settings.subtitle">Preferences</div>
+        <div class="settings-lang-block">
+          <span class="settings-row-label" data-i18n="settings.language">Language</span>
+          <div class="lang-switch" role="group" aria-label="Language">
+            <a href="#" class="lang-choice" data-set-lang="en" role="button">English</a>
+            <a href="#" class="lang-choice" data-set-lang="mr" role="button">मराठी</a>
+          </div>
+          <p class="lang-status"><span data-i18n="settings.currentLang">Current language:</span> <strong data-lang-status>English</strong></p>
+        </div>
+      </div>
+    </div>
+    <button type="button" class="nav-mobile-icon-btn nav-mobile-logout" id="mobileLogoutBtn" data-i18n="nav.logout">Logout</button>
+  </div>
   <button type="button" class="nav-menu-btn" id="navMenuBtn" aria-label="Open menu" aria-expanded="false">☰</button>
   <ul class="nav-links" id="navLinks">
     <li class="nav-settings-item">
@@ -236,19 +254,19 @@
 <section id="chat-page" class="chat-page" hidden aria-label="Messages"></section>
 
 <nav class="mobile-bottom-nav" id="mobileBottomNav" hidden aria-label="Quick navigation">
-  <a href="#" class="mobile-nav-item" data-mobile-home>
+  <a href="#" class="mobile-nav-item" data-mobile-home data-nav-tab="home">
     <span class="mobile-nav-icon">🏠</span>
     <span data-i18n="mobile.home">Home</span>
   </a>
-  <a href="#" class="mobile-nav-item" data-open-browse>
+  <a href="#" class="mobile-nav-item" data-open-browse data-nav-tab="browse">
     <span class="mobile-nav-icon">🔍</span>
     <span data-i18n="mobile.search">Search</span>
   </a>
-  <a href="#" class="mobile-nav-item nav-messages-link" data-open-chat>
+  <a href="#" class="mobile-nav-item nav-messages-link" data-open-chat data-nav-tab="chat">
     <span class="mobile-nav-icon mobile-nav-icon-chat">💬<span class="nav-msg-badge nav-msg-badge--mobile" id="navMsgBadgeMobile" hidden></span></span>
     <span data-i18n="nav.messages">Chat</span>
   </a>
-  <a href="#" class="mobile-nav-item" id="createProfileMobile" data-open-profile>
+  <a href="#" class="mobile-nav-item" data-open-profile data-nav-tab="profile" data-i18n-profile-cta>
     <span class="mobile-nav-icon">👤</span>
     <span data-i18n="nav.createProfile" data-i18n-profile-cta>Profile</span>
   </a>

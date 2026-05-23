@@ -48,14 +48,15 @@ async function requestForm(path, formData) {
 }
 
 async function request(path, options = {}) {
-  const headers = { ...(options.headers || {}) };
-  if (options.body && !headers['Content-Type']) {
+  const { signal, ...fetchOpts } = options;
+  const headers = { ...(fetchOpts.headers || {}) };
+  if (fetchOpts.body && !headers['Content-Type']) {
     headers['Content-Type'] = 'application/json';
   }
   const token = getToken();
   if (token) headers.Authorization = `Bearer ${token}`;
 
-  const res = await fetch(`${API_BASE}${path}`, { ...options, headers });
+  const res = await fetch(`${API_BASE}${path}`, { ...fetchOpts, headers, signal });
   let data = null;
   const text = await res.text();
   if (text) {
@@ -140,12 +141,12 @@ export const api = {
     return request(`/profiles/${id}?lang=${lang}`);
   },
 
-  search(params) {
+  search(params, options = {}) {
     const q = new URLSearchParams();
     Object.entries(params).forEach(([key, val]) => {
       if (val !== undefined && val !== null && val !== '') q.set(key, String(val));
     });
-    return request(`/profiles/search?${q.toString()}`);
+    return request(`/profiles/search?${q.toString()}`, options);
   },
 
   sendChatRequest(profileId, message) {

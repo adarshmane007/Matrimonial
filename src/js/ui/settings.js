@@ -1,5 +1,5 @@
 export function initSettingsPanels() {
-  const panels = document.querySelectorAll('.settings-panel');
+  const panels = document.querySelectorAll('.settings-panel, .settings-panel--mobile');
 
   document.addEventListener(
     'click',
@@ -16,7 +16,10 @@ export function initSettingsPanels() {
       const toggle = e.target.closest('.settings-toggle');
       if (toggle) {
         e.stopPropagation();
-        const panel = toggle.closest('.nav-settings-wrap')?.querySelector('.settings-panel');
+        const wrap = toggle.closest('.nav-settings-wrap');
+        const panel =
+          wrap?.querySelector('.settings-panel') ||
+          wrap?.querySelector('.settings-panel--mobile');
         if (!panel) return;
         const isOpen = panel.classList.contains('open');
         panels.forEach((p) => p.classList.remove('open'));

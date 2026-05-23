@@ -5,8 +5,12 @@ import { renderProfilesGrid } from './profiles.js';
 import { bindBrowseLocationFilters } from './locationSelect.js';
 import { enterMainSite } from './ui/session.js';
 import { closeFullPageOverlays } from './ui/fullPage.js';
+import { isNavLocked, withNavLock } from './ui/navigation.js';
+import { sanitizeSearchParams } from './searchParams.js';
 let metaCache = null;
+let browsePageMounted = false;
 let currentPage = 1;
+let searchAbort = null;
 
 function escapeHtml(s) {
   return String(s ?? '')
@@ -64,7 +68,7 @@ function filtersHtml(meta) {
           <label class="form-label" data-i18n="profile.state">State</label>
           <select class="form-select" name="state" id="browseFilterState">
             <option value="all">${escapeHtml(t('browse.genderAny'))}</option>
-            ${optionsHtml(meta.states || [], 'all')}
+            ${optionsHtml((meta.states || []).filter((s) => s.value && s.value !== 'all'), '')}
           </select>
         </div>
         <div class="form-group">
@@ -222,9 +226,9 @@ function collectFilters(form) {
   if (occupation) params.occupation = occupation;
   if (heightFrom) params.heightFrom = heightFrom;
   if (heightTo) params.heightTo = heightTo;
-  if (fd.get('verifiedOnly') === 'true') params.verifiedOnly = 'true';
-  if (fd.get('withPhotoOnly') === 'true') params.withPhotoOnly = 'true';
-  return params;
+  if (fd.get('verifiedOnly') === 'on' || fd.get('verifiedOnly') === 'true') params.verifiedOnly = 'true';
+  if (fd.get('withPhotoOnly') === 'on' || fd.get('withPhotoOnly') === 'true') params.withPhotoOnly = 'true';
+  return sanitizeSearchParams(params);
 }
 
 function countActiveFilters(params) {
@@ -251,8 +255,12 @@ async function runSearch(form) {
     `<p class="profiles-empty" style="grid-column:1/-1;text-align:center;padding:32px;color:var(--warm-muted)">${escapeHtml(t('browse.searching'))}</p>`;
 
   try {
+    if (searchAbort) searchAbort.abort();
+    searchAbort = new AbortController();
+    const signal = searchAbort.signal;
+
     const params = collectFilters(form);
-    const res = await api.search(params);
+    const res = await api.search(params, { signal });
     const profiles = res?.data?.profiles || [];
     const pag = res?.data?.pagination;
 
@@ -293,7 +301,14 @@ async function runSearch(form) {
       paginationEl.hidden = true;
     }
   } catch (err) {
-    grid.innerHTML = `<p class="profiles-empty is-error">${escapeHtml(err instanceof ApiError ? err.message : t('browse.searchFailed'))}</p>`;
+    if (err?.name === 'AbortError') return;
+    const msg =
+      err instanceof ApiError
+        ? err.message
+        : err?.message?.includes('fetch')
+          ? 'Cannot reach server. Check your connection or API URL.'
+          : t('browse.searchFailed');
+    grid.innerHTML = `<p class="profiles-empty is-error">${escapeHtml(msg)}</p>`;
   }
 
   if (window.__applySiteLanguage) window.__applySiteLanguage(getLang());
@@ -357,44 +372,55 @@ export function closeBrowsePage() {
 
 export async function openBrowsePage(initial = {}) {
   const page = document.getElementById('browse-page');
-  if (!page) return;
+  if (!page || isNavLocked('browse')) return;
 
   if (!document.body.classList.contains('on-main-site')) {
     enterMainSite();
+    return;
   }
 
-  closeFullPageOverlays({ except: 'browse' });
-  document.body.classList.add('on-browse-page');
-  page.hidden = false;
-  window.scrollTo({ top: 0, behavior: 'instant' in window ? 'instant' : 'auto' });
-  page.innerHTML = `<p class="profile-loading">${escapeHtml(t('browse.loading'))}</p>`;
-  currentPage = 1;
+  return withNavLock('browse', async () => {
+    closeFullPageOverlays({ except: 'browse' });
+    document.body.classList.add('on-browse-page');
+    page.hidden = false;
+    window.scrollTo(0, 0);
+    currentPage = 1;
 
-  try {
-    metaCache = metaCache || (await getSiteMeta());
-    page.innerHTML = pageShell(metaCache);
-    bindBrowseEvents(metaCache);
+    try {
+      if (!browsePageMounted) {
+        page.innerHTML = `<p class="profile-loading">${escapeHtml(t('browse.loading'))}</p>`;
+        metaCache = metaCache || (await getSiteMeta());
+        page.innerHTML = pageShell(metaCache);
+        bindBrowseEvents(metaCache);
+        browsePageMounted = true;
+      }
 
-    const form = document.getElementById('browseFiltersForm');
-    if (initial.gender && form) {
-      form.querySelectorAll('.browse-gender-toggle .gender-btn').forEach((b) => {
-        b.classList.toggle('active', b.dataset.gender === initial.gender);
-      });
+      const form = document.getElementById('browseFiltersForm');
+      if (initial.gender && form) {
+        form.querySelectorAll('.browse-gender-toggle .gender-btn').forEach((b) => {
+          b.classList.toggle('active', b.dataset.gender === initial.gender);
+        });
+      }
+      if (initial.ageFrom && form?.elements.ageFrom) form.elements.ageFrom.value = initial.ageFrom;
+      if (initial.ageTo && form?.elements.ageTo) form.elements.ageTo.value = initial.ageTo;
+      if (initial.district && form?.elements.district) form.elements.district.value = initial.district;
+      if (initial.education && form?.elements.education) form.elements.education.value = initial.education;
+
+      await runSearch(form);
+      if (window.__applySiteLanguage) window.__applySiteLanguage(getLang());
+    } catch (err) {
+      page.innerHTML = `<p class="profile-status is-error">${escapeHtml(err.message)}</p>`;
     }
-    if (initial.ageFrom && form?.elements.ageFrom) form.elements.ageFrom.value = initial.ageFrom;
-    if (initial.ageTo && form?.elements.ageTo) form.elements.ageTo.value = initial.ageTo;
-    if (initial.district && form?.elements.district) form.elements.district.value = initial.district;
-    if (initial.education && form?.elements.education) form.elements.education.value = initial.education;
-
-    await runSearch(form);
-    if (window.__applySiteLanguage) window.__applySiteLanguage(getLang());
-  } catch (err) {
-    page.innerHTML = `<p class="profile-status is-error">${escapeHtml(err.message)}</p>`;
-  }
+  });
 }
 
 export function initBrowseProfiles() {
   let browseOpening = false;
+
+  document.addEventListener('smm:lang-change', () => {
+    browsePageMounted = false;
+    metaCache = null;
+  });
 
   document.addEventListener('click', async (e) => {
     const link = e.target.closest('[data-open-browse]');
@@ -407,13 +433,16 @@ export function initBrowseProfiles() {
       return;
     }
 
+    if (document.body.classList.contains('on-browse-page')) return;
     browseOpening = true;
     try {
       const initial = {};
       if (link.dataset.browseGender) initial.gender = link.dataset.browseGender;
       await openBrowsePage(initial);
     } finally {
-      browseOpening = false;
+      setTimeout(() => {
+        browseOpening = false;
+      }, 300);
     }
   });
 }

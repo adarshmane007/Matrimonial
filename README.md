@@ -56,12 +56,13 @@ Open http://localhost:5173
 
 ## Deploy to AWS
 
-1. Edit `.deploy/envs.json` (bucket, CloudFront ID, `api_url`).
+1. Edit `.deploy/envs.json` (bucket, optional CloudFront ID, `api_url`).
 2. Add GitHub secrets `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`.
 3. Run workflow **Deploy Matrimonial Frontend to S3**.
 
-Build output is published to `s3://<bucket>/latest/` (Vite `base: /latest/`).
+Build output is published to the S3 bucket root `s3://<bucket>/` and should be served as an S3 static website.
+Set the bucket's static website hosting index document and error document to `index.html`.
 
 ## Backend CORS
 
-Set backend `CORS_ORIGIN` to your CloudFront/site URL, e.g. `https://matrimonial.yourdomain.com`.
+Set backend `CORS_ORIGIN` to your S3 website URL or custom domain, e.g. `http://<bucket-name>.s3-website.<region>.amazonaws.com` or `https://matrimonial.yourdomain.com`.

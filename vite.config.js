@@ -1,8 +1,8 @@
 import { defineConfig } from 'vite';
 
-/** CloudFront/S3 deploy serves from /latest/ (see deploy.yml). */
+/** S3 static website hosting serves from the bucket root. */
 export default defineConfig({
-  base: '/latest/',
+  base: '/',
   build: {
     outDir: 'dist',
     emptyOutDir: true,

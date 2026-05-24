@@ -3,11 +3,8 @@ import { showLoginScreen } from './session.js';
 import { closeFullPageOverlays } from './fullPage.js';
 import { api } from '../api.js';
 import { getLang, t } from '../i18n/index.js';
-import {
-  isNavSwitchLocked,
-  setMobileNavActive,
-  syncMobileNavFromBody,
-} from './navigation.js';
+import { setMobileNavActive, syncMobileNavFromBody, dismissMobileMore } from './navigation.js';
+import { initMobileNavRouter } from './mobileNavRouter.js';
 
 function syncProfileCtaLabels() {
   const hasProfile = !!(getProfile()?.id);
@@ -133,8 +130,7 @@ function closeOverlays() {
 
 export function goToHome() {
   closeOverlays();
-  document.getElementById('mobileMoreSheet')?.setAttribute('hidden', '');
-  document.body.classList.remove('mobile-more-open');
+  dismissMobileMore();
   setMobileNavActive('home');
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
@@ -167,53 +163,30 @@ export function initNav() {
   document.getElementById('mobileLogoutBtn')?.addEventListener('click', doLogout);
   document.getElementById('mobileMoreLogoutBtn')?.addEventListener('click', doLogout);
 
-  const moreSheet = document.getElementById('mobileMoreSheet');
-  const moreBtn = document.getElementById('mobileMoreBtn');
   const moreBackdrop = document.getElementById('mobileMoreBackdrop');
   const moreClose = document.getElementById('mobileMoreClose');
 
-  function closeMobileMore() {
-    if (!moreSheet) return;
-    moreSheet.hidden = true;
-    moreSheet.setAttribute('aria-hidden', 'true');
-    moreBtn?.setAttribute('aria-expanded', 'false');
-    document.body.classList.remove('mobile-more-open');
+  function closeMobileMoreMenu() {
+    dismissMobileMore();
     syncMobileNavFromBody();
   }
 
-  function openMobileMore() {
-    if (!moreSheet) return;
-    if (isNavSwitchLocked()) return;
-    moreSheet.hidden = false;
-    moreSheet.setAttribute('aria-hidden', 'false');
-    moreBtn?.setAttribute('aria-expanded', 'true');
-    document.body.classList.add('mobile-more-open');
-    setMobileNavActive('more');
-  }
-
-  moreBtn?.addEventListener('click', (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (isNavSwitchLocked()) return;
-    if (moreSheet?.hidden) openMobileMore();
-    else closeMobileMore();
-  });
-  moreBackdrop?.addEventListener('click', closeMobileMore);
-  moreClose?.addEventListener('click', closeMobileMore);
+  moreBackdrop?.addEventListener('click', closeMobileMoreMenu);
+  moreClose?.addEventListener('click', closeMobileMoreMenu);
 
   document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && document.body.classList.contains('mobile-more-open')) closeMobileMore();
+    if (e.key === 'Escape' && document.body.classList.contains('mobile-more-open')) {
+      closeMobileMoreMenu();
+    }
   });
 
   document.addEventListener('click', (e) => {
     if (e.target.closest('[data-set-lang]') && document.body.classList.contains('mobile-more-open')) {
-      setTimeout(closeMobileMore, 120);
-    }
-    const tab = e.target.closest('[data-nav-tab]');
-    if (tab && tab.id !== 'mobileMoreBtn' && document.body.classList.contains('mobile-more-open')) {
-      closeMobileMore();
+      setTimeout(closeMobileMoreMenu, 120);
     }
   });
+
+  initMobileNavRouter();
 
   document.querySelectorAll('[data-nav-home]').forEach((el) => {
     el.addEventListener('click', (e) => {
@@ -221,35 +194,6 @@ export function initNav() {
       goToHome();
     });
   });
-
-  document.querySelector('[data-mobile-home]')?.addEventListener('click', (e) => {
-    e.preventDefault();
-    goToHome();
-  });
-
-  /* Block rapid tab taps while a page switch is in progress (capture phase). */
-  document.addEventListener(
-    'click',
-    (e) => {
-      const tab = e.target.closest('.mobile-bottom-nav [data-nav-tab]');
-      if (!tab || !document.body.classList.contains('logged-in')) return;
-      if (tab.id === 'mobileMoreBtn') return;
-
-      if (isNavSwitchLocked()) {
-        e.preventDefault();
-        e.stopImmediatePropagation();
-        return;
-      }
-
-      const tabName = tab.dataset.navTab;
-      if (tabName) {
-        document.getElementById('mobileMoreSheet')?.setAttribute('hidden', '');
-        document.body.classList.remove('mobile-more-open');
-        setMobileNavActive(tabName);
-      }
-    },
-    true
-  );
 
   document.addEventListener('smm:enter-main', () => {
     setMobileNavActive('home');

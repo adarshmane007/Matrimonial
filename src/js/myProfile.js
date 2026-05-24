@@ -3,7 +3,7 @@ import { getProfile, setProfile } from './storage.js';
 import { getSiteMeta } from './meta.js';
 import { applyLanguageToRoot, getLang } from './i18n/index.js';
 import { closeFullPageOverlays } from './ui/fullPage.js';
-import { isNavLocked, isNavSwitchLocked, withNavLock, setMobileNavActive } from './ui/navigation.js';
+import { isNavLocked, withNavLock, isMobileBottomNavClick } from './ui/navigation.js';
 import {
   locationFieldsHtml,
   bindLocationFields,
@@ -260,6 +260,7 @@ export function closeProfilePage() {
   document.body.classList.remove('on-profile-page');
   const page = document.getElementById('profile-page');
   if (page) page.hidden = true;
+  import('./ui/navigation.js').then(({ syncMobileNavFromBody }) => syncMobileNavFromBody());
 }
 
 let profilePageMounted = false;
@@ -429,12 +430,11 @@ export function initMyProfile() {
   });
 
   const openProfileIfAllowed = (e) => {
+    if (isMobileBottomNavClick(e.target)) return;
     e.preventDefault();
     e.stopPropagation();
     if (!document.body.classList.contains('on-main-site')) return;
     if (document.body.classList.contains('on-profile-page')) return;
-    if (isNavSwitchLocked()) return;
-    setMobileNavActive('profile');
     openProfilePage();
   };
 

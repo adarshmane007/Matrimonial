@@ -6,7 +6,7 @@ import { getShortlistIds } from './shortlist.js';
 import { bindBrowseLocationFilters } from './locationSelect.js';
 import { enterMainSite } from './ui/session.js';
 import { closeFullPageOverlays } from './ui/fullPage.js';
-import { isNavLocked, isNavSwitchLocked, withNavLock, setMobileNavActive } from './ui/navigation.js';
+import { isNavLocked, isNavSwitchLocked, withNavLock, isMobileBottomNavClick } from './ui/navigation.js';
 import { sanitizeSearchParams } from './searchParams.js';
 let metaCache = null;
 let browsePageMounted = false;
@@ -448,6 +448,7 @@ export function closeBrowsePage() {
   document.body.classList.remove('on-browse-page', 'browse-filters-open');
   const page = document.getElementById('browse-page');
   if (page) page.hidden = true;
+  import('./ui/navigation.js').then(({ syncMobileNavFromBody }) => syncMobileNavFromBody());
 }
 
 export async function openBrowsePage(initial = {}) {
@@ -502,7 +503,7 @@ export function initBrowseProfiles() {
 
   document.addEventListener('click', async (e) => {
     const link = e.target.closest('[data-open-browse]');
-    if (!link || isNavSwitchLocked()) return;
+    if (!link || isNavSwitchLocked() || isMobileBottomNavClick(e.target)) return;
     e.preventDefault();
 
     if (!document.body.classList.contains('on-main-site')) {
@@ -513,7 +514,6 @@ export function initBrowseProfiles() {
 
     if (document.body.classList.contains('on-browse-page')) return;
 
-    setMobileNavActive('browse');
     const initial = {};
     if (link.dataset.browseGender) initial.gender = link.dataset.browseGender;
     await openBrowsePage(initial);

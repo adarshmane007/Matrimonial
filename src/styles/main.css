@@ -65,6 +65,11 @@
   }
   body.page-switching .mobile-bottom-nav {
     pointer-events: none;
+    opacity: 0.85;
+  }
+  .mobile-bottom-nav .mobile-nav-item {
+    user-select: none;
+    -webkit-user-select: none;
   }
 
   .nav-mobile-actions {

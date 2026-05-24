@@ -49,6 +49,7 @@ export function closeShortlistPage() {
   document.body.classList.remove('on-shortlist-page');
   const page = document.getElementById('shortlist-page');
   if (page) page.hidden = true;
+  import('./ui/navigation.js').then(({ syncMobileNavFromBody }) => syncMobileNavFromBody());
 }
 
 export async function openShortlistPage() {

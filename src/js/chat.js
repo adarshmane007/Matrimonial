@@ -5,7 +5,7 @@ import { translations } from './i18n/translations.js';
 import { openProfileModal } from './profileModal.js';
 import { refreshNavBadges } from './ui/nav.js';
 import { closeFullPageOverlays } from './ui/fullPage.js';
-import { isNavLocked, isNavSwitchLocked, withNavLock, setMobileNavActive } from './ui/navigation.js';
+import { isNavLocked, isNavSwitchLocked, withNavLock, isMobileBottomNavClick } from './ui/navigation.js';
 
 function t(key) {
   const lang = getLang();
@@ -59,6 +59,7 @@ export function closeChatPage() {
     page.hidden = true;
     page.querySelector('#chatLoadingOverlay')?.setAttribute('hidden', '');
   }
+  import('./ui/navigation.js').then(({ syncMobileNavFromBody }) => syncMobileNavFromBody());
 }
 
 function buildChatShell() {
@@ -486,13 +487,12 @@ async function openThread(conversationId, displayName, photoUrl, page) {
 export function initChat() {
   document.addEventListener('click', (e) => {
     const link = e.target.closest('[data-open-chat]');
-    if (!link) return;
+    if (!link || isMobileBottomNavClick(e.target)) return;
     e.preventDefault();
     e.stopPropagation();
     if (!isLoggedIn() || !document.body.classList.contains('on-main-site')) return;
     if (isNavSwitchLocked() || document.body.classList.contains('on-chat-page')) return;
 
-    setMobileNavActive('chat');
     openChatPage();
   });
 

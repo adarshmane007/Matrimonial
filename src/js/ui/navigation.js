@@ -1,4 +1,4 @@
-/** Debounced full-page navigation — prevents double-tap hangs and layout shake. */
+/** Full-page navigation + mobile bottom bar state (single source of truth). */
 const LOCKS = {
   profile: false,
   browse: false,
@@ -7,6 +7,8 @@ const LOCKS = {
 };
 
 let navSwitchLock = false;
+let switchGeneration = 0;
+let unlockSafetyTimer = null;
 
 export function isNavSwitchLocked() {
   return navSwitchLock;
@@ -14,6 +16,29 @@ export function isNavSwitchLocked() {
 
 export function isNavLocked(key) {
   return LOCKS[key] === true || navSwitchLock;
+}
+
+export function dismissMobileMore() {
+  const sheet = document.getElementById('mobileMoreSheet');
+  const moreBtn = document.getElementById('mobileMoreBtn');
+  if (sheet) {
+    sheet.hidden = true;
+    sheet.setAttribute('aria-hidden', 'true');
+  }
+  moreBtn?.setAttribute('aria-expanded', 'false');
+  document.body.classList.remove('mobile-more-open');
+}
+
+function releaseNavSwitch(key, generation) {
+  if (generation !== switchGeneration) return;
+  LOCKS[key] = false;
+  navSwitchLock = false;
+  document.body.classList.remove('page-switching');
+  if (unlockSafetyTimer) {
+    clearTimeout(unlockSafetyTimer);
+    unlockSafetyTimer = null;
+  }
+  syncMobileNavFromBody();
 }
 
 /** Exactly one bottom-nav tab may show the active highlight. */
@@ -32,13 +57,10 @@ export function setMobileNavActive(tab) {
   el?.classList.add('is-active');
 }
 
+/** Page overlays win over the More sheet for highlight sync. */
 export function syncMobileNavFromBody() {
   if (!document.body.classList.contains('logged-in')) return;
 
-  if (document.body.classList.contains('mobile-more-open')) {
-    setMobileNavActive('more');
-    return;
-  }
   if (document.body.classList.contains('on-browse-page')) {
     setMobileNavActive('browse');
   } else if (document.body.classList.contains('on-chat-page')) {
@@ -47,6 +69,8 @@ export function syncMobileNavFromBody() {
     setMobileNavActive('profile');
   } else if (document.body.classList.contains('on-shortlist-page')) {
     setMobileNavActive('more');
+  } else if (document.body.classList.contains('mobile-more-open')) {
+    setMobileNavActive('more');
   } else {
     setMobileNavActive('home');
   }
@@ -54,17 +78,23 @@ export function syncMobileNavFromBody() {
 
 export function withNavLock(key, fn) {
   if (LOCKS[key] || navSwitchLock) return Promise.resolve();
+
+  const generation = ++switchGeneration;
   LOCKS[key] = true;
   navSwitchLock = true;
   document.body.classList.add('page-switching');
-  return Promise.resolve(fn()).finally(() => {
-    setTimeout(() => {
-      LOCKS[key] = false;
-      navSwitchLock = false;
-      document.body.classList.remove('page-switching');
-      syncMobileNavFromBody();
-    }, 280);
-  });
+  dismissMobileMore();
+
+  if (unlockSafetyTimer) clearTimeout(unlockSafetyTimer);
+  unlockSafetyTimer = setTimeout(() => releaseNavSwitch(key, generation), 3500);
+
+  return Promise.resolve(fn())
+    .catch((err) => {
+      console.warn(`Navigation (${key}):`, err);
+    })
+    .finally(() => {
+      setTimeout(() => releaseNavSwitch(key, generation), 100);
+    });
 }
 
 export function preparePageSwitch() {
@@ -72,4 +102,8 @@ export function preparePageSwitch() {
   requestAnimationFrame(() => {
     requestAnimationFrame(() => document.body.classList.remove('page-switching'));
   });
+}
+
+export function isMobileBottomNavClick(target) {
+  return !!target?.closest?.('.mobile-bottom-nav');
 }

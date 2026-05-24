@@ -1,5 +1,8 @@
+import { dismissMobileMore } from './navigation.js';
+
 /** Close full-page overlays (profile, browse, chat) without scroll-lock jitter. */
 export function closeFullPageOverlays({ except } = {}) {
+  dismissMobileMore();
   const pages = [
     { id: 'profile-page', bodyClass: 'on-profile-page', key: 'profile' },
     { id: 'browse-page', bodyClass: 'on-browse-page', key: 'browse' },

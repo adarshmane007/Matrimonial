@@ -5,7 +5,12 @@ import { api } from '../api.js';
 import { getLang, t } from '../i18n/index.js';
 import { setMobileNavActive, syncMobileNavFromBody, dismissMobileMore } from './navigation.js';
 import { initMobileNavRouter } from './mobileNavRouter.js';
-import { initDeleteAccount, syncDeleteAccountPanel } from './accountDeletion.js';
+import {
+  initDeleteAccount,
+  syncDeleteAccountPanel,
+  syncDeletionBanner,
+  clearDeletionUiSession,
+} from './accountDeletion.js';
 
 function syncProfileCtaLabels() {
   const hasProfile = !!(getProfile()?.id);
@@ -118,6 +123,7 @@ export function updateNavAuth() {
     refreshNavBadges();
     syncMobileNavFromBody();
     syncDeleteAccountPanel();
+    syncDeletionBanner();
   } else {
     syncMobileProfileNavPhoto();
     setBadge(document.getElementById('navMsgBadge'), 0);
@@ -157,6 +163,7 @@ export function initNav() {
 
   const doLogout = () => {
     clearAuth();
+    clearDeletionUiSession();
     closeOverlays();
     showLoginScreen();
     updateNavAuth();

@@ -237,10 +237,16 @@ export const api = {
   },
 
   requestAccountDeletion() {
-    return request('/auth/account/delete-request', { method: 'POST' });
+    return request('/auth/account/delete-request', {
+      method: 'POST',
+      body: JSON.stringify({}),
+    });
   },
 
   cancelAccountDeletion() {
-    return request('/auth/account/cancel-deletion', { method: 'POST' });
+    return request('/auth/account/cancel-deletion', {
+      method: 'POST',
+      body: JSON.stringify({}),
+    });
   },
 };

@@ -293,6 +293,11 @@ export const translations = {
       'delete.requestFailed': 'Could not schedule deletion. Please try again.',
       'delete.recoverSuccess': 'Account recovered. Your profile is visible again.',
       'delete.recoverFailed': 'Could not recover account. Please try again.',
+      'delete.working': 'Please wait…',
+      'delete.confirmRecover': 'Recover your account? Your profile will be visible again and deletion will be cancelled.',
+      'delete.bannerText':
+        'Your account is scheduled for permanent deletion on {time}. Tap Recover if you want to keep your account.',
+      'delete.bannerDismiss': 'Dismiss',
       'reg.title': 'Free registration',
       'reg.manualHint': 'Create your account with basic details. You can upload biodata PDF later from your profile.',
       'reg.tabPaste': 'Paste biodata',
@@ -624,6 +629,11 @@ export const translations = {
       'delete.requestFailed': 'हटवणे वेळापत्रक ठरवता आले नाही. पुन्हा प्रयत्न करा.',
       'delete.recoverSuccess': 'खाते पुनर्प्राप्त झाले. प्रोफाइल पुन्हा दिसेल.',
       'delete.recoverFailed': 'खाते पुनर्प्राप्त करता आले नाही. पुन्हा प्रयत्न करा.',
+      'delete.working': 'कृपया प्रतीक्षा करा…',
+      'delete.confirmRecover': 'खाते पुनर्प्राप्त करायचे? प्रोफाइल पुन्हा दिसेल आणि हटवणे रद्द होईल.',
+      'delete.bannerText':
+        'आपले खाते {time} रोजी कायमस्वरूपी हटवले जाईल. खाते ठेवायचे असल्यास पुनर्प्राप्त करा दाबा.',
+      'delete.bannerDismiss': 'बंद करा',
       'reg.manualHint': 'मूलभूत माहितीने खाते तयार करा. बायोडेटा नंतर प्रोफाइलमधून अपलोड करा.',
       'reg.title': 'मोफत नोंदणी',
       'reg.tabPaste': 'बायोडेटा पेस्ट करा',

@@ -2511,6 +2511,53 @@
     color: var(--warm-muted);
     font-weight: 300;
   }
+  .account-deletion-banner {
+    position: fixed;
+    top: var(--nav-h, 64px);
+    left: 0;
+    right: 0;
+    z-index: 5100;
+    padding: 10px 4% calc(10px + env(safe-area-inset-top, 0px));
+    background: linear-gradient(135deg, #7c1d2e 0%, #a03a10 100%);
+    color: #fff;
+    box-shadow: 0 4px 20px rgba(42, 33, 28, 0.2);
+  }
+  .account-deletion-banner-inner {
+    max-width: 720px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .account-deletion-banner-text {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+  .account-deletion-banner-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .account-deletion-banner .btn-login,
+  .account-deletion-banner .btn-secondary {
+    flex: 1 1 auto;
+    min-height: 40px;
+    font-size: 14px;
+  }
+  .account-deletion-banner .btn-secondary {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.35);
+    color: #fff;
+  }
+  body.has-deletion-banner .hero,
+  body.has-deletion-banner #site-main > .hero {
+    padding-top: calc(var(--nav-h, 64px) + 88px);
+  }
+  body.logged-in.has-deletion-banner.on-main-site {
+    scroll-padding-top: calc(var(--nav-h, 64px) + 88px);
+  }
+
   .mobile-more-delete {
     margin-bottom: 20px;
     padding: 16px;

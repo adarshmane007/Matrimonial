@@ -249,6 +249,16 @@
   </ul>
 </nav>
 
+<div id="accountDeletionBanner" class="account-deletion-banner" hidden role="status" aria-live="polite">
+  <div class="account-deletion-banner-inner">
+    <p class="account-deletion-banner-text" id="accountDeletionBannerText"></p>
+    <div class="account-deletion-banner-actions">
+      <button type="button" class="btn-login" id="accountDeletionBannerRecover" data-i18n="delete.recoverBtn">Recover my account</button>
+      <button type="button" class="btn-secondary" id="accountDeletionBannerDismiss" data-i18n="delete.bannerDismiss">Dismiss</button>
+    </div>
+  </div>
+</div>
+
 <section id="profile-page" class="profile-page" hidden aria-label="Create profile"></section>
 <section id="browse-page" class="browse-page" hidden aria-label="Browse profiles"></section>
 <section id="chat-page" class="chat-page" hidden aria-label="Messages"></section>
@@ -305,6 +315,7 @@
         <li data-i18n="delete.point3">After 24 hours, deletion is permanent and cannot be undone.</li>
       </ul>
       <p class="mobile-more-delete-status" id="deleteAccountStatus" hidden></p>
+      <p class="mobile-more-delete-status" id="deleteAccountActionStatus" hidden></p>
       <button type="button" class="btn-secondary mobile-more-delete-btn" id="deleteAccountRequestBtn" data-i18n="delete.requestBtn">Schedule account deletion</button>
       <button type="button" class="btn-login mobile-more-recover-btn" id="deleteAccountRecoverBtn" hidden data-i18n="delete.recoverBtn">Recover my account</button>
     </section>

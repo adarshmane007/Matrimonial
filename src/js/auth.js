@@ -44,16 +44,24 @@ export function initAuth() {
 
     try {
       const res = await api.login(identifier, password);
-      if (res?.data?.token) {
-        saveAuth({
-          token: res.data.token,
-          user: res.data.user,
-          profile: res.data.profile ?? null,
-        });
-        const { syncDeleteAccountPanel } = await import('./ui/accountDeletion.js');
-        syncDeleteAccountPanel();
+      if (!res?.data?.token) {
+        setLoginError('Login failed. Please try again.');
+        return;
       }
+
+      saveAuth({
+        token: res.data.token,
+        user: res.data.user,
+        profile: res.data.profile ?? null,
+      });
+
       enterMainSite();
+
+      const { syncAccountDeletionUi, handlePostLoginDeletionNotice } = await import(
+        './ui/accountDeletion.js'
+      );
+      await syncAccountDeletionUi();
+      handlePostLoginDeletionNotice();
     } catch (err) {
       const msg =
         err instanceof ApiError
@@ -73,20 +81,21 @@ export async function restoreSession() {
   if (!getToken()) return false;
 
   try {
-    const res = await api.getMe();
-    if (res?.data?.user) {
-      saveAuth({
-        token: getToken(),
-        user: res.data.user,
-        profile: res.data.profile ?? null,
-      });
-      const { syncDeleteAccountPanel } = await import('./ui/accountDeletion.js');
-      syncDeleteAccountPanel();
-      enterMainSite();
-      return true;
+    const { refreshAuthFromServer, handlePostLoginDeletionNotice, syncDeleteAccountPanel, syncDeletionBanner } =
+      await import('./ui/accountDeletion.js');
+    const user = await refreshAuthFromServer();
+    if (!user) {
+      clearAuth();
+      return false;
     }
+    enterMainSite();
+    syncDeleteAccountPanel();
+    syncDeletionBanner();
+    handlePostLoginDeletionNotice();
+    return true;
   } catch {
     clearAuth();
+    showLoginScreen();
   }
   return false;
 }

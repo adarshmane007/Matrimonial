@@ -20,6 +20,23 @@ import { loadTestimonials } from './testimonials.js';
 import { hasSession } from './storage.js';
 import { API_BASE } from './config.js';
 
+function scheduleIdleWork(fn, timeoutMs = 2000) {
+  if (typeof requestIdleCallback === 'function') {
+    requestIdleCallback(() => fn(), { timeout: timeoutMs });
+  } else {
+    setTimeout(fn, 0);
+  }
+}
+
+async function loadHomeData() {
+  try {
+    if (hasSession()) await refreshShortlistIds();
+    await Promise.all([loadFeaturedProfiles(), loadTestimonials(getLang())]);
+  } catch (err) {
+    console.warn('Home data load:', err);
+  }
+}
+
 async function bootstrap() {
   initI18n();
   initModal();
@@ -38,11 +55,20 @@ async function bootstrap() {
   initSearch();
   initQuoteRotators();
 
+  document.body.classList.add('app-bootstrapped');
+
   const restored = await restoreSession();
   if (!restored && hasSession()) enterMainSite();
 
-  if (hasSession()) await refreshShortlistIds();
-  await Promise.all([loadFeaturedProfiles(), loadTestimonials(getLang())]);
+  let homeDataScheduled = false;
+  const scheduleHomeDataOnce = () => {
+    if (homeDataScheduled) return;
+    homeDataScheduled = true;
+    scheduleIdleWork(() => loadHomeData());
+  };
+
+  scheduleHomeDataOnce();
+  document.addEventListener('smm:lang-ready', scheduleHomeDataOnce, { once: true });
 
   let langReloadTimer = null;
   document.addEventListener('smm:lang-change', (e) => {
@@ -58,7 +84,7 @@ async function bootstrap() {
   });
 
   document.addEventListener('smm:enter-main', () => {
-    refreshShortlistIds().then(() => loadFeaturedProfiles());
+    scheduleIdleWork(() => refreshShortlistIds().then(() => loadFeaturedProfiles()));
   });
 
   console.info('Sakal Maratha — API:', API_BASE);

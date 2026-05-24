@@ -67,6 +67,8 @@ export function initMobileNavRouter() {
   const bar = document.getElementById('mobileBottomNav');
   if (!bar) return;
 
+  let moreTouchHandled = false;
+
   bar.addEventListener(
     'click',
     (e) => {
@@ -79,6 +81,10 @@ export function initMobileNavRouter() {
       e.stopImmediatePropagation();
 
       if (tab.id === 'mobileMoreBtn') {
+        if (moreTouchHandled) {
+          moreTouchHandled = false;
+          return;
+        }
         toggleMobileMore();
         return;
       }
@@ -106,5 +112,17 @@ export function initMobileNavRouter() {
       }
     },
     true
+  );
+
+  bar.addEventListener(
+    'touchend',
+    (e) => {
+      const tab = e.target.closest('[data-nav-tab]');
+      if (!tab || tab.id !== 'mobileMoreBtn' || !isLoggedIn()) return;
+      e.preventDefault();
+      moreTouchHandled = true;
+      toggleMobileMore();
+    },
+    { passive: false }
   );
 }

@@ -133,8 +133,10 @@ export const api = {
     return requestForm('/biodata/parse-pdf', formData);
   },
 
-  getFeatured(lang) {
-    return request(`/profiles/featured?lang=${lang}&limit=6`);
+  getFeatured(lang, { gender, limit = 6 } = {}) {
+    const q = new URLSearchParams({ lang, limit: String(limit) });
+    if (gender === 'bride' || gender === 'groom') q.set('gender', gender);
+    return request(`/profiles/featured?${q.toString()}`);
   },
 
   getProfile(id, lang) {
@@ -210,5 +212,21 @@ export const api = {
       method: 'POST',
       body: JSON.stringify({ profileId, message }),
     });
+  },
+
+  getShortlistIds() {
+    return request('/shortlist/ids');
+  },
+
+  getShortlist(lang) {
+    return request(`/shortlist?lang=${lang}`);
+  },
+
+  addShortlist(profileId) {
+    return request(`/shortlist/${profileId}`, { method: 'POST' });
+  },
+
+  removeShortlist(profileId) {
+    return request(`/shortlist/${profileId}`, { method: 'DELETE' });
   },
 };

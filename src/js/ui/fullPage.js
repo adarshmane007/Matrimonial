@@ -4,6 +4,7 @@ export function closeFullPageOverlays({ except } = {}) {
     { id: 'profile-page', bodyClass: 'on-profile-page', key: 'profile' },
     { id: 'browse-page', bodyClass: 'on-browse-page', key: 'browse' },
     { id: 'chat-page', bodyClass: 'on-chat-page', key: 'chat' },
+    { id: 'shortlist-page', bodyClass: 'on-shortlist-page', key: 'shortlist' },
   ];
 
   document.body.classList.remove(

@@ -3,6 +3,11 @@ import { showLoginScreen } from './session.js';
 import { closeFullPageOverlays } from './fullPage.js';
 import { api } from '../api.js';
 import { getLang, t } from '../i18n/index.js';
+import {
+  isNavSwitchLocked,
+  setMobileNavActive,
+  syncMobileNavFromBody,
+} from './navigation.js';
 
 function syncProfileCtaLabels() {
   const hasProfile = !!(getProfile()?.id);
@@ -50,6 +55,18 @@ export async function refreshNavBadges() {
   }
 }
 
+export function syncMobileProfileNavPhoto() {
+  const el = document.getElementById('mobileNavProfileIcon');
+  if (!el) return;
+  const url = getProfile()?.photoUrl;
+  if (url) {
+    el.innerHTML = `<img src="${url.replace(/"/g, '&quot;')}" alt="" class="mobile-nav-profile-img">`;
+  } else {
+    el.textContent = '👤';
+    el.className = 'mobile-nav-icon mobile-nav-icon-profile';
+  }
+}
+
 export function updateNavAuth() {
   const loggedIn = isLoggedIn();
   const user = getUser();
@@ -84,8 +101,11 @@ export function updateNavAuth() {
 
   if (loggedIn) {
     syncProfileCtaLabels();
+    syncMobileProfileNavPhoto();
     refreshNavBadges();
+    syncMobileNavFromBody();
   } else {
+    syncMobileProfileNavPhoto();
     setBadge(document.getElementById('navMsgBadge'), 0);
     setBadge(document.getElementById('navMsgBadgeMobile'), 0);
   }
@@ -100,8 +120,7 @@ export function goToHome() {
   closeOverlays();
   document.getElementById('mobileMoreSheet')?.setAttribute('hidden', '');
   document.body.classList.remove('mobile-more-open');
-  document.querySelectorAll('.mobile-nav-item').forEach((el) => el.classList.remove('is-active'));
-  document.querySelector('.mobile-nav-item[data-nav-tab="home"]')?.classList.add('is-active');
+  setMobileNavActive('home');
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
@@ -138,27 +157,29 @@ export function initNav() {
   const moreBackdrop = document.getElementById('mobileMoreBackdrop');
   const moreClose = document.getElementById('mobileMoreClose');
 
-  function openMobileMore() {
-    if (!moreSheet) return;
-    moreSheet.hidden = false;
-    moreSheet.setAttribute('aria-hidden', 'false');
-    moreBtn?.setAttribute('aria-expanded', 'true');
-    moreBtn?.classList.add('is-active');
-    document.body.classList.add('mobile-more-open');
-  }
-
   function closeMobileMore() {
     if (!moreSheet) return;
     moreSheet.hidden = true;
     moreSheet.setAttribute('aria-hidden', 'true');
     moreBtn?.setAttribute('aria-expanded', 'false');
-    moreBtn?.classList.remove('is-active');
     document.body.classList.remove('mobile-more-open');
+    syncMobileNavFromBody();
+  }
+
+  function openMobileMore() {
+    if (!moreSheet) return;
+    if (isNavSwitchLocked()) return;
+    moreSheet.hidden = false;
+    moreSheet.setAttribute('aria-hidden', 'false');
+    moreBtn?.setAttribute('aria-expanded', 'true');
+    document.body.classList.add('mobile-more-open');
+    setMobileNavActive('more');
   }
 
   moreBtn?.addEventListener('click', (e) => {
     e.preventDefault();
     e.stopPropagation();
+    if (isNavSwitchLocked()) return;
     if (moreSheet?.hidden) openMobileMore();
     else closeMobileMore();
   });
@@ -178,6 +199,7 @@ export function initNav() {
       closeMobileMore();
     }
   });
+
   document.querySelectorAll('[data-nav-home]').forEach((el) => {
     el.addEventListener('click', (e) => {
       e.preventDefault();
@@ -190,18 +212,32 @@ export function initNav() {
     goToHome();
   });
 
-  document.addEventListener('click', (e) => {
-    const tab = e.target.closest('[data-nav-tab]');
-    if (!tab || !document.body.classList.contains('logged-in')) return;
-    if (tab.id === 'mobileMoreBtn') return;
-    document.getElementById('mobileMoreSheet')?.setAttribute('hidden', '');
-    document.body.classList.remove('mobile-more-open');
-    document.querySelectorAll('.mobile-nav-item').forEach((el) => el.classList.remove('is-active'));
-    tab.classList.add('is-active');
-  });
+  /* Block rapid tab taps while a page switch is in progress (capture phase). */
+  document.addEventListener(
+    'click',
+    (e) => {
+      const tab = e.target.closest('.mobile-bottom-nav [data-nav-tab]');
+      if (!tab || !document.body.classList.contains('logged-in')) return;
+      if (tab.id === 'mobileMoreBtn') return;
+
+      if (isNavSwitchLocked()) {
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        return;
+      }
+
+      const tabName = tab.dataset.navTab;
+      if (tabName) {
+        document.getElementById('mobileMoreSheet')?.setAttribute('hidden', '');
+        document.body.classList.remove('mobile-more-open');
+        setMobileNavActive(tabName);
+      }
+    },
+    true
+  );
 
   document.addEventListener('smm:enter-main', () => {
-    document.querySelector('.mobile-nav-item[data-nav-tab="home"]')?.classList.add('is-active');
+    setMobileNavActive('home');
   });
 
   updateNavAuth();

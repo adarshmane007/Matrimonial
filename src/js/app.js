@@ -12,7 +12,8 @@ import { initProfileModal } from './profileModal.js';
 import { initMyProfile } from './myProfile.js';
 import { initBrowseProfiles } from './browseProfiles.js';
 import { initChat } from './chat.js';
-import { loadFeaturedProfiles } from './profiles.js';
+import { initShortlist, refreshShortlistIds } from './shortlist.js';
+import { loadFeaturedProfiles, initProfiles } from './profiles.js';
 import { initSearch } from './search.js';
 import { initQuoteRotators } from './quotes.js';
 import { loadTestimonials } from './testimonials.js';
@@ -32,12 +33,15 @@ async function bootstrap() {
   initMyProfile();
   initBrowseProfiles();
   initChat();
+  initShortlist();
+  initProfiles();
   initSearch();
   initQuoteRotators();
 
   const restored = await restoreSession();
   if (!restored && hasSession()) enterMainSite();
 
+  if (hasSession()) await refreshShortlistIds();
   await Promise.all([loadFeaturedProfiles(), loadTestimonials(getLang())]);
 
   let langReloadTimer = null;
@@ -54,7 +58,7 @@ async function bootstrap() {
   });
 
   document.addEventListener('smm:enter-main', () => {
-    loadFeaturedProfiles();
+    refreshShortlistIds().then(() => loadFeaturedProfiles());
   });
 
   console.info('Sakal Maratha — API:', API_BASE);

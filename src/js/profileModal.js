@@ -3,6 +3,7 @@ import { isLoggedIn } from './storage.js';
 import { getLang, t } from './i18n/index.js';
 import { openModal, closeModal, setModalMessage } from './ui/modal.js';
 import { openChatPage } from './chat.js';
+import { isShortlisted, toggleShortlist } from './shortlist.js';
 
 function escapeHtml(str) {
   return String(str ?? '')
@@ -75,6 +76,13 @@ function profileHtml(p) {
 
       ${p.bio ? `<div class="profile-detail-section"><h4 class="profile-detail-section-title">${escapeHtml(t('modal.about'))}</h4><p class="profile-detail-bio">${escapeHtml(p.bio)}</p></div>` : ''}
 
+      ${p.biodataUrl ? `
+      <div class="profile-detail-section profile-biodata-section">
+        <h4 class="profile-detail-section-title">${escapeHtml(t('modal.biodata'))}</h4>
+        <p class="modal-hint">${escapeHtml(t('modal.biodataHint'))}</p>
+        <a href="${escapeHtml(p.biodataUrl)}" class="btn-secondary profile-biodata-download" download="biodata.pdf" target="_blank" rel="noopener">${escapeHtml(t('modal.downloadBiodata'))}</a>
+      </div>` : p.hasBiodata ? `<p class="modal-hint">${escapeHtml(t('modal.biodataMembersOnly'))}</p>` : ''}
+
       <div id="profileModalActions"></div>
     </div>
   `;
@@ -119,13 +127,26 @@ function bindChatActions(profileId, p) {
     return;
   }
 
+  const listed = isShortlisted(profileId);
   actions.innerHTML = `
+    <button type="button" class="btn-secondary profile-modal-shortlist${listed ? ' is-shortlisted' : ''}" id="modalShortlistBtn" style="margin-top:12px;width:100%">${escapeHtml(listed ? t('shortlist.remove') : t('shortlist.add'))}</button>
     <div class="form-group" style="margin-top:16px">
       <label class="form-label">${escapeHtml(t('modal.introLabel'))}</label>
       <input class="form-input" id="chatRequestMessage" maxlength="500" placeholder="${escapeHtml(t('modal.introPlaceholder'))}">
     </div>
     <button type="button" class="btn-login" id="sendChatRequestBtn">${escapeHtml(t('modal.sendRequest'))}</button>
   `;
+
+  document.getElementById('modalShortlistBtn')?.addEventListener('click', async () => {
+    const btn = document.getElementById('modalShortlistBtn');
+    try {
+      const added = await toggleShortlist(profileId);
+      btn.classList.toggle('is-shortlisted', added);
+      btn.textContent = added ? t('shortlist.remove') : t('shortlist.add');
+    } catch (err) {
+      setModalMessage(err instanceof ApiError ? err.message : t('shortlist.failed'), true);
+    }
+  });
 
   document.getElementById('sendChatRequestBtn')?.addEventListener('click', async () => {
     const msg = document.getElementById('chatRequestMessage')?.value?.trim();

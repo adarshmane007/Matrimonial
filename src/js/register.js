@@ -26,22 +26,20 @@ function escapeHtml(s) {
     .replace(/"/g, '&quot;');
 }
 
-async function reviewFormHtml(meta, parsed = {}) {
+async function registerFormHtml(meta) {
   const eduLevels = (meta.educationLevels || []).filter((e) => e.value !== 'any');
-  const p = parsed;
-  const locValues = locationFromStoredProfile(p);
 
   return `
     <form id="registerForm" class="modal-form">
-      ${p.bio ? `<textarea name="bio" hidden aria-hidden="true">${escapeHtml(p.bio)}</textarea>` : ''}
+      <p class="modal-hint" data-i18n="reg.manualHint">Create your account with basic details. You can upload biodata PDF later from your profile.</p>
       <div class="form-row">
         <div class="form-group">
           <label class="form-label">${escapeHtml(t('profile.fullName'))}</label>
-          <input class="form-input" name="fullName" required maxlength="120" value="${escapeHtml(p.fullName)}">
+          <input class="form-input" name="fullName" required maxlength="120">
         </div>
         <div class="form-group">
           <label class="form-label">${escapeHtml(t('profile.gender'))}</label>
-          <select class="form-select" name="gender" required>${optionsHtml(meta.genders, p.gender)}</select>
+          <select class="form-select" name="gender" required>${optionsHtml(meta.genders, 'bride')}</select>
         </div>
       </div>
       <div class="form-row">
@@ -62,76 +60,40 @@ async function reviewFormHtml(meta, parsed = {}) {
         </div>
         <div class="form-group">
           <label class="form-label">${escapeHtml(t('profile.age'))}</label>
-          <input class="form-input" type="number" name="age" min="18" max="80" required value="${p.age ?? 26}">
+          <input class="form-input" type="number" name="age" min="18" max="80" required value="26">
         </div>
       </div>
-      ${locationFieldsHtml(meta, locValues)}
+      ${locationFieldsHtml(meta, {})}
       <div class="form-row">
         <div class="form-group">
           <label class="form-label">${escapeHtml(t('profile.education'))}</label>
-          <input class="form-input" name="education" value="${escapeHtml(p.education)}" placeholder="e.g. MBA Finance">
+          <input class="form-input" name="education" placeholder="e.g. MBA Finance">
         </div>
         <div class="form-group">
           <label class="form-label">${escapeHtml(t('profile.educationLevel'))}</label>
           <select class="form-select" name="educationLevel">
             <option value="">${escapeHtml(t('profile.select'))}</option>
-            ${optionsHtml(eduLevels, p.educationLevel || '')}
+            ${optionsHtml(eduLevels, '')}
           </select>
         </div>
       </div>
       <div class="form-row">
         <div class="form-group">
           <label class="form-label">${escapeHtml(t('profile.kul'))}</label>
-          <input class="form-input" name="kul" value="${escapeHtml(p.kul)}" placeholder="${escapeHtml(t('profile.kulPh'))}">
+          <input class="form-input" name="kul" placeholder="${escapeHtml(t('profile.kulPh'))}">
         </div>
         <div class="form-group">
           <label class="form-label">${escapeHtml(t('profile.occupation'))}</label>
-          <input class="form-input" name="occupation" value="${escapeHtml(p.occupation)}">
+          <input class="form-input" name="occupation">
         </div>
       </div>
       <div class="form-group">
         <label class="form-label">${escapeHtml(t('profile.height'))}</label>
-        <input class="form-input" name="height" value="${escapeHtml(p.height)}" placeholder="e.g. 5'6&quot;">
+        <input class="form-input" name="height" placeholder="e.g. 5'6&quot;">
       </div>
-      ${p.bio ? `<p class="modal-hint">${escapeHtml(t('reg.bioSaved'))}</p>` : ''}
       <button type="submit" class="btn-login" style="margin-top:8px">${escapeHtml(t('reg.createAccount'))}</button>
     </form>
   `;
-}
-
-function pasteStepHtml() {
-  return `
-    <div class="register-flow" id="registerFlow">
-      <div class="register-tabs" role="tablist">
-        <button type="button" class="register-tab active" data-register-tab="paste">${escapeHtml(t('reg.tabPaste'))}</button>
-        <button type="button" class="register-tab" data-register-tab="manual">${escapeHtml(t('reg.tabManual'))}</button>
-      </div>
-      <div class="register-pane" data-pane="paste">
-        <p class="modal-hint">${escapeHtml(t('reg.pasteHint'))}</p>
-        <textarea id="biodataInput" class="form-input biodata-textarea" rows="10" placeholder="${escapeHtml(t('reg.pastePlaceholder'))}"></textarea>
-        <button type="button" class="btn-login" id="parseBiodataBtn" style="margin-top:12px">${escapeHtml(t('reg.parseReview'))}</button>
-      </div>
-      <div class="register-pane hidden" data-pane="manual" id="registerManualPane"></div>
-    </div>
-  `;
-}
-
-function warningsHtml(warnings) {
-  if (!warnings?.length) return '';
-  return `<ul class="parse-warnings">${warnings.map((w) => `<li>${escapeHtml(w)}</li>`).join('')}</ul>`;
-}
-
-function bindRegisterTabs(flow, onManual) {
-  flow.querySelectorAll('[data-register-tab]').forEach((tab) => {
-    tab.addEventListener('click', () => {
-      const mode = tab.dataset.registerTab;
-      flow.querySelectorAll('.register-tab').forEach((btn) => btn.classList.toggle('active', btn === tab));
-      flow.querySelectorAll('.register-pane').forEach((pane) => {
-        pane.classList.toggle('hidden', pane.dataset.pane !== mode);
-      });
-      if (mode === 'manual') onManual();
-    });
-  });
 }
 
 function bindRegisterSubmit(form) {
@@ -152,7 +114,6 @@ function bindRegisterSubmit(form) {
       kul: fd.get('kul')?.trim() || undefined,
       occupation: fd.get('occupation')?.trim() || undefined,
       height: fd.get('height')?.trim() || undefined,
-      bio: fd.get('bio')?.trim() || undefined,
     };
 
     if (!payload.email && !payload.mobile) {
@@ -180,58 +141,17 @@ function bindRegisterSubmit(form) {
   });
 }
 
-async function showReviewStep(meta, parsed, warnings) {
-  const body = warningsHtml(warnings) + (await reviewFormHtml(meta, parsed));
-  const modalBody = document.getElementById('appModalBody');
-  if (modalBody) modalBody.innerHTML = body;
-  const form = document.getElementById('registerForm');
-  if (form) {
-    bindRegisterSubmit(form);
-    await bindLocationFields(form, locationFromStoredProfile(parsed));
-  }
-}
+export async function openRegisterModal() {
+  const meta = await getSiteMeta();
+  const body = await registerFormHtml(meta);
+  openModal(t('reg.title'), body);
+  setModalMessage('');
 
-async function showManualForm(meta) {
-  const pane = document.getElementById('registerManualPane');
-  if (!pane || pane.querySelector('#registerForm')) return;
-  pane.innerHTML = await reviewFormHtml(meta, {});
   const form = document.getElementById('registerForm');
   if (form) {
     bindRegisterSubmit(form);
     await bindLocationFields(form, locationFromStoredProfile({}));
   }
-}
-
-export async function openRegisterModal() {
-  const meta = await getSiteMeta();
-  openModal(t('reg.title'), pasteStepHtml());
-  setModalMessage('');
-
-  const flow = document.getElementById('registerFlow');
-  const parseBtn = document.getElementById('parseBiodataBtn');
-  const biodataInput = document.getElementById('biodataInput');
-
-  bindRegisterTabs(flow, () => showManualForm(meta));
-
-  parseBtn?.addEventListener('click', async () => {
-    const text = biodataInput?.value?.trim();
-    if (!text || text.length < 20) {
-      setModalMessage(t('reg.needBiodata'), true);
-      return;
-    }
-    setModalMessage('');
-    parseBtn.disabled = true;
-    parseBtn.textContent = t('reg.parsing');
-    try {
-      const res = await api.parseBiodata(text);
-      await showReviewStep(meta, res.data.parsed, res.data.warnings);
-    } catch (err) {
-      setModalMessage(err instanceof ApiError ? err.message : t('reg.parseFailed'), true);
-    } finally {
-      parseBtn.disabled = false;
-      parseBtn.textContent = t('reg.parseReview');
-    }
-  });
 }
 
 export function initRegister() {

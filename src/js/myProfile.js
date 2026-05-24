@@ -3,7 +3,7 @@ import { getProfile, setProfile } from './storage.js';
 import { getSiteMeta } from './meta.js';
 import { applyLanguageToRoot, getLang } from './i18n/index.js';
 import { closeFullPageOverlays } from './ui/fullPage.js';
-import { isNavLocked, withNavLock } from './ui/navigation.js';
+import { isNavLocked, isNavSwitchLocked, withNavLock, setMobileNavActive } from './ui/navigation.js';
 import {
   locationFieldsHtml,
   bindLocationFields,
@@ -23,33 +23,6 @@ function optionsHtml(items, selected = '') {
   return items
     .map((i) => `<option value="${i.value}" ${i.value === selected ? 'selected' : ''}>${escapeHtml(i.label)}</option>`)
     .join('');
-}
-
-function mapParsedToProfile(parsed) {
-  return {
-    displayName: parsed.fullName || parsed.displayName || '',
-    gender: parsed.gender || 'bride',
-    age: parsed.age ?? 25,
-    state: parsed.state || 'mh',
-    district: parsed.district || 'pune',
-    city: parsed.city || '',
-    education: parsed.education || '',
-    educationLevel: parsed.educationLevel || '',
-    occupation: parsed.occupation || '',
-    height: parsed.height || '',
-    kul: parsed.kul || '',
-    salary: parsed.salary || '',
-    maritalStatus: parsed.maritalStatus || '',
-    diet: parsed.diet || '',
-    manglik: parsed.manglik || '',
-    employmentType: parsed.employmentType || '',
-    nativePlace: parsed.nativePlace || '',
-    fatherOccupation: parsed.fatherOccupation || '',
-    motherTongue: parsed.motherTongue || '',
-    familyType: parsed.familyType || '',
-    heightCm: parsed.heightCm || '',
-    bio: parsed.bio || '',
-  };
 }
 
 function profileToFormValues(p = {}) {
@@ -79,6 +52,7 @@ function profileToFormValues(p = {}) {
     fatherOccupation: p.fatherOccupation || '',
     bio: p.bio || '',
     photoUrl: p.photoUrl || '',
+    biodataUrl: p.biodataUrl || '',
     email: p.email || '',
     mobile: p.mobile || '',
   };
@@ -113,19 +87,20 @@ function formHtml(meta, values) {
         <div>
           <p class="profile-page-label" data-i18n="profile.label">My matrimonial profile</p>
           <h1 class="profile-page-title" data-i18n="${titleKey}">Create your profile</h1>
-          <p class="profile-page-sub" data-i18n="profile.sub">Details from registration are pre-filled. Add photo, salary, and about you — or upload biodata PDF to auto-fill.</p>
+          <p class="profile-page-sub" data-i18n="profile.sub">Add your photo, salary, about you, and optional biodata PDF. Other members can view and download your biodata.</p>
         </div>
         <button type="button" class="profile-page-back" id="profilePageBack" data-i18n="profile.back">← Back to home</button>
       </div>
 
       <div class="profile-biodata-upload card-panel">
         <h3 class="card-panel-title" data-i18n="profile.biodataTitle">Upload biodata PDF</h3>
-        <p class="modal-hint" data-i18n="profile.biodataHint">Upload a searchable PDF — we scan Marathi or English biodata and fill fields automatically.</p>
+        <p class="modal-hint" data-i18n="profile.biodataHint">Upload your biodata PDF (max 2 MB). It is stored on your profile for other members to download.</p>
         <div class="profile-pdf-row">
           <input type="file" id="biodataPdfInput" accept=".pdf,application/pdf" class="profile-file-input">
-          <button type="button" class="btn-secondary" id="scanPdfBtn" data-i18n="profile.scanPdf">Scan PDF &amp; fill fields</button>
         </div>
-        <p id="pdfScanStatus" class="profile-status" hidden></p>
+        ${v.biodataUrl ? `<p class="modal-hint profile-biodata-onfile" data-i18n="profile.biodataOnFile">Biodata is on your profile. Choose a new PDF to replace it.</p>` : ''}
+        <input type="hidden" name="biodataUrl" id="profileBiodataUrl" value="${escapeHtml(v.biodataUrl)}">
+        <p id="biodataUploadStatus" class="profile-status" hidden></p>
       </div>
 
       <div class="profile-page-grid">
@@ -281,34 +256,6 @@ function setStatus(el, msg, isError = false) {
   el.classList.toggle('is-error', isError);
 }
 
-function fillFormFromParsed(form, parsed) {
-  const mapped = mapParsedToProfile(parsed);
-  const set = (name, val) => {
-    const field = form.elements[name];
-    if (field && val !== undefined && val !== null) field.value = val;
-  };
-  set('displayName', mapped.displayName);
-  set('gender', mapped.gender);
-  set('age', mapped.age);
-  return mapped;
-  set('education', mapped.education);
-  set('educationLevel', mapped.educationLevel);
-  set('occupation', mapped.occupation);
-  set('height', mapped.height);
-  set('kul', mapped.kul);
-  set('salary', mapped.salary);
-  set('bio', mapped.bio);
-  set('maritalStatus', mapped.maritalStatus);
-  set('diet', mapped.diet);
-  set('manglik', mapped.manglik);
-  set('employmentType', mapped.employmentType);
-  set('nativePlace', mapped.nativePlace);
-  set('fatherOccupation', mapped.fatherOccupation);
-  set('motherTongue', mapped.motherTongue);
-  set('familyType', mapped.familyType);
-  if (mapped.heightCm) set('heightCm', String(mapped.heightCm));
-}
-
 export function closeProfilePage() {
   document.body.classList.remove('on-profile-page');
   const page = document.getElementById('profile-page');
@@ -398,34 +345,25 @@ function bindProfilePageEvents(meta) {
     reader.readAsDataURL(file);
   });
 
-  const scanBtn = document.getElementById('scanPdfBtn');
   const pdfInput = document.getElementById('biodataPdfInput');
-  const pdfStatus = document.getElementById('pdfScanStatus');
+  const biodataStatus = document.getElementById('biodataUploadStatus');
+  const biodataUrlField = document.getElementById('profileBiodataUrl');
 
-  scanBtn?.addEventListener('click', async () => {
-    const file = pdfInput?.files?.[0];
-    if (!file) {
-      setStatus(pdfStatus, 'Choose a PDF file first.', true);
+  pdfInput?.addEventListener('change', () => {
+    const file = pdfInput.files?.[0];
+    if (!file) return;
+    if (file.size > 2 * 1024 * 1024) {
+      setStatus(biodataStatus, 'Biodata PDF must be under 2 MB.', true);
+      pdfInput.value = '';
       return;
     }
-    setStatus(pdfStatus, 'Scanning PDF…');
-    scanBtn.disabled = true;
-    try {
-      const res = await api.parseBiodataPdf(file);
-      const form = document.getElementById('myProfileForm');
-      if (form && res?.data?.parsed) {
-        const mapped = fillFormFromParsed(form, res.data.parsed);
-        await bindLocationFields(document.getElementById('profile-page'), locationFromStoredProfile(mapped));
-        const warn = res.data.warnings?.length
-          ? ` Filled with notes: ${res.data.warnings.join('; ')}`
-          : '';
-        setStatus(pdfStatus, `Fields updated from PDF.${warn}`);
-      }
-    } catch (err) {
-      setStatus(pdfStatus, err instanceof ApiError ? err.message : 'PDF scan failed.', true);
-    } finally {
-      scanBtn.disabled = false;
-    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (biodataUrlField) biodataUrlField.value = reader.result;
+      setStatus(biodataStatus, 'Biodata ready — save profile to upload.');
+    };
+    reader.onerror = () => setStatus(biodataStatus, 'Could not read PDF.', true);
+    reader.readAsDataURL(file);
   });
 
   const form = document.getElementById('myProfileForm');
@@ -457,6 +395,7 @@ function bindProfilePageEvents(meta) {
       heightCm: fd.get('heightCm') ? Number(fd.get('heightCm')) : undefined,
       bio: fd.get('bio')?.trim() || undefined,
       photoUrl: fd.get('photoUrl')?.trim() || undefined,
+      biodataUrl: fd.get('biodataUrl')?.trim() || undefined,
     };
 
     const btn = form.querySelector('.profile-save-btn');
@@ -466,8 +405,9 @@ function bindProfilePageEvents(meta) {
       if (res?.data) {
         setProfile(res.data);
         setStatus(msgEl, 'Profile saved successfully.');
-        const { updateNavAuth } = await import('./ui/nav.js');
+        const { updateNavAuth, syncMobileProfileNavPhoto } = await import('./ui/nav.js');
         updateNavAuth();
+        syncMobileProfileNavPhoto();
       }
     } catch (err) {
       setStatus(msgEl, err instanceof ApiError ? err.message : 'Could not save profile.', true);
@@ -493,6 +433,8 @@ export function initMyProfile() {
     e.stopPropagation();
     if (!document.body.classList.contains('on-main-site')) return;
     if (document.body.classList.contains('on-profile-page')) return;
+    if (isNavSwitchLocked()) return;
+    setMobileNavActive('profile');
     openProfilePage();
   };
 

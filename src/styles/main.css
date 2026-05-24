@@ -63,6 +63,9 @@
   body.page-switching * {
     transition: none !important;
   }
+  body.page-switching .mobile-bottom-nav {
+    pointer-events: none;
+  }
 
   .nav-mobile-actions {
     display: none;
@@ -562,12 +565,15 @@
 
   body.on-profile-page #site-main > *:not(#profile-page):not(nav):not(.mobile-bottom-nav),
   body.on-browse-page #site-main > *:not(#browse-page):not(nav):not(.mobile-bottom-nav),
-  body.on-chat-page #site-main > *:not(#chat-page):not(nav):not(.mobile-bottom-nav) { display: none !important; }
+  body.on-chat-page #site-main > *:not(#chat-page):not(nav):not(.mobile-bottom-nav),
+  body.on-shortlist-page #site-main > *:not(#shortlist-page):not(nav):not(.mobile-bottom-nav) { display: none !important; }
   body.on-profile-page footer.site-footer,
   body.on-browse-page footer.site-footer,
-  body.on-chat-page footer.site-footer { display: none !important; }
+  body.on-chat-page footer.site-footer,
+  body.on-shortlist-page footer.site-footer { display: none !important; }
   body.on-profile-page #profile-page,
-  body.on-browse-page #browse-page {
+  body.on-browse-page #browse-page,
+  body.on-shortlist-page #shortlist-page {
     display: block !important;
     min-height: calc(100vh - var(--nav-h, 72px));
     min-height: calc(100dvh - var(--nav-h, 72px));
@@ -609,7 +615,8 @@
   }
   body.on-profile-page nav.site-nav,
   body.on-browse-page nav.site-nav,
-  body.on-chat-page nav.site-nav { display: flex !important; }
+  body.on-chat-page nav.site-nav,
+  body.on-shortlist-page nav.site-nav { display: flex !important; }
 
   body.logged-in [data-open-register],
   body.logged-in #navRegisterItem { display: none !important; }
@@ -1030,11 +1037,58 @@
     gap: 24px;
   }
   .profile-card {
+    position: relative;
     background: #fff;
     border-radius: 20px;
     overflow: hidden;
     border: 1px solid var(--border);
     transition: transform 0.25s, box-shadow 0.25s;
+  }
+  .profile-shortlist-btn {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 3;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(255,255,255,0.92);
+    color: var(--warm-muted);
+    font-size: 18px;
+    line-height: 1;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(42,33,28,0.12);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .profile-shortlist-btn.is-shortlisted {
+    color: var(--maroon);
+    background: #fff;
+  }
+  .profile-modal-shortlist.is-shortlisted,
+  .profile-shortlist-btn.is-shortlisted { font-weight: 600; }
+  .browse-gender-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--warm-muted);
+    margin: 0 0 8px;
+  }
+  .browse-search-any-btn {
+    width: 100%;
+    margin: 12px 0 16px;
+    font-size: 14px;
+  }
+  .browse-gender-toggle--pair .gender-btn { flex: 1; }
+  .profile-biodata-download { margin-top: 8px; display: inline-block; }
+  .mobile-nav-profile-img {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    object-fit: cover;
+    display: block;
+    border: 2px solid var(--border);
   }
   .profile-card:hover { transform: translateY(-4px); box-shadow: 0 20px 48px rgba(76,44,28,0.12); }
   .profile-card:has(.profile-action:active),
@@ -2274,16 +2328,24 @@
     border-radius: 12px;
     min-height: 52px;
   }
-  .mobile-nav-item:active,
   .mobile-nav-item.is-active {
     background: var(--maroon-light);
     color: var(--maroon);
+  }
+  .mobile-nav-item:active:not(.is-active) {
+    opacity: 0.72;
   }
   .mobile-nav-item {
     touch-action: manipulation;
     -webkit-tap-highlight-color: transparent;
   }
   .mobile-nav-icon { font-size: 20px; line-height: 1; }
+  .mobile-nav-icon-profile {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 26px;
+  }
   .mobile-nav-more {
     border: none;
     background: transparent;
@@ -2530,6 +2592,8 @@
     .app-modal { align-items: flex-end; padding: 0; }
     .profile-page, .browse-page { padding: 80px 4% 48px; }
     .profile-page-top, .browse-page-header { flex-direction: column; }
+    body.logged-in #browsePageBack,
+    body.logged-in #profilePageBack { display: none !important; }
     .gender-btn, .btn-login, .search-submit { min-height: 48px; }
     .profile-action {
       min-height: 48px;

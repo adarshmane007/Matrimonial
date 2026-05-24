@@ -5,7 +5,7 @@ import { translations } from './i18n/translations.js';
 import { openProfileModal } from './profileModal.js';
 import { refreshNavBadges } from './ui/nav.js';
 import { closeFullPageOverlays } from './ui/fullPage.js';
-import { isNavLocked, withNavLock } from './ui/navigation.js';
+import { isNavLocked, isNavSwitchLocked, withNavLock, setMobileNavActive } from './ui/navigation.js';
 
 function t(key) {
   const lang = getLang();
@@ -484,22 +484,16 @@ async function openThread(conversationId, displayName, photoUrl, page) {
 }
 
 export function initChat() {
-  let clickLock = false;
-
   document.addEventListener('click', (e) => {
     const link = e.target.closest('[data-open-chat]');
     if (!link) return;
     e.preventDefault();
     e.stopPropagation();
     if (!isLoggedIn() || !document.body.classList.contains('on-main-site')) return;
-    if (clickLock || document.body.classList.contains('on-chat-page')) return;
+    if (isNavSwitchLocked() || document.body.classList.contains('on-chat-page')) return;
 
-    clickLock = true;
-    openChatPage().finally(() => {
-      setTimeout(() => {
-        clickLock = false;
-      }, 320);
-    });
+    setMobileNavActive('chat');
+    openChatPage();
   });
 
   document.addEventListener('smm:lang-change', () => {

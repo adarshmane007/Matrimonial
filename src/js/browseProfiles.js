@@ -2,10 +2,11 @@ import { api, ApiError } from './api.js';
 import { getSiteMeta } from './meta.js';
 import { applyLanguageToRoot, getLang, t } from './i18n/index.js';
 import { renderProfilesGrid } from './profiles.js';
+import { getShortlistIds } from './shortlist.js';
 import { bindBrowseLocationFilters } from './locationSelect.js';
 import { enterMainSite } from './ui/session.js';
 import { closeFullPageOverlays } from './ui/fullPage.js';
-import { isNavLocked, withNavLock } from './ui/navigation.js';
+import { isNavLocked, isNavSwitchLocked, withNavLock, setMobileNavActive } from './ui/navigation.js';
 import { sanitizeSearchParams } from './searchParams.js';
 let metaCache = null;
 let browsePageMounted = false;
@@ -41,11 +42,12 @@ function filtersHtml(meta) {
     <form id="browseFiltersForm" class="browse-filters-form">
       <div class="browse-filter-section">
         <h3 class="browse-filter-heading" data-i18n="browse.basic">Basic</h3>
-        <div class="gender-toggle browse-gender-toggle">
-          <button type="button" class="gender-btn active" data-gender="" data-i18n="browse.genderAny">Any</button>
-          <button type="button" class="gender-btn" data-gender="bride" data-i18n="search.bride">Bride</button>
+        <p class="browse-gender-label" data-i18n="browse.lookingFor">Looking for</p>
+        <div class="gender-toggle browse-gender-toggle browse-gender-toggle--pair">
+          <button type="button" class="gender-btn active" data-gender="bride" data-i18n="search.bride">Bride</button>
           <button type="button" class="gender-btn" data-gender="groom" data-i18n="search.groom">Groom</button>
         </div>
+        <button type="button" class="btn-secondary browse-search-any-btn" id="browseSearchAnyBtn" data-i18n="browse.searchAny">Search all profiles (Any)</button>
         <div class="form-row">
           <div class="form-group">
             <label class="form-label" data-i18n="search.ageFrom">Age From</label>
@@ -193,10 +195,44 @@ function pageShell(meta) {
   `;
 }
 
+let browseGenderAnyMode = false;
+
 function getSelectedGender(form) {
+  if (browseGenderAnyMode) return '';
   const active = form?.querySelector('.browse-gender-toggle .gender-btn.active');
   const g = active?.dataset.gender;
-  return g === 'bride' || g === 'groom' ? g : '';
+  return g === 'bride' || g === 'groom' ? g : 'bride';
+}
+
+function resetFiltersToAny(form, meta) {
+  if (!form) return;
+  browseGenderAnyMode = true;
+  form.reset();
+  form.querySelectorAll('.browse-gender-toggle .gender-btn').forEach((b) => b.classList.remove('active'));
+  const setSelect = (name, value) => {
+    const el = form.elements[name];
+    if (el) el.value = value;
+  };
+  setSelect('ageFrom', '');
+  setSelect('ageTo', '');
+  setSelect('maritalStatus', 'any');
+  setSelect('state', 'all');
+  setSelect('district', 'all');
+  setSelect('education', 'any');
+  setSelect('motherTongue', 'any');
+  setSelect('employmentType', 'any');
+  setSelect('incomeBracket', 'any');
+  setSelect('diet', 'any');
+  setSelect('manglik', 'any');
+  setSelect('familyType', 'any');
+  setSelect('sort', 'recent');
+  const kul = form.elements.kul;
+  if (kul) kul.value = '';
+  const occupation = form.elements.occupation;
+  if (occupation) occupation.value = '';
+  form.querySelectorAll('input[type="checkbox"]').forEach((cb) => {
+    cb.checked = false;
+  });
 }
 
 function collectFilters(form) {
@@ -267,7 +303,7 @@ async function runSearch(form) {
     const profiles = res?.data?.profiles || [];
     const pag = res?.data?.pagination;
 
-    renderProfilesGrid(grid, profiles);
+    renderProfilesGrid(grid, profiles, { shortlistedIds: getShortlistIds() });
 
     if (countEl) {
       const total = pag?.total ?? profiles.length;
@@ -340,9 +376,17 @@ function bindBrowseEvents(meta) {
 
   form?.querySelectorAll('.browse-gender-toggle .gender-btn').forEach((btn) => {
     btn.addEventListener('click', () => {
+      browseGenderAnyMode = false;
       form.querySelectorAll('.browse-gender-toggle .gender-btn').forEach((b) => b.classList.remove('active'));
       btn.classList.add('active');
     });
+  });
+
+  document.getElementById('browseSearchAnyBtn')?.addEventListener('click', () => {
+    resetFiltersToAny(form, meta);
+    currentPage = 1;
+    runSearch(form);
+    closeBrowseFilters();
   });
 
   form?.addEventListener('submit', (e) => {
@@ -353,9 +397,10 @@ function bindBrowseEvents(meta) {
   });
 
   document.getElementById('browseResetBtn')?.addEventListener('click', () => {
+    browseGenderAnyMode = false;
     form?.reset();
     form?.querySelectorAll('.browse-gender-toggle .gender-btn').forEach((b) => {
-      b.classList.toggle('active', b.dataset.gender === '');
+      b.classList.toggle('active', b.dataset.gender === 'bride');
     });
     currentPage = 1;
     runSearch(form);
@@ -446,8 +491,6 @@ export async function openBrowsePage(initial = {}) {
 }
 
 export function initBrowseProfiles() {
-  let browseOpening = false;
-
   document.addEventListener('smm:lang-change', () => {
     browsePageMounted = false;
     metaCache = null;
@@ -455,7 +498,7 @@ export function initBrowseProfiles() {
 
   document.addEventListener('click', async (e) => {
     const link = e.target.closest('[data-open-browse]');
-    if (!link || browseOpening) return;
+    if (!link || isNavSwitchLocked()) return;
     e.preventDefault();
 
     if (!document.body.classList.contains('on-main-site')) {
@@ -465,15 +508,10 @@ export function initBrowseProfiles() {
     }
 
     if (document.body.classList.contains('on-browse-page')) return;
-    browseOpening = true;
-    try {
-      const initial = {};
-      if (link.dataset.browseGender) initial.gender = link.dataset.browseGender;
-      await openBrowsePage(initial);
-    } finally {
-      setTimeout(() => {
-        browseOpening = false;
-      }, 300);
-    }
+
+    setMobileNavActive('browse');
+    const initial = {};
+    if (link.dataset.browseGender) initial.gender = link.dataset.browseGender;
+    await openBrowsePage(initial);
   });
 }

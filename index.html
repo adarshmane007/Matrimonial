@@ -252,6 +252,7 @@
 <section id="profile-page" class="profile-page" hidden aria-label="Create profile"></section>
 <section id="browse-page" class="browse-page" hidden aria-label="Browse profiles"></section>
 <section id="chat-page" class="chat-page" hidden aria-label="Messages"></section>
+<section id="shortlist-page" class="shortlist-page" hidden aria-label="Shortlisted profiles"></section>
 
 <nav class="mobile-bottom-nav" id="mobileBottomNav" hidden aria-label="Quick navigation">
   <a href="#" class="mobile-nav-item" data-mobile-home data-nav-tab="home">
@@ -267,7 +268,7 @@
     <span data-i18n="nav.messages">Chat</span>
   </a>
   <a href="#" class="mobile-nav-item" data-open-profile data-nav-tab="profile" data-i18n-profile-cta>
-    <span class="mobile-nav-icon">👤</span>
+    <span class="mobile-nav-icon mobile-nav-icon-profile" id="mobileNavProfileIcon">👤</span>
     <span data-i18n="nav.createProfile" data-i18n-profile-cta>Profile</span>
   </a>
   <button type="button" class="mobile-nav-item mobile-nav-more" id="mobileMoreBtn" data-nav-tab="more" aria-expanded="false" aria-haspopup="dialog">
@@ -283,6 +284,10 @@
       <h2 id="mobileMoreTitle" data-i18n="mobile.moreMenu">Menu</h2>
       <button type="button" class="mobile-more-close" id="mobileMoreClose" aria-label="Close">✕</button>
     </div>
+    <button type="button" class="mobile-more-link" data-open-shortlist>
+      <span class="mobile-more-link-icon">♥</span>
+      <span data-i18n="shortlist.menu">My Shortlist</span>
+    </button>
     <div class="mobile-more-settings">
       <p class="settings-panel-title" data-i18n="settings.title">Settings</p>
       <p class="settings-panel-sub" data-i18n="settings.subtitle">Preferences</p>

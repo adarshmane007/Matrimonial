@@ -5,6 +5,7 @@ import { api } from '../api.js';
 import { getLang, t } from '../i18n/index.js';
 import { setMobileNavActive, syncMobileNavFromBody, dismissMobileMore } from './navigation.js';
 import { initMobileNavRouter } from './mobileNavRouter.js';
+import { initDeleteAccount, syncDeleteAccountPanel } from './accountDeletion.js';
 
 function syncProfileCtaLabels() {
   const hasProfile = !!(getProfile()?.id);
@@ -116,6 +117,7 @@ export function updateNavAuth() {
     syncMobileProfileNavPhoto();
     refreshNavBadges();
     syncMobileNavFromBody();
+    syncDeleteAccountPanel();
   } else {
     syncMobileProfileNavPhoto();
     setBadge(document.getElementById('navMsgBadge'), 0);
@@ -187,6 +189,7 @@ export function initNav() {
   });
 
   initMobileNavRouter();
+  initDeleteAccount();
 
   document.querySelectorAll('[data-nav-home]').forEach((el) => {
     el.addEventListener('click', (e) => {

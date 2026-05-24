@@ -127,6 +127,12 @@ export const api = {
     });
   },
 
+  uploadProfilePhoto(file) {
+    const formData = new FormData();
+    formData.append('photo', file, file.name || 'profile.jpg');
+    return requestForm('/profiles/me/photo', formData);
+  },
+
   parseBiodataPdf(file) {
     const formData = new FormData();
     formData.append('biodataPdf', file);
@@ -228,5 +234,13 @@ export const api = {
 
   removeShortlist(profileId) {
     return request(`/shortlist/${profileId}`, { method: 'DELETE' });
+  },
+
+  requestAccountDeletion() {
+    return request('/auth/account/delete-request', { method: 'POST' });
+  },
+
+  cancelAccountDeletion() {
+    return request('/auth/account/cancel-deletion', { method: 'POST' });
   },
 };

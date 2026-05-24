@@ -77,7 +77,6 @@ export async function openShortlistPage() {
             <div>
               <p class="profile-page-label" data-i18n="shortlist.label">Shortlist</p>
               <h1 class="profile-page-title" data-i18n="shortlist.title">My shortlisted profiles</h1>
-              <p class="profile-page-sub" data-i18n="shortlist.sub">Profiles you saved to review later.</p>
             </div>
             <button type="button" class="profile-page-back" id="shortlistPageBack" data-i18n="shortlist.back">← Back</button>
           </div>
@@ -85,13 +84,14 @@ export async function openShortlistPage() {
         </div>
       `;
 
-      applyLanguageToRoot(page);
       const grid = document.getElementById('shortlistProfilesGrid');
       if (!profiles.length) {
-        grid.innerHTML = `<p class="profiles-empty" style="grid-column:1/-1;text-align:center;padding:32px;color:var(--warm-muted);">${escapeHtml(t('shortlist.empty'))}</p>`;
+        grid.innerHTML =
+          '<p class="profiles-empty" data-i18n="shortlist.empty" style="grid-column:1/-1;text-align:center;padding:32px;color:var(--warm-muted);"></p>';
       } else {
         renderProfilesGrid(grid, profiles, { shortlistedIds: shortlistIds });
       }
+      applyLanguageToRoot(page);
 
       document.getElementById('shortlistPageBack')?.addEventListener('click', (e) => {
         e.preventDefault();
@@ -121,5 +121,11 @@ export function initShortlist() {
 
   document.addEventListener('smm:enter-main', () => {
     refreshShortlistIds();
+  });
+
+  document.addEventListener('smm:lang-change', () => {
+    if (!document.body.classList.contains('on-shortlist-page')) return;
+    const page = document.getElementById('shortlist-page');
+    if (page) applyLanguageToRoot(page);
   });
 }

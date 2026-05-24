@@ -296,6 +296,18 @@
       </span>
       <span class="mobile-more-action-arrow" aria-hidden="true">›</span>
     </button>
+    <section class="mobile-more-delete" id="deleteAccountPanel" aria-labelledby="deleteAccountTitle">
+      <h3 class="mobile-more-delete-title" id="deleteAccountTitle" data-i18n="delete.title">Delete profile</h3>
+      <p class="mobile-more-delete-intro" data-i18n="delete.intro">Your account and profile will be permanently removed after a 24-hour waiting period — not instantly.</p>
+      <ul class="mobile-more-delete-list">
+        <li data-i18n="delete.point1">During those 24 hours your profile is hidden from search.</li>
+        <li data-i18n="delete.point2">You can recover your account anytime before the deadline.</li>
+        <li data-i18n="delete.point3">After 24 hours, deletion is permanent and cannot be undone.</li>
+      </ul>
+      <p class="mobile-more-delete-status" id="deleteAccountStatus" hidden></p>
+      <button type="button" class="btn-secondary mobile-more-delete-btn" id="deleteAccountRequestBtn" data-i18n="delete.requestBtn">Schedule account deletion</button>
+      <button type="button" class="btn-login mobile-more-recover-btn" id="deleteAccountRecoverBtn" hidden data-i18n="delete.recoverBtn">Recover my account</button>
+    </section>
     <div class="mobile-more-settings">
       <p class="settings-panel-title" data-i18n="settings.title">Settings</p>
       <p class="settings-panel-sub" data-i18n="settings.subtitle">Preferences</p>

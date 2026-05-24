@@ -48,8 +48,10 @@ export function initAuth() {
         saveAuth({
           token: res.data.token,
           user: res.data.user,
-          profile: res.data.profile || null,
+          profile: res.data.profile ?? null,
         });
+        const { syncDeleteAccountPanel } = await import('./ui/accountDeletion.js');
+        syncDeleteAccountPanel();
       }
       enterMainSite();
     } catch (err) {
@@ -76,8 +78,10 @@ export async function restoreSession() {
       saveAuth({
         token: getToken(),
         user: res.data.user,
-        profile: res.data.profile || null,
+        profile: res.data.profile ?? null,
       });
+      const { syncDeleteAccountPanel } = await import('./ui/accountDeletion.js');
+      syncDeleteAccountPanel();
       enterMainSite();
       return true;
     }

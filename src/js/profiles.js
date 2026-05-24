@@ -81,7 +81,7 @@ export async function loadFeaturedProfiles(shortlistedIds = null) {
   try {
     const me = getProfile();
     const gender = oppositeGender(me?.gender);
-    const res = await api.getFeatured(getLang(), { gender, limit: 6 });
+    const res = await api.getFeatured(getLang(), { gender, limit: 3 });
     let profiles = res?.data || [];
     const myId = getProfile()?.id;
     if (myId) profiles = profiles.filter((p) => p.id !== myId);

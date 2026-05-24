@@ -131,11 +131,7 @@ function bindChatActions(profileId, p) {
   const listed = isShortlisted(profileId);
   actions.innerHTML = `
     <button type="button" class="btn-secondary profile-modal-shortlist${listed ? ' is-shortlisted' : ''}" id="modalShortlistBtn" style="margin-top:12px;width:100%">${escapeHtml(listed ? t('shortlist.remove') : t('shortlist.add'))}</button>
-    <div class="form-group" style="margin-top:16px">
-      <label class="form-label">${escapeHtml(t('modal.introLabel'))}</label>
-      <input class="form-input" id="chatRequestMessage" maxlength="500" placeholder="${escapeHtml(t('modal.introPlaceholder'))}">
-    </div>
-    <button type="button" class="btn-login" id="sendChatRequestBtn">${escapeHtml(t('modal.sendRequest'))}</button>
+    <button type="button" class="btn-login" id="sendChatRequestBtn" style="margin-top:16px;width:100%">${escapeHtml(t('modal.sendRequest'))}</button>
   `;
 
   document.getElementById('modalShortlistBtn')?.addEventListener('click', async () => {
@@ -150,11 +146,10 @@ function bindChatActions(profileId, p) {
   });
 
   document.getElementById('sendChatRequestBtn')?.addEventListener('click', async () => {
-    const msg = document.getElementById('chatRequestMessage')?.value?.trim();
     const btn = document.getElementById('sendChatRequestBtn');
     btn.disabled = true;
     try {
-      await api.sendChatRequest(profileId, msg || undefined);
+      await api.sendChatRequest(profileId);
       setModalMessage(t('modal.requestSuccess'));
       btn.replaceWith(
         Object.assign(document.createElement('p'), {

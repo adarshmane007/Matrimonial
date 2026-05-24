@@ -1,7 +1,7 @@
 import { api, ApiError } from './api.js';
 import { getProfile, setProfile } from './storage.js';
 import { getSiteMeta } from './meta.js';
-import { applyLanguageToRoot, getLang } from './i18n/index.js';
+import { applyLanguageToRoot, getLang, t } from './i18n/index.js';
 import { closeFullPageOverlays } from './ui/fullPage.js';
 import { isNavLocked, withNavLock, isMobileBottomNavClick } from './ui/navigation.js';
 import {
@@ -10,6 +10,7 @@ import {
   locationPayloadFromForm,
   locationFromStoredProfile,
 } from './locationSelect.js';
+import { compressProfilePhoto } from './utils/compressImage.js';
 
 function escapeHtml(s) {
   return String(s ?? '')
@@ -74,9 +75,8 @@ function formHtml(meta, values) {
   const families = filterAny(meta.familyTypes);
   const incomes = filterAny(meta.incomeBrackets);
   const heights = filterAny(meta.heights);
-  const photoPreview = v.photoUrl
-    ? `<img src="${escapeHtml(v.photoUrl)}" alt="Profile photo" class="profile-photo-preview" id="profilePhotoPreview">`
-    : `<div class="profile-photo-placeholder" id="profilePhotoPreview">📷</div>`;
+  const photoPreview = `<div class="profile-photo-placeholder" id="profilePhotoPreview">📷</div>`;
+  const photoBtnKey = v.photoUrl ? 'profile.changePhoto' : 'profile.addPhoto';
 
   const hasProfile = !!(values.id || getProfile()?.id);
   const titleKey = hasProfile ? 'profile.titleEdit' : 'profile.titleCreate';
@@ -108,10 +108,11 @@ function formHtml(meta, values) {
           <h3 class="card-panel-title" data-i18n="profile.photoTitle">Profile photo</h3>
           <div class="profile-photo-wrap">${photoPreview}</div>
           <label class="btn-secondary profile-upload-btn">
-            <span data-i18n="profile.addPhoto">Add photo</span>
+            <span data-i18n="${photoBtnKey}">Add photo</span>
             <input type="file" id="profilePhotoInput" accept="image/jpeg,image/png,image/webp" hidden>
           </label>
           <p class="modal-hint" data-i18n="profile.photoHint">JPG or PNG, max 1 MB</p>
+          <p id="profilePhotoStatus" class="profile-status" hidden></p>
         </aside>
 
         <div class="profile-fields-card card-panel">
@@ -240,7 +241,7 @@ function formHtml(meta, values) {
             <label class="form-label" data-i18n="profile.about">About you</label>
             <textarea class="form-input profile-about" name="bio" rows="5" maxlength="8000" data-i18n-placeholder="profile.aboutPh" placeholder="Tell families about yourself, values, and expectations…">${escapeHtml(v.bio)}</textarea>
           </div>
-          <input type="hidden" name="photoUrl" id="profilePhotoUrl" value="${escapeHtml(v.photoUrl)}">
+          <input type="hidden" name="photoUrl" id="profilePhotoUrl" value="">
           <p id="profileSaveMessage" class="profile-status" hidden></p>
           <button type="submit" class="btn-login profile-save-btn" data-i18n="profile.save">Save profile</button>
         </div>
@@ -254,6 +255,33 @@ function setStatus(el, msg, isError = false) {
   el.textContent = msg || '';
   el.hidden = !msg;
   el.classList.toggle('is-error', isError);
+}
+
+function setProfilePhotoPreview(dataUrl) {
+  const wrap = document.querySelector('.profile-photo-wrap');
+  if (!wrap || !dataUrl) return;
+
+  let preview = document.getElementById('profilePhotoPreview');
+  if (preview?.tagName === 'IMG') {
+    preview.src = dataUrl;
+    preview.removeAttribute('aria-hidden');
+    return;
+  }
+
+  const img = document.createElement('img');
+  img.src = dataUrl;
+  img.alt = 'Profile photo';
+  img.className = 'profile-photo-preview';
+  img.id = 'profilePhotoPreview';
+  if (preview) preview.replaceWith(img);
+  else wrap.appendChild(img);
+}
+
+function applyStoredPhotoToForm(photoUrl) {
+  if (!photoUrl) return;
+  const field = document.getElementById('profilePhotoUrl');
+  if (field) field.value = photoUrl;
+  setProfilePhotoPreview(photoUrl);
 }
 
 export function closeProfilePage() {
@@ -270,6 +298,7 @@ function renderProfileForm(page, meta, p) {
   const formValues = profileToFormValues(p);
   page.innerHTML = formHtml(meta, formValues);
   applyLanguageToRoot(page, getLang());
+  applyStoredPhotoToForm(formValues.photoUrl);
   bindProfilePageEvents(meta);
   bindLocationFields(page, locationFromStoredProfile(formValues));
 }
@@ -318,32 +347,56 @@ function bindProfilePageEvents(meta) {
   });
 
   const photoInput = document.getElementById('profilePhotoInput');
-  const photoUrlField = document.getElementById('profilePhotoUrl');
-  const photoPreview = document.getElementById('profilePhotoPreview');
 
-  photoInput?.addEventListener('change', () => {
+  photoInput?.addEventListener('change', async () => {
     const file = photoInput.files?.[0];
     if (!file) return;
-    if (file.size > 1024 * 1024) {
-      setStatus(document.getElementById('profileSaveMessage'), 'Photo must be under 1 MB.', true);
-      return;
-    }
-    const reader = new FileReader();
-    reader.onload = () => {
-      const dataUrl = reader.result;
-      if (photoUrlField) photoUrlField.value = dataUrl;
-      if (photoPreview?.tagName === 'IMG') {
-        photoPreview.src = dataUrl;
-      } else if (photoPreview) {
-        const img = document.createElement('img');
-        img.src = dataUrl;
-        img.alt = 'Profile photo';
-        img.className = 'profile-photo-preview';
-        img.id = 'profilePhotoPreview';
-        photoPreview.replaceWith(img);
+
+    const photoStatus = document.getElementById('profilePhotoStatus');
+    const saveMsg = document.getElementById('profileSaveMessage');
+    const lang = getLang();
+
+    photoInput.disabled = true;
+    setStatus(photoStatus, t('profile.photoUploading', lang), false);
+
+    try {
+      if (file.size > 4 * 1024 * 1024) {
+        throw new Error(t('profile.photoTooLarge', lang));
       }
-    };
-    reader.readAsDataURL(file);
+
+      const dataUrl = await compressProfilePhoto(file);
+      setProfilePhotoPreview(dataUrl);
+      const urlField = document.getElementById('profilePhotoUrl');
+      if (urlField) urlField.value = dataUrl;
+
+      const blob = await (await fetch(dataUrl)).blob();
+      const uploadFile = new File([blob], 'profile.jpg', { type: blob.type || 'image/jpeg' });
+      const res = await api.uploadProfilePhoto(uploadFile);
+
+      if (res?.data) {
+        setProfile(res.data);
+        if (res.data.photoUrl) {
+          applyStoredPhotoToForm(res.data.photoUrl);
+        }
+        const { syncMobileProfileNavPhoto } = await import('./ui/nav.js');
+        syncMobileProfileNavPhoto();
+        setStatus(photoStatus, t('profile.photoSaved', lang), false);
+        setStatus(saveMsg, '', false);
+
+        const labelSpan = document.querySelector('.profile-upload-btn span[data-i18n]');
+        if (labelSpan) {
+          labelSpan.setAttribute('data-i18n', 'profile.changePhoto');
+          labelSpan.textContent = t('profile.changePhoto', lang);
+        }
+      }
+    } catch (err) {
+      const msg =
+        err instanceof ApiError ? err.message : err?.message || t('profile.photoFailed', lang);
+      setStatus(photoStatus, msg, true);
+    } finally {
+      photoInput.disabled = false;
+      photoInput.value = '';
+    }
   });
 
   const pdfInput = document.getElementById('biodataPdfInput');
@@ -395,7 +448,10 @@ function bindProfilePageEvents(meta) {
       fatherOccupation: fd.get('fatherOccupation')?.trim() || undefined,
       heightCm: fd.get('heightCm') ? Number(fd.get('heightCm')) : undefined,
       bio: fd.get('bio')?.trim() || undefined,
-      photoUrl: fd.get('photoUrl')?.trim() || undefined,
+      photoUrl: (() => {
+        const url = fd.get('photoUrl')?.toString().trim();
+        return url || undefined;
+      })(),
       biodataUrl: fd.get('biodataUrl')?.trim() || undefined,
     };
 

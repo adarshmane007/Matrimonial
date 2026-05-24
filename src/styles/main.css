@@ -1772,6 +1772,18 @@
     cursor: pointer;
     text-align: center;
     margin-bottom: 8px;
+    position: relative;
+  }
+  .profile-upload-btn input[type="file"] {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
   }
   .profile-about { resize: vertical; min-height: 120px; }
   .profile-save-btn { margin-top: 8px; max-width: 320px; }
@@ -2498,6 +2510,51 @@
     line-height: 1;
     color: var(--warm-muted);
     font-weight: 300;
+  }
+  .mobile-more-delete {
+    margin-bottom: 20px;
+    padding: 16px;
+    border-radius: 14px;
+    border: 1px solid rgba(124, 29, 46, 0.2);
+    background: rgba(245, 228, 232, 0.45);
+  }
+  .mobile-more-delete-title {
+    margin: 0 0 8px;
+    font-size: 16px;
+    color: var(--maroon);
+    font-family: var(--font-display);
+  }
+  .mobile-more-delete-intro,
+  .mobile-more-delete-list {
+    font-size: 13px;
+    color: var(--warm-mid);
+    line-height: 1.55;
+  }
+  .mobile-more-delete-intro { margin: 0 0 10px; }
+  .mobile-more-delete-list {
+    margin: 0 0 12px 18px;
+    padding: 0;
+  }
+  .mobile-more-delete-list li { margin-bottom: 6px; }
+  .mobile-more-delete-status {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--maroon);
+    margin: 0 0 12px;
+  }
+  .mobile-more-delete-btn {
+    width: 100%;
+    border-color: var(--maroon) !important;
+    color: var(--maroon) !important;
+    margin-bottom: 8px;
+  }
+  .mobile-more-recover-btn {
+    width: 100%;
+    margin-bottom: 0;
+  }
+  .mobile-more-delete.is-pending .mobile-more-delete-intro,
+  .mobile-more-delete.is-pending .mobile-more-delete-list {
+    opacity: 0.85;
   }
   .mobile-more-settings { margin-bottom: 16px; }
   .mobile-more-logout {

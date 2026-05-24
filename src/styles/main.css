@@ -1774,6 +1774,32 @@
     margin-bottom: 8px;
     position: relative;
   }
+  .register-otp-block {
+    margin: 12px 0 16px;
+    padding: 14px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    background: rgba(245, 232, 232, 0.35);
+  }
+  .register-otp-row {
+    align-items: flex-end;
+  }
+  .register-otp-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 120px;
+  }
+  .register-otp-actions .btn-secondary,
+  .register-otp-actions .btn-login {
+    width: 100%;
+    min-height: 44px;
+  }
+  .register-otp-verified {
+    color: var(--maroon);
+    font-weight: 600;
+  }
+
   .profile-upload-btn input[type="file"] {
     position: absolute;
     width: 1px;

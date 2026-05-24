@@ -11,6 +11,14 @@ import {
   locationPayloadFromForm,
   locationFromStoredProfile,
 } from './locationSelect.js';
+import { getOtpStatus } from './otp/otpStatus.js';
+import {
+  registerOtpHtml,
+  bindRegisterOtp,
+  resetRegisterOtpState,
+  isMobileOtpVerified,
+  getMobileVerificationToken,
+} from './otp/registerOtp.js';
 
 function optionsHtml(items, selected = '') {
   return items
@@ -26,8 +34,9 @@ function escapeHtml(s) {
     .replace(/"/g, '&quot;');
 }
 
-async function registerFormHtml(meta) {
+async function registerFormHtml(meta, otpEnabled) {
   const eduLevels = (meta.educationLevels || []).filter((e) => e.value !== 'any');
+  const otpBlock = otpEnabled ? registerOtpHtml() : '';
 
   return `
     <form id="registerForm" class="modal-form">
@@ -53,6 +62,7 @@ async function registerFormHtml(meta) {
         </div>
       </div>
       <p class="modal-hint">${escapeHtml(t('reg.contactHint'))}</p>
+      ${otpBlock}
       <div class="form-row">
         <div class="form-group">
           <label class="form-label">${escapeHtml(t('login.passwordLabel'))} *</label>
@@ -96,15 +106,22 @@ async function registerFormHtml(meta) {
   `;
 }
 
-function bindRegisterSubmit(form) {
+function bindRegisterSubmit(form, otpEnabled) {
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
     setModalMessage('');
     const fd = new FormData(form);
+    const mobile = fd.get('mobile')?.trim() || undefined;
+
+    if (otpEnabled && mobile && !isMobileOtpVerified(mobile)) {
+      setModalMessage(t('otp.needVerifyFirst'), true);
+      return;
+    }
+
     const payload = {
       fullName: fd.get('fullName')?.trim(),
       email: fd.get('email')?.trim() || undefined,
-      mobile: fd.get('mobile')?.trim() || undefined,
+      mobile,
       password: fd.get('password'),
       gender: fd.get('gender'),
       age: Number(fd.get('age')),
@@ -115,6 +132,10 @@ function bindRegisterSubmit(form) {
       occupation: fd.get('occupation')?.trim() || undefined,
       height: fd.get('height')?.trim() || undefined,
     };
+
+    if (otpEnabled && mobile) {
+      payload.mobileVerificationToken = getMobileVerificationToken();
+    }
 
     if (!payload.email && !payload.mobile) {
       setModalMessage(t('reg.needContact'), true);
@@ -142,14 +163,19 @@ function bindRegisterSubmit(form) {
 }
 
 export async function openRegisterModal() {
-  const meta = await getSiteMeta();
-  const body = await registerFormHtml(meta);
+  resetRegisterOtpState();
+  const [meta, otpStatus] = await Promise.all([getSiteMeta(), getOtpStatus()]);
+  const otpEnabled = !!otpStatus?.enabled;
+  const body = await registerFormHtml(meta, otpEnabled);
   openModal(t('reg.title'), body);
   setModalMessage('');
 
   const form = document.getElementById('registerForm');
   if (form) {
-    bindRegisterSubmit(form);
+    bindRegisterSubmit(form, otpEnabled);
+    if (otpEnabled) {
+      bindRegisterOtp(form, () => form.querySelector('[name="mobile"]')?.value);
+    }
     await bindLocationFields(form, locationFromStoredProfile({}));
   }
 }

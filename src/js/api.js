@@ -87,6 +87,24 @@ export const api = {
     return request(`/meta?lang=${lang}`);
   },
 
+  getOtpStatus() {
+    return request('/otp/status');
+  },
+
+  sendOtp(mobile) {
+    return request('/otp/send', {
+      method: 'POST',
+      body: JSON.stringify({ mobile }),
+    });
+  },
+
+  verifyOtp(mobile, code) {
+    return request('/otp/verify', {
+      method: 'POST',
+      body: JSON.stringify({ mobile, code }),
+    });
+  },
+
   getCities(state, lang) {
     return request(`/meta/cities?state=${encodeURIComponent(state)}&lang=${lang}`);
   },

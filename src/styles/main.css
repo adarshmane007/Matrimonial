@@ -572,10 +572,10 @@
   body.on-main-site #site-main,
   body.on-main-site footer.site-footer { display: block; }
 
-  body.on-profile-page #site-main > *:not(#profile-page):not(nav):not(.mobile-bottom-nav),
-  body.on-browse-page #site-main > *:not(#browse-page):not(nav):not(.mobile-bottom-nav),
-  body.on-chat-page #site-main > *:not(#chat-page):not(nav):not(.mobile-bottom-nav),
-  body.on-shortlist-page #site-main > *:not(#shortlist-page):not(nav):not(.mobile-bottom-nav) { display: none !important; }
+  body.on-profile-page #site-main > *:not(#profile-page):not(nav):not(.mobile-bottom-nav):not(.mobile-more-sheet),
+  body.on-browse-page #site-main > *:not(#browse-page):not(nav):not(.mobile-bottom-nav):not(.mobile-more-sheet),
+  body.on-chat-page #site-main > *:not(#chat-page):not(nav):not(.mobile-bottom-nav):not(.mobile-more-sheet),
+  body.on-shortlist-page #site-main > *:not(#shortlist-page):not(nav):not(.mobile-bottom-nav):not(.mobile-more-sheet) { display: none !important; }
   body.on-profile-page footer.site-footer,
   body.on-browse-page footer.site-footer,
   body.on-chat-page footer.site-footer,

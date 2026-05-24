@@ -195,20 +195,23 @@ function pageShell(meta) {
   `;
 }
 
-let browseGenderAnyMode = false;
-
 function getSelectedGender(form) {
-  if (browseGenderAnyMode) return '';
   const active = form?.querySelector('.browse-gender-toggle .gender-btn.active');
   const g = active?.dataset.gender;
   return g === 'bride' || g === 'groom' ? g : 'bride';
 }
 
-function resetFiltersToAny(form, meta) {
+function resetFiltersToAny(form) {
   if (!form) return;
-  browseGenderAnyMode = true;
+  const activeGenderBtn = form.querySelector('.browse-gender-toggle .gender-btn.active');
+  const keepGender = activeGenderBtn?.dataset.gender === 'groom' ? 'groom' : 'bride';
+
   form.reset();
-  form.querySelectorAll('.browse-gender-toggle .gender-btn').forEach((b) => b.classList.remove('active'));
+
+  form.querySelectorAll('.browse-gender-toggle .gender-btn').forEach((b) => {
+    b.classList.toggle('active', b.dataset.gender === keepGender);
+  });
+
   const setSelect = (name, value) => {
     const el = form.elements[name];
     if (el) el.value = value;
@@ -356,6 +359,9 @@ async function runSearch(form) {
 function closeBrowseFilters() {
   const sidebar = document.getElementById('browseSidebar');
   const toggle = document.getElementById('browseFiltersToggle');
+  if (sidebar?.contains(document.activeElement)) {
+    toggle?.focus({ preventScroll: true });
+  }
   sidebar?.classList.remove('is-open');
   sidebar?.setAttribute('aria-hidden', 'true');
   document.body.classList.remove('browse-filters-open');
@@ -376,14 +382,13 @@ function bindBrowseEvents(meta) {
 
   form?.querySelectorAll('.browse-gender-toggle .gender-btn').forEach((btn) => {
     btn.addEventListener('click', () => {
-      browseGenderAnyMode = false;
       form.querySelectorAll('.browse-gender-toggle .gender-btn').forEach((b) => b.classList.remove('active'));
       btn.classList.add('active');
     });
   });
 
   document.getElementById('browseSearchAnyBtn')?.addEventListener('click', () => {
-    resetFiltersToAny(form, meta);
+    resetFiltersToAny(form);
     currentPage = 1;
     runSearch(form);
     closeBrowseFilters();
@@ -397,7 +402,6 @@ function bindBrowseEvents(meta) {
   });
 
   document.getElementById('browseResetBtn')?.addEventListener('click', () => {
-    browseGenderAnyMode = false;
     form?.reset();
     form?.querySelectorAll('.browse-gender-toggle .gender-btn').forEach((b) => {
       b.classList.toggle('active', b.dataset.gender === 'bride');

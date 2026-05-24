@@ -1081,7 +1081,14 @@
     font-size: 14px;
   }
   .browse-gender-toggle--pair .gender-btn { flex: 1; }
-  .profile-biodata-download { margin-top: 8px; display: inline-block; }
+  .profile-biodata-download {
+    margin-top: 8px;
+    display: inline-block;
+    width: 100%;
+    max-width: 100%;
+    font-family: inherit;
+    cursor: pointer;
+  }
   .mobile-nav-icon-profile {
     display: flex;
     align-items: center;
@@ -1089,12 +1096,21 @@
     width: 28px;
     height: 28px;
     min-height: 28px;
+    min-width: 28px;
     font-size: 20px;
     line-height: 1;
+    flex-shrink: 0;
+    color: inherit;
+  }
+  .mobile-nav-profile-svg {
+    display: block;
+    width: 22px;
+    height: 22px;
+    flex-shrink: 0;
   }
   .mobile-nav-profile-img {
-    width: 28px;
-    height: 28px;
+    width: 26px;
+    height: 26px;
     border-radius: 50%;
     object-fit: cover;
     display: block;
@@ -2351,6 +2367,13 @@
     -webkit-tap-highlight-color: transparent;
   }
   .mobile-nav-icon { font-size: 20px; line-height: 1; }
+  .mobile-nav-item .mobile-nav-icon-profile {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 22px;
+    min-width: 22px;
+  }
   .mobile-nav-more {
     border: none;
     background: transparent;
@@ -2660,7 +2683,8 @@
     .profile-page, .browse-page { padding: 80px 4% 48px; }
     .profile-page-top, .browse-page-header { flex-direction: column; }
     body.logged-in #browsePageBack,
-    body.logged-in #profilePageBack { display: none !important; }
+    body.logged-in #profilePageBack,
+    body.logged-in #shortlistPageBack { display: none !important; }
     .gender-btn, .btn-login, .search-submit { min-height: 48px; }
     .profile-action {
       min-height: 48px;

@@ -55,16 +55,21 @@ export async function refreshNavBadges() {
   }
 }
 
+const MOBILE_PROFILE_ICON_SVG = `<svg class="mobile-nav-profile-svg" viewBox="0 0 24 24" width="22" height="22" focusable="false" aria-hidden="true"><path fill="currentColor" d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>`;
+
+function showMobileProfileIcon(el) {
+  el.innerHTML = MOBILE_PROFILE_ICON_SVG;
+}
+
 export function syncMobileProfileNavPhoto() {
   const el = document.getElementById('mobileNavProfileIcon');
   if (!el) return;
 
-  const url = getProfile()?.photoUrl?.trim();
   el.className = 'mobile-nav-icon mobile-nav-icon-profile';
-  el.querySelector('.mobile-nav-profile-img')?.remove();
 
-  if (!url) {
-    el.textContent = '👤';
+  const url = getProfile()?.photoUrl?.trim();
+  if (!url || url.length < 12) {
+    showMobileProfileIcon(el);
     return;
   }
 
@@ -72,12 +77,8 @@ export function syncMobileProfileNavPhoto() {
   img.className = 'mobile-nav-profile-img';
   img.alt = '';
   img.decoding = 'async';
-  img.onerror = () => {
-    img.remove();
-    el.textContent = '👤';
-  };
-  el.textContent = '';
-  el.appendChild(img);
+  img.onerror = () => showMobileProfileIcon(el);
+  el.replaceChildren(img);
   img.src = url;
 }
 

@@ -4,6 +4,7 @@ import { getLang, t } from './i18n/index.js';
 import { openModal, closeModal, setModalMessage } from './ui/modal.js';
 import { openChatPage } from './chat.js';
 import { isShortlisted, toggleShortlist } from './shortlist.js';
+import { downloadBiodataPdf } from './utils/biodataDownload.js';
 
 function escapeHtml(str) {
   return String(str ?? '')
@@ -80,7 +81,7 @@ function profileHtml(p) {
       <div class="profile-detail-section profile-biodata-section">
         <h4 class="profile-detail-section-title">${escapeHtml(t('modal.biodata'))}</h4>
         <p class="modal-hint">${escapeHtml(t('modal.biodataHint'))}</p>
-        <a href="${escapeHtml(p.biodataUrl)}" class="btn-secondary profile-biodata-download" download="biodata.pdf" target="_blank" rel="noopener">${escapeHtml(t('modal.downloadBiodata'))}</a>
+        <button type="button" class="btn-secondary profile-biodata-download" id="profileBiodataDownloadBtn">${escapeHtml(t('modal.downloadBiodata'))}</button>
       </div>` : p.hasBiodata ? `<p class="modal-hint">${escapeHtml(t('modal.biodataMembersOnly'))}</p>` : ''}
 
       <div id="profileModalActions"></div>
@@ -180,6 +181,18 @@ export async function openProfileModal(profileId) {
     if (!p) throw new Error('Not found');
 
     openModal(p.displayName, profileHtml(p));
+
+    const biodataBtn = document.getElementById('profileBiodataDownloadBtn');
+    if (biodataBtn && p.biodataUrl) {
+      biodataBtn.addEventListener('click', async () => {
+        biodataBtn.disabled = true;
+        const ok = await downloadBiodataPdf(p.biodataUrl, p.displayName);
+        biodataBtn.disabled = false;
+        if (!ok) {
+          setModalMessage(t('modal.biodataDownloadFailed'), true);
+        }
+      });
+    }
 
     if (!isLoggedIn()) {
       const actions = document.getElementById('profileModalActions');

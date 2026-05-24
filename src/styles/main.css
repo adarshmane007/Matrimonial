@@ -63,9 +63,13 @@
   body.page-switching * {
     transition: none !important;
   }
-  body.page-switching .mobile-bottom-nav {
+  body.page-switching .mobile-bottom-nav .mobile-nav-item:not(#mobileMoreBtn) {
     pointer-events: none;
     opacity: 0.85;
+  }
+  body.page-switching #mobileMoreBtn {
+    pointer-events: auto;
+    opacity: 1;
   }
   .mobile-bottom-nav .mobile-nav-item {
     user-select: none;

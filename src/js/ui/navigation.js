@@ -7,7 +7,6 @@ const LOCKS = {
 };
 
 let navSwitchLock = false;
-let switchGeneration = 0;
 let unlockSafetyTimer = null;
 
 export function isNavSwitchLocked() {
@@ -29,15 +28,21 @@ export function dismissMobileMore() {
   document.body.classList.remove('mobile-more-open');
 }
 
-function releaseNavSwitch(key, generation) {
-  if (generation !== switchGeneration) return;
-  LOCKS[key] = false;
-  navSwitchLock = false;
-  document.body.classList.remove('page-switching');
-  if (unlockSafetyTimer) {
-    clearTimeout(unlockSafetyTimer);
-    unlockSafetyTimer = null;
+function clearPageSwitchingIfIdle() {
+  const anyLocked = Object.values(LOCKS).some(Boolean);
+  navSwitchLock = anyLocked;
+  if (!anyLocked) {
+    document.body.classList.remove('page-switching');
+    if (unlockSafetyTimer) {
+      clearTimeout(unlockSafetyTimer);
+      unlockSafetyTimer = null;
+    }
   }
+}
+
+function finishNavSwitch(key) {
+  LOCKS[key] = false;
+  clearPageSwitchingIfIdle();
   syncMobileNavFromBody();
 }
 
@@ -57,19 +62,19 @@ export function setMobileNavActive(tab) {
   el?.classList.add('is-active');
 }
 
-/** Page overlays win over the More sheet for highlight sync. */
+/** More menu open state wins over full-page overlays for the tab highlight. */
 export function syncMobileNavFromBody() {
   if (!document.body.classList.contains('logged-in')) return;
 
-  if (document.body.classList.contains('on-browse-page')) {
+  if (document.body.classList.contains('mobile-more-open')) {
+    setMobileNavActive('more');
+  } else if (document.body.classList.contains('on-browse-page')) {
     setMobileNavActive('browse');
   } else if (document.body.classList.contains('on-chat-page')) {
     setMobileNavActive('chat');
   } else if (document.body.classList.contains('on-profile-page')) {
     setMobileNavActive('profile');
   } else if (document.body.classList.contains('on-shortlist-page')) {
-    setMobileNavActive('more');
-  } else if (document.body.classList.contains('mobile-more-open')) {
     setMobileNavActive('more');
   } else {
     setMobileNavActive('home');
@@ -79,21 +84,28 @@ export function syncMobileNavFromBody() {
 export function withNavLock(key, fn) {
   if (LOCKS[key] || navSwitchLock) return Promise.resolve();
 
-  const generation = ++switchGeneration;
   LOCKS[key] = true;
   navSwitchLock = true;
   document.body.classList.add('page-switching');
   dismissMobileMore();
 
   if (unlockSafetyTimer) clearTimeout(unlockSafetyTimer);
-  unlockSafetyTimer = setTimeout(() => releaseNavSwitch(key, generation), 3500);
+  unlockSafetyTimer = setTimeout(() => {
+    Object.keys(LOCKS).forEach((k) => {
+      LOCKS[k] = false;
+    });
+    navSwitchLock = false;
+    document.body.classList.remove('page-switching');
+    unlockSafetyTimer = null;
+    syncMobileNavFromBody();
+  }, 4000);
 
   return Promise.resolve(fn())
     .catch((err) => {
       console.warn(`Navigation (${key}):`, err);
     })
     .finally(() => {
-      setTimeout(() => releaseNavSwitch(key, generation), 100);
+      setTimeout(() => finishNavSwitch(key), 80);
     });
 }
 

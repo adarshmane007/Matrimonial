@@ -19,11 +19,10 @@ function toggleMobileMore() {
   const moreBtn = document.getElementById('mobileMoreBtn');
   if (!sheet || !moreBtn) return;
 
-  if (isNavSwitchLocked()) return;
-
   const willOpen = sheet.hidden;
   if (willOpen) {
     sheet.hidden = false;
+    sheet.removeAttribute('hidden');
     sheet.setAttribute('aria-hidden', 'false');
     moreBtn.setAttribute('aria-expanded', 'true');
     document.body.classList.add('mobile-more-open');
@@ -62,7 +61,7 @@ async function openProfileFromNav() {
 }
 
 /**
- * Single handler for bottom nav — prevents duplicate listeners and stuck highlights.
+ * Single handler for bottom nav — More is never blocked by page-switch lock.
  */
 export function initMobileNavRouter() {
   const bar = document.getElementById('mobileBottomNav');

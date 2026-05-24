@@ -109,6 +109,8 @@ export function initShortlist() {
     const open = e.target.closest('[data-open-shortlist]');
     if (!open || isNavSwitchLocked()) return;
     e.preventDefault();
+    document.getElementById('mobileMoreSheet')?.setAttribute('hidden', '');
+    document.body.classList.remove('mobile-more-open');
     openShortlistPage();
   });
 

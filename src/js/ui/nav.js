@@ -58,13 +58,27 @@ export async function refreshNavBadges() {
 export function syncMobileProfileNavPhoto() {
   const el = document.getElementById('mobileNavProfileIcon');
   if (!el) return;
-  const url = getProfile()?.photoUrl;
-  if (url) {
-    el.innerHTML = `<img src="${url.replace(/"/g, '&quot;')}" alt="" class="mobile-nav-profile-img">`;
-  } else {
+
+  const url = getProfile()?.photoUrl?.trim();
+  el.className = 'mobile-nav-icon mobile-nav-icon-profile';
+  el.querySelector('.mobile-nav-profile-img')?.remove();
+
+  if (!url) {
     el.textContent = '👤';
-    el.className = 'mobile-nav-icon mobile-nav-icon-profile';
+    return;
   }
+
+  const img = document.createElement('img');
+  img.className = 'mobile-nav-profile-img';
+  img.alt = '';
+  img.decoding = 'async';
+  img.onerror = () => {
+    img.remove();
+    el.textContent = '👤';
+  };
+  el.textContent = '';
+  el.appendChild(img);
+  img.src = url;
 }
 
 export function updateNavAuth() {
@@ -238,6 +252,7 @@ export function initNav() {
 
   document.addEventListener('smm:enter-main', () => {
     setMobileNavActive('home');
+    syncMobileProfileNavPhoto();
   });
 
   updateNavAuth();

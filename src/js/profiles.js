@@ -116,6 +116,10 @@ export function initProfiles() {
       btn.classList.toggle('is-shortlisted', added);
     } catch (err) {
       console.warn('Shortlist:', err);
+      const { ApiError } = await import('./api.js');
+      const msg = err instanceof ApiError ? err.message : 'Could not update shortlist';
+      btn.setAttribute('title', msg);
+      setTimeout(() => btn.removeAttribute('title'), 2500);
     }
   });
 }

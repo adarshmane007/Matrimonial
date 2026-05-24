@@ -284,9 +284,13 @@
       <h2 id="mobileMoreTitle" data-i18n="mobile.moreMenu">Menu</h2>
       <button type="button" class="mobile-more-close" id="mobileMoreClose" aria-label="Close">✕</button>
     </div>
-    <button type="button" class="mobile-more-link" data-open-shortlist>
-      <span class="mobile-more-link-icon">♥</span>
-      <span data-i18n="shortlist.menu">My Shortlist</span>
+    <button type="button" class="mobile-more-action mobile-more-action--shortlist" data-open-shortlist>
+      <span class="mobile-more-action-icon" aria-hidden="true">♥</span>
+      <span class="mobile-more-action-body">
+        <strong class="mobile-more-action-title" data-i18n="shortlist.menu">My Shortlist</strong>
+        <small class="mobile-more-action-sub" data-i18n="shortlist.menuSub">View profiles you saved</small>
+      </span>
+      <span class="mobile-more-action-arrow" aria-hidden="true">›</span>
     </button>
     <div class="mobile-more-settings">
       <p class="settings-panel-title" data-i18n="settings.title">Settings</p>

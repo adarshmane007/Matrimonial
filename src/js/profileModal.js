@@ -38,6 +38,7 @@ function profileHtml(p) {
         <h4 class="profile-detail-section-title">${escapeHtml(t('modal.basicInfo'))}</h4>
         <ul class="profile-detail-facts profile-detail-facts-grid">
           ${factRow(t('modal.age'), ageText)}
+          ${factRow(t('profile.profileCreator'), p.profileCreatorLabel)}
           ${factRow(t('modal.height'), p.height)}
           ${factRow(t('modal.maritalStatus'), p.maritalStatusLabel)}
           ${factRow(t('profile.kul'), p.kul)}

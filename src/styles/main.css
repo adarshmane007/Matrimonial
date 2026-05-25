@@ -485,11 +485,9 @@
   .login-form .form-input::placeholder { color: rgba(140,112,96,0.55); }
   .login-error { color: var(--maroon); font-size: 13px; margin-top: 12px; text-align: center; }
   .login-options {
-    display: flex; align-items: center; justify-content: space-between;
+    display: flex; align-items: center; justify-content: flex-end;
     margin-bottom: 28px; font-size: 13px; color: var(--warm-mid);
   }
-  .login-remember { display: flex; align-items: center; gap: 8px; cursor: pointer; }
-  .login-remember input { accent-color: var(--maroon); width: 15px; height: 15px; }
   .login-forgot {
     color: var(--maroon); text-decoration: none; font-weight: 500;
     transition: color 0.2s;

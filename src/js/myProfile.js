@@ -31,6 +31,7 @@ function profileToFormValues(p = {}) {
     id: p.id || null,
     displayName: p.displayName || p.fullName || '',
     gender: p.gender || 'bride',
+    profileCreator: p.profileCreator || '',
     age: p.age ?? 26,
     state: p.state || 'mh',
     district: p.district || 'pune',
@@ -75,6 +76,7 @@ function formHtml(meta, values) {
   const families = filterAny(meta.familyTypes);
   const incomes = filterAny(meta.incomeBrackets);
   const heights = filterAny(meta.heights);
+  const profileCreators = (meta.profileCreators || []).filter((o) => o.value);
   const photoPreview = `<div class="profile-photo-placeholder" id="profilePhotoPreview">📷</div>`;
   const photoBtnKey = v.photoUrl ? 'profile.changePhoto' : 'profile.addPhoto';
 
@@ -126,6 +128,14 @@ function formHtml(meta, values) {
               <label class="form-label" data-i18n="profile.gender">Gender *</label>
               <select class="form-select" name="gender" required>${optionsHtml(meta.genders, v.gender)}</select>
             </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" data-i18n="profile.profileCreator">Profile creator *</label>
+            <select class="form-select" name="profileCreator" required>
+              <option value="" data-i18n="profile.select">— Select —</option>
+              ${optionsHtml(profileCreators, v.profileCreator)}
+            </select>
+            <p class="modal-hint" data-i18n="profile.profileCreatorHint">Who is creating this profile?</p>
           </div>
           <div class="form-row">
             <div class="form-group">
@@ -429,6 +439,7 @@ function bindProfilePageEvents(meta) {
     const payload = {
       displayName: fd.get('displayName')?.trim(),
       gender: fd.get('gender'),
+      profileCreator: fd.get('profileCreator') || undefined,
       age: Number(fd.get('age')),
       ...locationPayloadFromForm(form),
       education: fd.get('education')?.trim() || undefined,

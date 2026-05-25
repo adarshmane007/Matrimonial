@@ -26,14 +26,12 @@ function escapeHtml(s) {
     .replace(/"/g, '&quot;');
 }
 
-function filterAny(list) {
-  return (list || []).filter((i) => i.value && i.value !== 'any');
+function profileCreatorsForForm(meta) {
+  return (meta.profileCreators || []).filter((o) => o.value);
 }
 
 async function registerFormHtml(meta) {
-  const eduLevels = (meta.educationLevels || []).filter((e) => e.value !== 'any');
-  const heights = filterAny(meta.heights);
-
+  const creators = profileCreatorsForForm(meta);
   return `
     <form id="registerForm" class="modal-form">
       <p class="modal-hint" data-i18n="reg.manualHint">Create your account with basic details. You can upload biodata PDF later from your profile.</p>
@@ -46,6 +44,14 @@ async function registerFormHtml(meta) {
           <label class="form-label">${escapeHtml(t('profile.gender'))}</label>
           <select class="form-select" name="gender" required>${optionsHtml(meta.genders, 'bride')}</select>
         </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label" data-i18n="profile.profileCreator">${escapeHtml(t('profile.profileCreator'))}</label>
+        <select class="form-select" name="profileCreator" required>
+          <option value="">${escapeHtml(t('profile.select'))}</option>
+          ${optionsHtml(creators, '')}
+        </select>
+        <p class="modal-hint" data-i18n="profile.profileCreatorHint">${escapeHtml(t('profile.profileCreatorHint'))}</p>
       </div>
       <div class="form-row">
         <div class="form-group">
@@ -69,36 +75,7 @@ async function registerFormHtml(meta) {
         </div>
       </div>
       ${locationFieldsHtml(meta, {})}
-      <div class="form-row">
-        <div class="form-group">
-          <label class="form-label">${escapeHtml(t('profile.education'))}</label>
-          <input class="form-input" name="education" placeholder="e.g. MBA Finance">
-        </div>
-        <div class="form-group">
-          <label class="form-label">${escapeHtml(t('profile.educationLevel'))}</label>
-          <select class="form-select" name="educationLevel">
-            <option value="">${escapeHtml(t('profile.select'))}</option>
-            ${optionsHtml(eduLevels, '')}
-          </select>
-        </div>
-      </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label class="form-label" data-i18n="profile.kul">${escapeHtml(t('profile.kul'))}</label>
-          <input class="form-input" name="kul" data-i18n-placeholder="profile.kulPh" placeholder="${escapeHtml(t('profile.kulPh'))}" maxlength="60">
-        </div>
-        <div class="form-group">
-          <label class="form-label" data-i18n="profile.height">${escapeHtml(t('profile.height'))}</label>
-          <select class="form-select" name="heightCm">
-            <option value="" data-i18n="profile.select">${escapeHtml(t('profile.select'))}</option>
-            ${optionsHtml(heights, '')}
-          </select>
-        </div>
-      </div>
-      <div class="form-group">
-        <label class="form-label">${escapeHtml(t('profile.occupation'))}</label>
-        <input class="form-input" name="occupation">
-      </div>
+      <p class="modal-hint" data-i18n="reg.profileLaterHint">Add education, kul, height, occupation and photo from your profile after sign-up.</p>
       <button type="submit" class="btn-login" style="margin-top:8px">${escapeHtml(t('reg.createAccount'))}</button>
     </form>
   `;
@@ -115,13 +92,9 @@ function bindRegisterSubmit(form) {
       mobile: fd.get('mobile')?.trim() || undefined,
       password: fd.get('password'),
       gender: fd.get('gender'),
+      profileCreator: fd.get('profileCreator') || undefined,
       age: Number(fd.get('age')),
       ...locationPayloadFromForm(form),
-      education: fd.get('education')?.trim() || undefined,
-      educationLevel: fd.get('educationLevel') || undefined,
-      kul: fd.get('kul')?.trim() || undefined,
-      occupation: fd.get('occupation')?.trim() || undefined,
-      heightCm: fd.get('heightCm') ? Number(fd.get('heightCm')) : undefined,
     };
 
     if (!payload.email && !payload.mobile) {

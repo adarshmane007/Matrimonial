@@ -1287,13 +1287,15 @@
     display: block;
   }
   .testi-text {
-    font-size: 14px;
     line-height: 1.75;
     color: var(--warm-mid);
     margin-bottom: 20px;
     font-family: var(--font-display);
     font-size: 17px;
     font-style: italic;
+  }
+  .testi-card--quote .testi-text {
+    margin-bottom: 0;
   }
   .testi-author {
     display: flex; align-items: center; gap: 12px;

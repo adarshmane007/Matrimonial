@@ -1,7 +1,7 @@
 import { api, ApiError } from './api.js';
 import { saveAuth } from './storage.js';
 import { getSiteMeta } from './meta.js';
-import { t } from './i18n/index.js';
+import { t, getLang } from './i18n/index.js';
 import { openModal, closeModal, setModalMessage } from './ui/modal.js';
 import { enterMainSite } from './ui/session.js';
 import { openProfilePage } from './myProfile.js';
@@ -39,6 +39,7 @@ async function registerFormHtml(meta) {
         <div class="form-group">
           <label class="form-label">${escapeHtml(t('profile.fullName'))}</label>
           <input class="form-input" name="fullName" required maxlength="120">
+          ${getLang() === 'mr' ? `<p class="modal-hint" data-i18n="reg.nameMrHint">${escapeHtml(t('reg.nameMrHint'))}</p>` : ''}
         </div>
         <div class="form-group">
           <label class="form-label">${escapeHtml(t('profile.gender'))}</label>
@@ -86,8 +87,10 @@ function bindRegisterSubmit(form) {
     e.preventDefault();
     setModalMessage('');
     const fd = new FormData(form);
+    const fullName = fd.get('fullName')?.trim();
     const payload = {
-      fullName: fd.get('fullName')?.trim(),
+      fullName,
+      displayNameMr: getLang() === 'mr' ? fullName : undefined,
       email: fd.get('email')?.trim() || undefined,
       mobile: fd.get('mobile')?.trim() || undefined,
       password: fd.get('password'),

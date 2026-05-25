@@ -116,8 +116,9 @@ export const api = {
     return request('/auth/me');
   },
 
-  getMyProfile() {
-    return request('/profiles/me');
+  getMyProfile(lang) {
+    const q = lang ? `?lang=${encodeURIComponent(lang)}` : '';
+    return request(`/profiles/me${q}`);
   },
 
   updateMyProfile(payload) {

@@ -335,7 +335,7 @@ export async function openProfilePage() {
     try {
       const [metaRes, profileRes] = await Promise.all([
         metaPromise,
-        api.getMyProfile().catch(() => ({ data: getProfile() })),
+        api.getMyProfile(getLang()).catch(() => ({ data: getProfile() })),
       ]);
       profileMetaCache = metaRes;
       profilePageMounted = true;
@@ -436,8 +436,10 @@ function bindProfilePageEvents(meta) {
     const msgEl = document.getElementById('profileSaveMessage');
     setStatus(msgEl, '');
     const fd = new FormData(form);
+    const displayName = fd.get('displayName')?.trim();
     const payload = {
-      displayName: fd.get('displayName')?.trim(),
+      displayName,
+      displayNameMr: getLang() === 'mr' ? displayName : undefined,
       gender: fd.get('gender'),
       profileCreator: fd.get('profileCreator') || undefined,
       age: Number(fd.get('age')),
@@ -486,13 +488,19 @@ function bindProfilePageEvents(meta) {
 }
 
 export function initMyProfile() {
-  document.addEventListener('smm:lang-change', () => {
+  document.addEventListener('smm:lang-change', async () => {
     if (!document.body.classList.contains('on-profile-page')) return;
     const page = document.getElementById('profile-page');
-    if (page) {
-      import('./i18n/index.js').then(({ applyLanguageToRoot }) => {
-        applyLanguageToRoot(page);
-      });
+    if (!page || !profileMetaCache) return;
+    try {
+      const res = await api.getMyProfile(getLang());
+      const p = res?.data;
+      if (p) {
+        setProfile(p);
+        renderProfileForm(page, profileMetaCache, p);
+      }
+    } catch {
+      applyLanguageToRoot(page, getLang());
     }
   });
 

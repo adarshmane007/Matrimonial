@@ -425,6 +425,7 @@ function closeThreadMenu() {
 function bindThreadHeaderActions(conversationId, profileId, page) {
   document.getElementById('chatThreadProfileBtn')?.addEventListener('click', (e) => {
     e.preventDefault();
+    closeThreadMenu();
     const id = e.currentTarget.dataset.profileId;
     if (id) openProfileModal(id);
   });
@@ -453,7 +454,13 @@ function bindThreadHeaderActions(conversationId, profileId, page) {
       chatState.activeConversationId = null;
       await openChatPage('chats');
     } catch (err) {
-      alert(err instanceof ApiError ? err.message : t('chat.unfriendFailed'));
+      const msg =
+        err instanceof ApiError && err.status === 404 && /route not found/i.test(err.message || '')
+          ? t('chat.unfriendRetry')
+          : err instanceof ApiError
+            ? err.message
+            : t('chat.unfriendFailed');
+      alert(msg);
     } finally {
       btn.disabled = false;
     }

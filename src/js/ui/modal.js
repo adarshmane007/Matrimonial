@@ -15,6 +15,13 @@ export function initModal() {
   });
 }
 
+function releaseModalFocus() {
+  const active = document.activeElement;
+  if (active && modalEl?.contains(active)) {
+    active.blur();
+  }
+}
+
 export function openModal(title, html) {
   if (!modalEl || !bodyEl) return;
   const titleEl = document.getElementById('appModalTitle');
@@ -23,10 +30,19 @@ export function openModal(title, html) {
   modalEl.hidden = false;
   modalEl.setAttribute('aria-hidden', 'false');
   document.body.style.overflow = 'hidden';
+  requestAnimationFrame(() => {
+    const panel = modalEl.querySelector('.app-modal-panel');
+    const first =
+      panel?.querySelector(
+        'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled])'
+      ) || panel;
+    first?.focus?.({ preventScroll: true });
+  });
 }
 
 export function closeModal() {
   if (!modalEl) return;
+  releaseModalFocus();
   modalEl.hidden = true;
   modalEl.setAttribute('aria-hidden', 'true');
   bodyEl.innerHTML = '';

@@ -26,8 +26,13 @@ function escapeHtml(s) {
     .replace(/"/g, '&quot;');
 }
 
+function filterAny(list) {
+  return (list || []).filter((i) => i.value && i.value !== 'any');
+}
+
 async function registerFormHtml(meta) {
   const eduLevels = (meta.educationLevels || []).filter((e) => e.value !== 'any');
+  const heights = filterAny(meta.heights);
 
   return `
     <form id="registerForm" class="modal-form">
@@ -79,17 +84,20 @@ async function registerFormHtml(meta) {
       </div>
       <div class="form-row">
         <div class="form-group">
-          <label class="form-label">${escapeHtml(t('profile.kul'))}</label>
-          <input class="form-input" name="kul" placeholder="${escapeHtml(t('profile.kulPh'))}">
+          <label class="form-label" data-i18n="profile.kul">${escapeHtml(t('profile.kul'))}</label>
+          <input class="form-input" name="kul" data-i18n-placeholder="profile.kulPh" placeholder="${escapeHtml(t('profile.kulPh'))}" maxlength="60">
         </div>
         <div class="form-group">
-          <label class="form-label">${escapeHtml(t('profile.occupation'))}</label>
-          <input class="form-input" name="occupation">
+          <label class="form-label" data-i18n="profile.height">${escapeHtml(t('profile.height'))}</label>
+          <select class="form-select" name="heightCm">
+            <option value="" data-i18n="profile.select">${escapeHtml(t('profile.select'))}</option>
+            ${optionsHtml(heights, '')}
+          </select>
         </div>
       </div>
       <div class="form-group">
-        <label class="form-label">${escapeHtml(t('profile.height'))}</label>
-        <input class="form-input" name="height" placeholder="e.g. 5'6&quot;">
+        <label class="form-label">${escapeHtml(t('profile.occupation'))}</label>
+        <input class="form-input" name="occupation">
       </div>
       <button type="submit" class="btn-login" style="margin-top:8px">${escapeHtml(t('reg.createAccount'))}</button>
     </form>
@@ -113,7 +121,7 @@ function bindRegisterSubmit(form) {
       educationLevel: fd.get('educationLevel') || undefined,
       kul: fd.get('kul')?.trim() || undefined,
       occupation: fd.get('occupation')?.trim() || undefined,
-      height: fd.get('height')?.trim() || undefined,
+      heightCm: fd.get('heightCm') ? Number(fd.get('heightCm')) : undefined,
     };
 
     if (!payload.email && !payload.mobile) {

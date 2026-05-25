@@ -205,6 +205,7 @@ function renderConversations(list) {
       (c) => `
     <li class="chat-conv-item ${chatState.activeConversationId === c.conversationId ? 'active' : ''}"
         data-open-conversation="${c.conversationId}"
+        data-conv-profile-id="${c.profile?.id || ''}"
         data-conv-name="${escapeHtml(c.profile?.displayName || c.otherName)}"
         data-conv-photo="${escapeHtml(c.profile?.photoUrl || '')}">
       ${avatarHtml(c.profile?.displayName || c.otherName, c.profile?.photoUrl)}
@@ -280,6 +281,7 @@ export async function openChatPage(tab = 'chats', conversationId = null) {
         conversationId,
         conv?.profile?.displayName || conv?.otherName,
         conv?.profile?.photoUrl || '',
+        conv?.profile?.id || null,
         page
       );
     }
@@ -364,21 +366,40 @@ function bindConversationActions(page) {
         el.dataset.openConversation,
         el.dataset.convName,
         el.dataset.convPhoto || '',
+        el.dataset.convProfileId || null,
         page
       );
     });
   });
 }
 
-function threadShellHtml(displayName, photoUrl) {
-  return `
-    <div class="chat-thread-panel">
-      <header class="chat-thread-header">
-        <button type="button" class="chat-thread-back-btn" id="chatThreadBack" aria-label="Back">←</button>
+function threadShellHtml(displayName, photoUrl, profileId) {
+  const profileBtn = profileId
+    ? `<button type="button" class="chat-thread-profile-btn" id="chatThreadProfileBtn" data-profile-id="${profileId}" aria-label="${escapeHtml(t('chat.viewProfileHeader'))}">
+        ${avatarHtml(displayName, photoUrl, 'chat-avatar--lg')}
+        <div class="chat-thread-header-text">
+          <strong>${escapeHtml(displayName || 'Chat')}</strong>
+          <span class="chat-thread-status">${escapeHtml(t('chat.viewProfileHeader'))}</span>
+        </div>
+      </button>`
+    : `<div class="chat-thread-profile-btn chat-thread-profile-btn--static">
         ${avatarHtml(displayName, photoUrl, 'chat-avatar--lg')}
         <div class="chat-thread-header-text">
           <strong>${escapeHtml(displayName || 'Chat')}</strong>
           <span class="chat-thread-status">${escapeHtml(t('chat.startConversation'))}</span>
+        </div>
+      </div>`;
+
+  return `
+    <div class="chat-thread-panel">
+      <header class="chat-thread-header">
+        <button type="button" class="chat-thread-back-btn" id="chatThreadBack" aria-label="Back">←</button>
+        ${profileBtn}
+        <div class="chat-thread-menu-wrap">
+          <button type="button" class="chat-thread-menu-btn" id="chatThreadMenuBtn" aria-label="${escapeHtml(t('chat.moreActions'))}" aria-haspopup="true" aria-expanded="false">⋮</button>
+          <div class="chat-thread-menu-dropdown" id="chatThreadMenuDropdown" hidden role="menu">
+            <button type="button" class="chat-thread-menu-item chat-thread-menu-item--danger" id="chatThreadUnfriendBtn" role="menuitem">${escapeHtml(t('chat.unfriend'))}</button>
+          </div>
         </div>
       </header>
       <div class="chat-thread-messages" id="chatMessages">
@@ -394,7 +415,52 @@ function threadShellHtml(displayName, photoUrl) {
   `;
 }
 
-async function openThread(conversationId, displayName, photoUrl, page) {
+function closeThreadMenu() {
+  const dropdown = document.getElementById('chatThreadMenuDropdown');
+  const menuBtn = document.getElementById('chatThreadMenuBtn');
+  if (dropdown) dropdown.hidden = true;
+  if (menuBtn) menuBtn.setAttribute('aria-expanded', 'false');
+}
+
+function bindThreadHeaderActions(conversationId, profileId, page) {
+  document.getElementById('chatThreadProfileBtn')?.addEventListener('click', (e) => {
+    e.preventDefault();
+    const id = e.currentTarget.dataset.profileId;
+    if (id) openProfileModal(id);
+  });
+
+  const menuBtn = document.getElementById('chatThreadMenuBtn');
+  const dropdown = document.getElementById('chatThreadMenuDropdown');
+
+  menuBtn?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const open = dropdown?.hidden !== false;
+    if (dropdown) dropdown.hidden = !open;
+    menuBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+  });
+
+  document.getElementById('chatThreadUnfriendBtn')?.addEventListener('click', async (e) => {
+    e.stopPropagation();
+    closeThreadMenu();
+    if (!window.confirm(t('chat.unfriendConfirm'))) return;
+
+    const btn = e.currentTarget;
+    btn.disabled = true;
+    try {
+      chatCache.at = 0;
+      await api.disconnectChat(conversationId);
+      document.body.classList.remove('chat-thread-open');
+      chatState.activeConversationId = null;
+      await openChatPage('chats');
+    } catch (err) {
+      alert(err instanceof ApiError ? err.message : t('chat.unfriendFailed'));
+    } finally {
+      btn.disabled = false;
+    }
+  });
+}
+
+async function openThread(conversationId, displayName, photoUrl, profileId, page) {
   const main = page.querySelector('#chatMain');
   if (!main) return;
 
@@ -405,9 +471,11 @@ async function openThread(conversationId, displayName, photoUrl, page) {
     el.classList.toggle('active', el.dataset.openConversation === String(conversationId));
   });
 
-  main.innerHTML = threadShellHtml(displayName, photoUrl);
+  main.innerHTML = threadShellHtml(displayName, photoUrl, profileId);
+  bindThreadHeaderActions(conversationId, profileId, page);
 
   document.getElementById('chatThreadBack')?.addEventListener('click', () => {
+    closeThreadMenu();
     document.body.classList.remove('chat-thread-open');
     chatState.activeConversationId = null;
     resetMainPane(page);
@@ -485,6 +553,12 @@ async function openThread(conversationId, displayName, photoUrl, page) {
 }
 
 export function initChat() {
+  document.addEventListener('click', (e) => {
+    if (document.body.classList.contains('chat-thread-open')) {
+      if (!e.target.closest('.chat-thread-menu-wrap')) closeThreadMenu();
+    }
+  });
+
   document.addEventListener('click', (e) => {
     const link = e.target.closest('[data-open-chat]');
     if (!link || isMobileBottomNavClick(e.target)) return;

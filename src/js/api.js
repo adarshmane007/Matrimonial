@@ -191,6 +191,12 @@ export const api = {
     return request(`/chat/conversations/${conversationId}/messages`);
   },
 
+  disconnectChat(conversationId) {
+    return request(`/chat/conversations/${conversationId}/disconnect`, {
+      method: 'POST',
+    });
+  },
+
   sendChatMessage(conversationId, body) {
     return request(`/chat/conversations/${conversationId}/messages`, {
       method: 'POST',

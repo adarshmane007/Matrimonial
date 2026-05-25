@@ -106,7 +106,7 @@ function bindChatActions(profileId, p) {
     `;
     document.getElementById('openChatBtn')?.addEventListener('click', () => {
       closeModal();
-      openChatPage('chats');
+      openChatPage('chats', p.conversationId);
     });
     return;
   }

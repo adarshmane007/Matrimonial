@@ -56,7 +56,7 @@ export function initAdminMessageBanner() {
     }
     dismissAdminMessageBanner();
     const { openChatPage } = await import('../chat.js');
-    openChatPage('admin');
+    openChatPage('admin', null, { openAdminThread: true });
   });
 
   document.addEventListener('smm:enter-main', () => {

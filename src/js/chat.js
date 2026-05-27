@@ -114,13 +114,7 @@ function ensureChatMounted(page) {
   page.querySelectorAll('[data-chat-tab]').forEach((btn) => {
     btn.addEventListener('click', () => {
       if (btn.classList.contains('active')) return;
-      const tab = btn.dataset.chatTab;
-      switchChatTab(tab, page);
-      if (tab === 'admin') {
-        if (adminCache.loadError) showAdminEmptyMain(page);
-        else if (adminCache.messages.length) openAdminThread(page);
-        else showAdminEmptyMain(page);
-      }
+      switchChatTab(btn.dataset.chatTab, page);
     });
   });
 
@@ -176,6 +170,11 @@ function switchChatTab(tab, page) {
     document.body.classList.remove('chat-thread-open', 'chat-admin-thread-open');
     chatState.activeConversationId = null;
     resetMainPane(page);
+  } else {
+    document.body.classList.remove('chat-thread-open', 'chat-admin-thread-open');
+    chatState.activeConversationId = null;
+    page.querySelector('.chat-conv-item--admin')?.classList.remove('active');
+    showAdminEmptyMain(page);
   }
 }
 
@@ -337,7 +336,13 @@ async function fetchChatData(force = false) {
   return { incoming, conversations };
 }
 
-export async function openChatPage(tab = 'chats', conversationId = null) {
+/**
+ * @param {string} tab - requests | chats | admin
+ * @param {number|null} conversationId - open a chat thread when tab is chats
+ * @param {{ openAdminThread?: boolean }} [options] - if true (e.g. home banner), open admin message panel immediately
+ */
+export async function openChatPage(tab = 'chats', conversationId = null, options = {}) {
+  const openAdminThreadNow = options.openAdminThread === true;
   const page = document.getElementById('chat-page');
   if (!page || chatBusy || isNavLocked('chat')) return;
   if (!isLoggedIn() || !document.body.classList.contains('on-main-site')) return;
@@ -364,9 +369,7 @@ export async function openChatPage(tab = 'chats', conversationId = null) {
     setLoading(page, false);
 
     if (tab === 'admin') {
-      if (adminLoadError) {
-        showAdminEmptyMain(page);
-      } else if (adminMessages.length) {
+      if (openAdminThreadNow && !adminLoadError && adminMessages.length) {
         openAdminThread(page);
       } else {
         showAdminEmptyMain(page);
@@ -455,7 +458,14 @@ function bindRequestActions(page) {
 }
 
 function bindAdminActions(page) {
-  page.querySelector('[data-open-admin-thread]')?.addEventListener('click', () => {
+  const app = page.querySelector('#chatApp');
+  if (!app || app.dataset.adminClickBound === '1') return;
+  app.dataset.adminClickBound = '1';
+  app.addEventListener('click', (e) => {
+    const row = e.target.closest('[data-open-admin-thread]');
+    if (!row) return;
+    e.preventDefault();
+    e.stopPropagation();
     openAdminThread(page);
   });
 }
@@ -489,15 +499,10 @@ async function openAdminThread(page) {
   document.getElementById('chatAdminThreadBack')?.addEventListener('click', () => {
     document.body.classList.remove('chat-thread-open', 'chat-admin-thread-open');
     page.querySelector('.chat-conv-item--admin')?.classList.remove('active');
-    resetMainPane(page);
     if (chatState.tab === 'admin') {
-      main.innerHTML = `
-        <div class="chat-main-empty">
-          <div class="chat-main-empty-icon">📩</div>
-          <h2>${escapeHtml(t('chat.selectAdmin'))}</h2>
-          <p>${escapeHtml(t('chat.selectAdminSub'))}</p>
-        </div>
-      `;
+      showAdminEmptyMain(page);
+    } else {
+      resetMainPane(page);
     }
   });
 

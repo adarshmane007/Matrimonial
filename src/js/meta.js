@@ -25,6 +25,12 @@ export async function getSiteMeta() {
         { value: 'bride', label: 'Bride' },
         { value: 'groom', label: 'Groom' },
       ],
+      profileCreators: [
+        { value: 'groom', label: 'Groom' },
+        { value: 'bride', label: 'Bride' },
+        { value: 'father', label: 'Father' },
+        { value: 'mother', label: 'Mother' },
+      ],
       maritalStatuses: [...any('Any'), { value: 'never_married', label: 'Never Married' }],
       diets: [...any('Any'), { value: 'veg', label: 'Vegetarian' }],
       manglikOptions: [...any('Any'), { value: 'no', label: 'Non-Manglik' }],

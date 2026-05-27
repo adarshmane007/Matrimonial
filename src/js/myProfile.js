@@ -31,6 +31,7 @@ function profileToFormValues(p = {}) {
     id: p.id || null,
     displayName: p.displayName || p.fullName || '',
     gender: p.gender || 'bride',
+    profileCreator: p.profileCreator || '',
     age: p.age ?? 26,
     state: p.state || 'mh',
     district: p.district || 'pune',
@@ -75,6 +76,7 @@ function formHtml(meta, values) {
   const families = filterAny(meta.familyTypes);
   const incomes = filterAny(meta.incomeBrackets);
   const heights = filterAny(meta.heights);
+  const profileCreators = (meta.profileCreators || []).filter((o) => o.value);
   const photoPreview = `<div class="profile-photo-placeholder" id="profilePhotoPreview">📷</div>`;
   const photoBtnKey = v.photoUrl ? 'profile.changePhoto' : 'profile.addPhoto';
 
@@ -126,6 +128,14 @@ function formHtml(meta, values) {
               <label class="form-label" data-i18n="profile.gender">Gender *</label>
               <select class="form-select" name="gender" required>${optionsHtml(meta.genders, v.gender)}</select>
             </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" data-i18n="profile.profileCreator">Profile creator *</label>
+            <select class="form-select" name="profileCreator" required>
+              <option value="" data-i18n="profile.select">— Select —</option>
+              ${optionsHtml(profileCreators, v.profileCreator)}
+            </select>
+            <p class="modal-hint" data-i18n="profile.profileCreatorHint">Who is creating this profile?</p>
           </div>
           <div class="form-row">
             <div class="form-group">
@@ -325,7 +335,7 @@ export async function openProfilePage() {
     try {
       const [metaRes, profileRes] = await Promise.all([
         metaPromise,
-        api.getMyProfile().catch(() => ({ data: getProfile() })),
+        api.getMyProfile(getLang()).catch(() => ({ data: getProfile() })),
       ]);
       profileMetaCache = metaRes;
       profilePageMounted = true;
@@ -426,9 +436,12 @@ function bindProfilePageEvents(meta) {
     const msgEl = document.getElementById('profileSaveMessage');
     setStatus(msgEl, '');
     const fd = new FormData(form);
+    const displayName = fd.get('displayName')?.trim();
     const payload = {
-      displayName: fd.get('displayName')?.trim(),
+      displayName,
+      displayNameMr: getLang() === 'mr' ? displayName : undefined,
       gender: fd.get('gender'),
+      profileCreator: fd.get('profileCreator') || undefined,
       age: Number(fd.get('age')),
       ...locationPayloadFromForm(form),
       education: fd.get('education')?.trim() || undefined,
@@ -475,13 +488,19 @@ function bindProfilePageEvents(meta) {
 }
 
 export function initMyProfile() {
-  document.addEventListener('smm:lang-change', () => {
+  document.addEventListener('smm:lang-change', async () => {
     if (!document.body.classList.contains('on-profile-page')) return;
     const page = document.getElementById('profile-page');
-    if (page) {
-      import('./i18n/index.js').then(({ applyLanguageToRoot }) => {
-        applyLanguageToRoot(page);
-      });
+    if (!page || !profileMetaCache) return;
+    try {
+      const res = await api.getMyProfile(getLang());
+      const p = res?.data;
+      if (p) {
+        setProfile(p);
+        renderProfileForm(page, profileMetaCache, p);
+      }
+    } catch {
+      applyLanguageToRoot(page, getLang());
     }
   });
 

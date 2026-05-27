@@ -116,8 +116,9 @@ export const api = {
     return request('/auth/me');
   },
 
-  getMyProfile() {
-    return request('/profiles/me');
+  getMyProfile(lang) {
+    const q = lang ? `?lang=${encodeURIComponent(lang)}` : '';
+    return request(`/profiles/me${q}`);
   },
 
   updateMyProfile(payload) {
@@ -189,6 +190,37 @@ export const api = {
 
   getChatMessages(conversationId) {
     return request(`/chat/conversations/${conversationId}/messages`);
+  },
+
+  async disconnectChat(conversationId) {
+    const id = Number(conversationId);
+    const paths = [
+      () =>
+        request('/chat/disconnect', {
+          method: 'POST',
+          body: JSON.stringify({ conversationId: id }),
+        }),
+      () =>
+        request(`/chat/conversations/${id}/disconnect`, {
+          method: 'POST',
+        }),
+    ];
+
+    let lastErr;
+    for (let attempt = 0; attempt < paths.length; attempt++) {
+      try {
+        return await paths[attempt]();
+      } catch (err) {
+        lastErr = err;
+        const isRouteMissing =
+          err instanceof ApiError &&
+          err.status === 404 &&
+          /route not found/i.test(String(err.message || ''));
+        if (!isRouteMissing || attempt === paths.length - 1) break;
+        await new Promise((r) => setTimeout(r, 800));
+      }
+    }
+    throw lastErr;
   },
 
   sendChatMessage(conversationId, body) {

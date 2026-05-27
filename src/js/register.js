@@ -1,7 +1,7 @@
 import { api, ApiError } from './api.js';
 import { saveAuth } from './storage.js';
 import { getSiteMeta } from './meta.js';
-import { t } from './i18n/index.js';
+import { t, getLang } from './i18n/index.js';
 import { openModal, closeModal, setModalMessage } from './ui/modal.js';
 import { enterMainSite } from './ui/session.js';
 import { openProfilePage } from './myProfile.js';
@@ -26,9 +26,12 @@ function escapeHtml(s) {
     .replace(/"/g, '&quot;');
 }
 
-async function registerFormHtml(meta) {
-  const eduLevels = (meta.educationLevels || []).filter((e) => e.value !== 'any');
+function profileCreatorsForForm(meta) {
+  return (meta.profileCreators || []).filter((o) => o.value);
+}
 
+async function registerFormHtml(meta) {
+  const creators = profileCreatorsForForm(meta);
   return `
     <form id="registerForm" class="modal-form">
       <p class="modal-hint" data-i18n="reg.manualHint">Create your account with basic details. You can upload biodata PDF later from your profile.</p>
@@ -36,11 +39,20 @@ async function registerFormHtml(meta) {
         <div class="form-group">
           <label class="form-label">${escapeHtml(t('profile.fullName'))}</label>
           <input class="form-input" name="fullName" required maxlength="120">
+          ${getLang() === 'mr' ? `<p class="modal-hint" data-i18n="reg.nameMrHint">${escapeHtml(t('reg.nameMrHint'))}</p>` : ''}
         </div>
         <div class="form-group">
           <label class="form-label">${escapeHtml(t('profile.gender'))}</label>
           <select class="form-select" name="gender" required>${optionsHtml(meta.genders, 'bride')}</select>
         </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label" data-i18n="profile.profileCreator">${escapeHtml(t('profile.profileCreator'))}</label>
+        <select class="form-select" name="profileCreator" required>
+          <option value="">${escapeHtml(t('profile.select'))}</option>
+          ${optionsHtml(creators, '')}
+        </select>
+        <p class="modal-hint" data-i18n="profile.profileCreatorHint">${escapeHtml(t('profile.profileCreatorHint'))}</p>
       </div>
       <div class="form-row">
         <div class="form-group">
@@ -64,33 +76,7 @@ async function registerFormHtml(meta) {
         </div>
       </div>
       ${locationFieldsHtml(meta, {})}
-      <div class="form-row">
-        <div class="form-group">
-          <label class="form-label">${escapeHtml(t('profile.education'))}</label>
-          <input class="form-input" name="education" placeholder="e.g. MBA Finance">
-        </div>
-        <div class="form-group">
-          <label class="form-label">${escapeHtml(t('profile.educationLevel'))}</label>
-          <select class="form-select" name="educationLevel">
-            <option value="">${escapeHtml(t('profile.select'))}</option>
-            ${optionsHtml(eduLevels, '')}
-          </select>
-        </div>
-      </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label class="form-label">${escapeHtml(t('profile.kul'))}</label>
-          <input class="form-input" name="kul" placeholder="${escapeHtml(t('profile.kulPh'))}">
-        </div>
-        <div class="form-group">
-          <label class="form-label">${escapeHtml(t('profile.occupation'))}</label>
-          <input class="form-input" name="occupation">
-        </div>
-      </div>
-      <div class="form-group">
-        <label class="form-label">${escapeHtml(t('profile.height'))}</label>
-        <input class="form-input" name="height" placeholder="e.g. 5'6&quot;">
-      </div>
+      <p class="modal-hint" data-i18n="reg.profileLaterHint">Add education, kul, height, occupation and photo from your profile after sign-up.</p>
       <button type="submit" class="btn-login" style="margin-top:8px">${escapeHtml(t('reg.createAccount'))}</button>
     </form>
   `;
@@ -101,19 +87,17 @@ function bindRegisterSubmit(form) {
     e.preventDefault();
     setModalMessage('');
     const fd = new FormData(form);
+    const fullName = fd.get('fullName')?.trim();
     const payload = {
-      fullName: fd.get('fullName')?.trim(),
+      fullName,
+      displayNameMr: getLang() === 'mr' ? fullName : undefined,
       email: fd.get('email')?.trim() || undefined,
       mobile: fd.get('mobile')?.trim() || undefined,
       password: fd.get('password'),
       gender: fd.get('gender'),
+      profileCreator: fd.get('profileCreator') || undefined,
       age: Number(fd.get('age')),
       ...locationPayloadFromForm(form),
-      education: fd.get('education')?.trim() || undefined,
-      educationLevel: fd.get('educationLevel') || undefined,
-      kul: fd.get('kul')?.trim() || undefined,
-      occupation: fd.get('occupation')?.trim() || undefined,
-      height: fd.get('height')?.trim() || undefined,
     };
 
     if (!payload.email && !payload.mobile) {

@@ -60,8 +60,10 @@ export function initAuth() {
       const { syncAccountDeletionUi, handlePostLoginDeletionNotice } = await import(
         './ui/accountDeletion.js'
       );
+      const { syncAdminMessageBanner } = await import('./ui/adminMessageBanner.js');
       await syncAccountDeletionUi();
       handlePostLoginDeletionNotice();
+      await syncAdminMessageBanner();
     } catch (err) {
       const msg =
         err instanceof ApiError
@@ -83,6 +85,7 @@ export async function restoreSession() {
   try {
     const { refreshAuthFromServer, handlePostLoginDeletionNotice, syncDeleteAccountPanel, syncDeletionBanner } =
       await import('./ui/accountDeletion.js');
+    const { syncAdminMessageBanner } = await import('./ui/adminMessageBanner.js');
     const user = await refreshAuthFromServer();
     if (!user) {
       clearAuth();
@@ -92,6 +95,7 @@ export async function restoreSession() {
     syncDeleteAccountPanel();
     syncDeletionBanner();
     handlePostLoginDeletionNotice();
+    await syncAdminMessageBanner();
     return true;
   } catch {
     clearAuth();

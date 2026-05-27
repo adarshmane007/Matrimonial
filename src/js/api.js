@@ -281,4 +281,21 @@ export const api = {
       body: JSON.stringify({}),
     });
   },
+
+  getAdminMessageBanner(lang) {
+    const q = lang ? `?lang=${encodeURIComponent(lang)}` : '';
+    return request(`/admin/messages/banner${q}`);
+  },
+
+  getAdminMessages(lang) {
+    const q = lang ? `?lang=${encodeURIComponent(lang)}` : '';
+    return request(`/admin/messages${q}`);
+  },
+
+  markAdminMessagesRead(messageId) {
+    return request('/admin/messages/read', {
+      method: 'POST',
+      body: JSON.stringify(messageId ? { messageId } : {}),
+    });
+  },
 };

@@ -4,6 +4,7 @@ import { getLang } from './i18n/index.js';
 import { translations } from './i18n/translations.js';
 import { openProfileModal } from './profileModal.js';
 import { refreshNavBadges } from './ui/nav.js';
+import { syncAdminMessageBanner, dismissAdminMessageBanner } from './ui/adminMessageBanner.js';
 import { closeFullPageOverlays } from './ui/fullPage.js';
 import { isNavLocked, isNavSwitchLocked, withNavLock, isMobileBottomNavClick } from './ui/navigation.js';
 
@@ -49,11 +50,12 @@ let chatState = { tab: 'chats', activeConversationId: null };
 let chatMounted = false;
 let chatBusy = false;
 let chatCache = { incoming: [], conversations: [], at: 0 };
+let adminCache = { messages: [], unreadCount: 0, at: 0 };
 
 const CACHE_MS = 12000;
 
 export function closeChatPage() {
-  document.body.classList.remove('on-chat-page', 'chat-thread-open');
+  document.body.classList.remove('on-chat-page', 'chat-thread-open', 'chat-admin-thread-open');
   const page = document.getElementById('chat-page');
   if (page) {
     page.hidden = true;
@@ -76,6 +78,7 @@ function buildChatShell() {
         <div class="chat-sidebar-tabs" role="tablist">
           <button type="button" class="chat-sidebar-tab" data-chat-tab="requests">${escapeHtml(t('chat.requests'))}<span class="chat-tab-badge" data-requests-badge hidden></span></button>
           <button type="button" class="chat-sidebar-tab active" data-chat-tab="chats">${escapeHtml(t('chat.chats'))}<span class="chat-tab-badge chat-tab-badge--muted" data-chats-badge hidden></span></button>
+          <button type="button" class="chat-sidebar-tab" data-chat-tab="admin">${escapeHtml(t('chat.admin'))}<span class="chat-tab-badge" data-admin-badge hidden></span></button>
         </div>
         <div class="chat-loading-overlay" id="chatLoadingOverlay" aria-live="polite" aria-busy="true">
           <div class="chat-skeleton">
@@ -86,6 +89,7 @@ function buildChatShell() {
         </div>
         <div class="chat-sidebar-pane" data-pane="requests"></div>
         <div class="chat-sidebar-pane" data-pane="chats"></div>
+        <div class="chat-sidebar-pane" data-pane="admin"></div>
       </aside>
       <main class="chat-main" id="chatMain">
         <div class="chat-main-empty">
@@ -110,7 +114,12 @@ function ensureChatMounted(page) {
   page.querySelectorAll('[data-chat-tab]').forEach((btn) => {
     btn.addEventListener('click', () => {
       if (btn.classList.contains('active')) return;
-      switchChatTab(btn.dataset.chatTab, page);
+      const tab = btn.dataset.chatTab;
+      switchChatTab(tab, page);
+      if (tab === 'admin') {
+        if (adminCache.messages.length) openAdminThread(page);
+        else showAdminEmptyMain(page);
+      }
     });
   });
 
@@ -124,9 +133,10 @@ function setLoading(page, on) {
   else overlay.setAttribute('hidden', '');
 }
 
-function updateTabBadges(page, reqCount, chatCount) {
+function updateTabBadges(page, reqCount, chatCount, adminUnread = 0) {
   const reqBadge = page.querySelector('[data-requests-badge]');
   const chatBadge = page.querySelector('[data-chats-badge]');
+  const adminBadge = page.querySelector('[data-admin-badge]');
   if (reqBadge) {
     if (reqCount > 0) {
       reqBadge.textContent = String(reqCount);
@@ -143,6 +153,14 @@ function updateTabBadges(page, reqCount, chatCount) {
       chatBadge.hidden = true;
     }
   }
+  if (adminBadge) {
+    if (adminUnread > 0) {
+      adminBadge.textContent = adminUnread > 9 ? '9+' : String(adminUnread);
+      adminBadge.hidden = false;
+    } else {
+      adminBadge.hidden = true;
+    }
+  }
 }
 
 function switchChatTab(tab, page) {
@@ -153,9 +171,11 @@ function switchChatTab(tab, page) {
   page.querySelectorAll('[data-pane]').forEach((pane) => {
     pane.classList.toggle('hidden', pane.dataset.pane !== tab);
   });
-  document.body.classList.remove('chat-thread-open');
-  chatState.activeConversationId = null;
-  resetMainPane(page);
+  if (tab !== 'admin') {
+    document.body.classList.remove('chat-thread-open', 'chat-admin-thread-open');
+    chatState.activeConversationId = null;
+    resetMainPane(page);
+  }
 }
 
 function resetMainPane(page) {
@@ -166,6 +186,18 @@ function resetMainPane(page) {
       <div class="chat-main-empty-icon">💬</div>
       <h2>${escapeHtml(t('chat.selectConversation'))}</h2>
       <p>${escapeHtml(t('chat.selectConversationSub'))}</p>
+    </div>
+  `;
+}
+
+function showAdminEmptyMain(page) {
+  const main = page.querySelector('#chatMain');
+  if (!main) return;
+  main.innerHTML = `
+    <div class="chat-main-empty">
+      <div class="chat-main-empty-icon">📩</div>
+      <h2>${escapeHtml(t('chat.selectAdmin'))}</h2>
+      <p>${escapeHtml(t('chat.selectAdminSub'))}</p>
     </div>
   `;
 }
@@ -222,17 +254,54 @@ function renderConversations(list) {
     .join('')}</ul>`;
 }
 
-function paintChatData(page, incoming, conversations, tab) {
+function renderAdminSidebar(messages) {
+  if (!messages.length) {
+    return `<p class="chat-sidebar-empty">${escapeHtml(t('chat.noAdmin'))}</p>`;
+  }
+  const latest = messages[messages.length - 1];
+  const unread = messages.filter((m) => !m.isRead).length;
+  return `<ul class="chat-conv-list">
+    <li class="chat-conv-item chat-conv-item--admin" data-open-admin-thread>
+      <span class="chat-avatar chat-avatar--initials chat-avatar--admin" aria-hidden="true">A</span>
+      <div class="chat-conv-body">
+        <div class="chat-conv-top">
+          <strong>${escapeHtml(t('chat.adminFrom'))}</strong>
+          <span class="chat-conv-time">${formatTime(latest.createdAt)}</span>
+        </div>
+        <p class="chat-conv-preview">${escapeHtml(latest.body)}</p>
+      </div>
+      ${unread > 0 ? `<span class="chat-conv-unread">${unread > 9 ? '9+' : unread}</span>` : ''}
+    </li>
+  </ul>`;
+}
+
+function paintChatData(page, incoming, conversations, tab, adminMessages = []) {
   const reqPane = page.querySelector('[data-pane="requests"]');
   const chatPane = page.querySelector('[data-pane="chats"]');
+  const adminPane = page.querySelector('[data-pane="admin"]');
   if (reqPane) reqPane.innerHTML = renderRequests(incoming);
   if (chatPane) chatPane.innerHTML = renderConversations(conversations);
+  if (adminPane) adminPane.innerHTML = renderAdminSidebar(adminMessages);
 
-  updateTabBadges(page, incoming.length, conversations.length);
+  const adminUnread = adminMessages.filter((m) => !m.isRead).length;
+  updateTabBadges(page, incoming.length, conversations.length, adminUnread);
   switchChatTab(tab, page);
 
   bindRequestActions(page);
   bindConversationActions(page);
+  bindAdminActions(page);
+}
+
+async function fetchAdminData(force = false) {
+  const now = Date.now();
+  if (!force && adminCache.at && now - adminCache.at < CACHE_MS) {
+    return { messages: adminCache.messages, unreadCount: adminCache.unreadCount };
+  }
+  const res = await api.getAdminMessages(getLang());
+  const messages = res?.data?.messages || [];
+  const unreadCount = res?.data?.unreadCount ?? 0;
+  adminCache = { messages, unreadCount, at: now };
+  return { messages, unreadCount };
 }
 
 async function fetchChatData(force = false) {
@@ -271,9 +340,17 @@ export async function openChatPage(tab = 'chats', conversationId = null) {
   if (!useCache) setLoading(page, true);
 
   try {
-    const { incoming, conversations } = await fetchChatData(!useCache);
-    paintChatData(page, incoming, conversations, tab);
+    const [{ incoming, conversations }, { messages: adminMessages }] = await Promise.all([
+      fetchChatData(!useCache),
+      fetchAdminData(!useCache),
+    ]);
+    paintChatData(page, incoming, conversations, tab, adminMessages);
     setLoading(page, false);
+
+    if (tab === 'admin') {
+      if (adminMessages.length) openAdminThread(page);
+      else showAdminEmptyMain(page);
+    }
 
     if (conversationId) {
       const conv = conversations.find((c) => String(c.conversationId) === String(conversationId));
@@ -354,6 +431,97 @@ function bindRequestActions(page) {
       openProfileModal(btn.dataset.viewProfile);
     });
   });
+}
+
+function bindAdminActions(page) {
+  page.querySelector('[data-open-admin-thread]')?.addEventListener('click', () => {
+    openAdminThread(page);
+  });
+}
+
+async function openAdminThread(page) {
+  const main = page.querySelector('#chatMain');
+  if (!main) return;
+
+  document.body.classList.add('chat-thread-open', 'chat-admin-thread-open');
+  page.querySelector('.chat-conv-item--admin')?.classList.add('active');
+
+  main.innerHTML = `
+    <div class="chat-thread chat-thread--admin">
+      <header class="chat-thread-header">
+        <button type="button" class="chat-thread-back" id="chatAdminThreadBack" aria-label="${escapeHtml(t('chat.backToList'))}">←</button>
+        <div class="chat-thread-peer">
+          <span class="chat-avatar chat-avatar--initials chat-avatar--admin" aria-hidden="true">A</span>
+          <div>
+            <h2 class="chat-thread-name">${escapeHtml(t('chat.adminFrom'))}</h2>
+            <p class="chat-thread-sub">${escapeHtml(t('chat.adminReadOnly'))}</p>
+          </div>
+        </div>
+      </header>
+      <div class="chat-thread-messages" id="chatAdminMessages">
+        <div class="chat-msg-skeleton"><div class="chat-skeleton-line"></div></div>
+      </div>
+      <div class="chat-thread-readonly-note" aria-live="polite">${escapeHtml(t('chat.adminReadOnly'))}</div>
+    </div>
+  `;
+
+  document.getElementById('chatAdminThreadBack')?.addEventListener('click', () => {
+    document.body.classList.remove('chat-thread-open', 'chat-admin-thread-open');
+    page.querySelector('.chat-conv-item--admin')?.classList.remove('active');
+    resetMainPane(page);
+    if (chatState.tab === 'admin') {
+      main.innerHTML = `
+        <div class="chat-main-empty">
+          <div class="chat-main-empty-icon">📩</div>
+          <h2>${escapeHtml(t('chat.selectAdmin'))}</h2>
+          <p>${escapeHtml(t('chat.selectAdminSub'))}</p>
+        </div>
+      `;
+    }
+  });
+
+  try {
+    const { messages } = await fetchAdminData(true);
+    const box = document.getElementById('chatAdminMessages');
+    if (!messages.length) {
+      box.innerHTML = `<p class="chat-sidebar-empty">${escapeHtml(t('chat.noAdmin'))}</p>`;
+      return;
+    }
+
+    let lastDay = '';
+    box.innerHTML = messages
+      .map((m) => {
+        const d = new Date(m.createdAt);
+        const dayKey = d.toDateString();
+        let daySep = '';
+        if (dayKey !== lastDay) {
+          lastDay = dayKey;
+          const dayLabel = d.toLocaleDateString([], { weekday: 'short', day: 'numeric', month: 'short' });
+          daySep = `<div class="chat-day-sep"><span>${escapeHtml(dayLabel)}</span></div>`;
+        }
+        return `${daySep}
+        <div class="chat-msg-row chat-msg-row--theirs">
+          <div class="chat-msg-bubble chat-msg-bubble--admin">
+            <p>${escapeHtml(m.body)}</p>
+            <time class="chat-msg-time">${formatTime(m.createdAt)}</time>
+          </div>
+        </div>`;
+      })
+      .join('');
+    box.scrollTop = box.scrollHeight;
+
+    await api.markAdminMessagesRead();
+    adminCache.messages = messages.map((m) => ({ ...m, isRead: true, readAt: m.readAt || new Date().toISOString() }));
+    adminCache.unreadCount = 0;
+    adminCache.at = Date.now();
+    const adminPane = page.querySelector('[data-pane="admin"]');
+    if (adminPane) adminPane.innerHTML = renderAdminSidebar(adminCache.messages);
+    updateTabBadges(page, chatCache.incoming.length, chatCache.conversations.length, 0);
+    dismissAdminMessageBanner();
+    syncAdminMessageBanner();
+  } catch (err) {
+    document.getElementById('chatAdminMessages').innerHTML = `<p class="profile-status is-error">${escapeHtml(err.message)}</p>`;
+  }
 }
 
 function bindConversationActions(page) {

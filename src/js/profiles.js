@@ -1,6 +1,7 @@
 import { api } from './api.js';
-import { applyLanguageToRoot, getLang } from './i18n/index.js';
+import { applyLanguageToRoot, getLang, t } from './i18n/index.js';
 import { getProfile } from './storage.js';
+import { showEphemeralStrip } from './ui/ephemeralStrip.js';
 
 const BG_CLASSES = ['profile-img-bg-1', 'profile-img-bg-2', 'profile-img-bg-3'];
 
@@ -39,10 +40,15 @@ export function renderProfileCard(profile, index = 0, { guestMode = false, short
     ? ''
     : `<button type="button" class="profile-shortlist-btn${isListed ? ' is-shortlisted' : ''}" data-shortlist-toggle="${profile.id}" aria-label="Shortlist" title="Shortlist">♥</button>`;
 
+  const foundingStar = profile.isFoundingMember
+    ? `<button type="button" class="profile-founding-star" data-founding-star aria-label="Founding member" title="Founding member">★</button>`
+    : '';
+
   return `
     <article class="${cardClass}" ${guestMode ? '' : `data-profile-id="${profile.id}"`}>
       ${shortlistBtn}
       <div class="profile-img-wrap">
+        ${foundingStar}
         ${photoInner}
         ${profile.isOnline ? `<div class="profile-badge">${escapeHtml(onlineLabel)}</div>` : ''}
         ${profile.isVerified ? '<div class="profile-badge profile-badge-verified">✓ Verified</div>' : ''}
@@ -104,6 +110,14 @@ export async function loadFeaturedProfiles(shortlistedIds = null) {
 }
 
 export function initProfiles() {
+  document.addEventListener('click', (e) => {
+    const star = e.target.closest('[data-founding-star]');
+    if (!star) return;
+    e.preventDefault();
+    e.stopPropagation();
+    showEphemeralStrip(t('founding.stripMessage'), { variant: 'founding', durationMs: 10000 });
+  });
+
   document.addEventListener('click', async (e) => {
     const btn = e.target.closest('[data-shortlist-toggle]');
     if (!btn) return;

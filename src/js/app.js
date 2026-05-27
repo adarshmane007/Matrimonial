@@ -19,6 +19,7 @@ import { initQuoteRotators } from './quotes.js';
 import { loadTestimonials } from './testimonials.js';
 import { hasSession } from './storage.js';
 import { API_BASE } from './config.js';
+import { initAdminMessageBanner } from './ui/adminMessageBanner.js';
 
 function scheduleIdleWork(fn, timeoutMs = 2000) {
   if (typeof requestIdleCallback === 'function') {
@@ -54,6 +55,7 @@ async function bootstrap() {
   initProfiles();
   initSearch();
   initQuoteRotators();
+  initAdminMessageBanner();
 
   document.body.classList.add('app-bootstrapped');
 

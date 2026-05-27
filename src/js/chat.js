@@ -50,7 +50,7 @@ let chatState = { tab: 'chats', activeConversationId: null };
 let chatMounted = false;
 let chatBusy = false;
 let chatCache = { incoming: [], conversations: [], at: 0 };
-let adminCache = { messages: [], unreadCount: 0, at: 0 };
+let adminCache = { messages: [], unreadCount: 0, at: 0, loadError: null };
 
 const CACHE_MS = 12000;
 
@@ -117,7 +117,8 @@ function ensureChatMounted(page) {
       const tab = btn.dataset.chatTab;
       switchChatTab(tab, page);
       if (tab === 'admin') {
-        if (adminCache.messages.length) openAdminThread(page);
+        if (adminCache.loadError) showAdminEmptyMain(page);
+        else if (adminCache.messages.length) openAdminThread(page);
         else showAdminEmptyMain(page);
       }
     });
@@ -254,7 +255,14 @@ function renderConversations(list) {
     .join('')}</ul>`;
 }
 
-function renderAdminSidebar(messages) {
+function renderAdminSidebar(messages, loadError = null) {
+  if (loadError) {
+    const hint =
+      loadError instanceof ApiError && loadError.status === 404
+        ? t('chat.adminUnavailable')
+        : loadError.message || t('chat.adminUnavailable');
+    return `<p class="chat-sidebar-empty chat-sidebar-empty--muted">${escapeHtml(hint)}</p>`;
+  }
   if (!messages.length) {
     return `<p class="chat-sidebar-empty">${escapeHtml(t('chat.noAdmin'))}</p>`;
   }
@@ -275,13 +283,13 @@ function renderAdminSidebar(messages) {
   </ul>`;
 }
 
-function paintChatData(page, incoming, conversations, tab, adminMessages = []) {
+function paintChatData(page, incoming, conversations, tab, adminMessages = [], adminLoadError = null) {
   const reqPane = page.querySelector('[data-pane="requests"]');
   const chatPane = page.querySelector('[data-pane="chats"]');
   const adminPane = page.querySelector('[data-pane="admin"]');
   if (reqPane) reqPane.innerHTML = renderRequests(incoming);
   if (chatPane) chatPane.innerHTML = renderConversations(conversations);
-  if (adminPane) adminPane.innerHTML = renderAdminSidebar(adminMessages);
+  if (adminPane) adminPane.innerHTML = renderAdminSidebar(adminMessages, adminLoadError);
 
   const adminUnread = adminMessages.filter((m) => !m.isRead).length;
   updateTabBadges(page, incoming.length, conversations.length, adminUnread);
@@ -295,13 +303,23 @@ function paintChatData(page, incoming, conversations, tab, adminMessages = []) {
 async function fetchAdminData(force = false) {
   const now = Date.now();
   if (!force && adminCache.at && now - adminCache.at < CACHE_MS) {
-    return { messages: adminCache.messages, unreadCount: adminCache.unreadCount };
+    return {
+      messages: adminCache.messages,
+      unreadCount: adminCache.unreadCount,
+      loadError: adminCache.loadError,
+    };
   }
-  const res = await api.getAdminMessages(getLang());
-  const messages = res?.data?.messages || [];
-  const unreadCount = res?.data?.unreadCount ?? 0;
-  adminCache = { messages, unreadCount, at: now };
-  return { messages, unreadCount };
+  try {
+    const res = await api.getAdminMessages(getLang());
+    const messages = res?.data?.messages || [];
+    const unreadCount = res?.data?.unreadCount ?? 0;
+    adminCache = { messages, unreadCount, at: now, loadError: null };
+    return { messages, unreadCount, loadError: null };
+  } catch (err) {
+    console.warn('Admin messages:', err);
+    adminCache = { messages: [], unreadCount: 0, at: now, loadError: err };
+    return { messages: [], unreadCount: 0, loadError: err };
+  }
 }
 
 async function fetchChatData(force = false) {
@@ -340,16 +358,19 @@ export async function openChatPage(tab = 'chats', conversationId = null) {
   if (!useCache) setLoading(page, true);
 
   try {
-    const [{ incoming, conversations }, { messages: adminMessages }] = await Promise.all([
-      fetchChatData(!useCache),
-      fetchAdminData(!useCache),
-    ]);
-    paintChatData(page, incoming, conversations, tab, adminMessages);
+    const { incoming, conversations } = await fetchChatData(!useCache);
+    const { messages: adminMessages, loadError: adminLoadError } = await fetchAdminData(!useCache);
+    paintChatData(page, incoming, conversations, tab, adminMessages, adminLoadError);
     setLoading(page, false);
 
     if (tab === 'admin') {
-      if (adminMessages.length) openAdminThread(page);
-      else showAdminEmptyMain(page);
+      if (adminLoadError) {
+        showAdminEmptyMain(page);
+      } else if (adminMessages.length) {
+        openAdminThread(page);
+      } else {
+        showAdminEmptyMain(page);
+      }
     }
 
     if (conversationId) {
@@ -481,8 +502,16 @@ async function openAdminThread(page) {
   });
 
   try {
-    const { messages } = await fetchAdminData(true);
+    const { messages, loadError } = await fetchAdminData(true);
     const box = document.getElementById('chatAdminMessages');
+    if (loadError) {
+      box.innerHTML = `<p class="chat-sidebar-empty">${escapeHtml(
+        loadError instanceof ApiError && loadError.status === 404
+          ? t('chat.adminUnavailable')
+          : loadError.message || t('chat.adminUnavailable')
+      )}</p>`;
+      return;
+    }
     if (!messages.length) {
       box.innerHTML = `<p class="chat-sidebar-empty">${escapeHtml(t('chat.noAdmin'))}</p>`;
       return;
@@ -515,7 +544,9 @@ async function openAdminThread(page) {
     adminCache.unreadCount = 0;
     adminCache.at = Date.now();
     const adminPane = page.querySelector('[data-pane="admin"]');
-    if (adminPane) adminPane.innerHTML = renderAdminSidebar(adminCache.messages);
+    if (adminPane) {
+      adminPane.innerHTML = renderAdminSidebar(adminCache.messages, adminCache.loadError);
+    }
     updateTabBadges(page, chatCache.incoming.length, chatCache.conversations.length, 0);
     dismissAdminMessageBanner();
     syncAdminMessageBanner();

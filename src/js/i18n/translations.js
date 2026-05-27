@@ -222,6 +222,8 @@ export const translations = {
       'chat.adminFrom': 'Admin',
       'chat.selectAdmin': 'Admin messages',
       'chat.selectAdminSub': 'Read messages from the site admin. Replies are not available.',
+      'chat.adminUnavailable':
+        'Admin messages are not available yet. Deploy the latest backend, or use Requests and Chats as usual.',
       'admin.bannerText': 'Admin sent you a message',
       'admin.bannerOpen': 'View message',
       'founding.stripMessage':
@@ -579,6 +581,8 @@ export const translations = {
       'chat.adminFrom': 'प्रशासन',
       'chat.selectAdmin': 'प्रशासक संदेश',
       'chat.selectAdminSub': 'साइट प्रशासकाचे संदेश वाचा. उत्तर देणे शक्य नाही.',
+      'chat.adminUnavailable':
+        'प्रशासक संदेश अद्याप उपलब्ध नाहीत. नवीनतम बॅकएंड डिप्लॉय करा; विनंत्या आणि चॅट नेहमी वापरता येतील.',
       'admin.bannerText': 'प्रशासकाने तुम्हाला संदेश पाठवला आहे',
       'admin.bannerOpen': 'संदेश पहा',
       'founding.stripMessage':

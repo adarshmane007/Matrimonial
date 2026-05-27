@@ -11,6 +11,7 @@ export function showEphemeralStrip(text, { durationMs = 10000, variant = '' } = 
 
   textEl.textContent = text || '';
   strip.hidden = false;
+  document.body.classList.add('has-ephemeral-strip');
   requestAnimationFrame(() => strip.classList.add('ephemeral-strip--visible'));
 
   hideTimer = setTimeout(() => hideEphemeralStrip(), durationMs);
@@ -21,6 +22,7 @@ export function hideEphemeralStrip() {
   if (!strip) return;
   clearTimeout(hideTimer);
   strip.classList.remove('ephemeral-strip--visible');
+  document.body.classList.remove('has-ephemeral-strip');
   setTimeout(() => {
     if (!strip.classList.contains('ephemeral-strip--visible')) {
       strip.hidden = true;

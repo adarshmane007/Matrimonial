@@ -570,10 +570,10 @@
   body.on-main-site #site-main,
   body.on-main-site footer.site-footer { display: block; }
 
-  body.on-profile-page #site-main > *:not(#profile-page):not(nav):not(.mobile-bottom-nav):not(.mobile-more-sheet),
-  body.on-browse-page #site-main > *:not(#browse-page):not(nav):not(.mobile-bottom-nav):not(.mobile-more-sheet),
-  body.on-chat-page #site-main > *:not(#chat-page):not(nav):not(.mobile-bottom-nav):not(.mobile-more-sheet),
-  body.on-shortlist-page #site-main > *:not(#shortlist-page):not(nav):not(.mobile-bottom-nav):not(.mobile-more-sheet) { display: none !important; }
+  body.on-profile-page #site-main > *:not(#profile-page):not(#ephemeralStrip):not(nav):not(.mobile-bottom-nav):not(.mobile-more-sheet),
+  body.on-browse-page #site-main > *:not(#browse-page):not(#ephemeralStrip):not(nav):not(.mobile-bottom-nav):not(.mobile-more-sheet),
+  body.on-chat-page #site-main > *:not(#chat-page):not(#ephemeralStrip):not(nav):not(.mobile-bottom-nav):not(.mobile-more-sheet),
+  body.on-shortlist-page #site-main > *:not(#shortlist-page):not(#ephemeralStrip):not(nav):not(.mobile-bottom-nav):not(.mobile-more-sheet) { display: none !important; }
   body.on-profile-page footer.site-footer,
   body.on-browse-page footer.site-footer,
   body.on-chat-page footer.site-footer,
@@ -2653,7 +2653,7 @@
     top: var(--nav-h, 64px);
     left: 4%;
     right: 4%;
-    z-index: 5090;
+    z-index: 5200;
     max-width: 720px;
     margin: 0 auto;
     padding: 12px 16px;
@@ -2678,6 +2678,15 @@
     font-size: 14px;
     line-height: 1.5;
     text-align: center;
+  }
+
+  body.has-ephemeral-strip.on-browse-page #browse-page,
+  body.has-ephemeral-strip.on-shortlist-page #shortlist-page {
+    scroll-padding-top: 72px;
+  }
+  body.has-ephemeral-strip.on-browse-page #browse-page .browse-page-header,
+  body.has-ephemeral-strip.on-shortlist-page #shortlist-page .browse-page-header {
+    margin-top: 56px;
   }
 
   .profile-founding-star {
